@@ -22,7 +22,7 @@ public class RedisHandler extends JedisPubSub {
 	public void onMessage(final String channel, final String c_message) {
 		try {
 			//SERVER|USER|MESSAGE
-			final String[] split = c_message.split("\\|");
+			final String[] split = c_message.split("\\|", 3);
 			final String name = PlayerHelper.getFullPlayerName(split[1]);
 			String message = split[2];
 			if(message.length() > 4 && message.substring(0, 4).toLowerCase().equals("/me ")) {
