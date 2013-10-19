@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.Set;
 
 public class RedisManager {
-	static final JedisPool readJedisPool = createPool("arcticfox-mc.doridian.de");
+	static final JedisPool readJedisPool = createPool("mc.arcticfox.doridian.net");
 	private static final JedisPool[] writeJedisPools = new JedisPool[] { readJedisPool };
 
 	private static final String REDIS_PASSWORD = "SECRET";
