@@ -35,7 +35,7 @@ public class RedisHandler extends JedisPubSub {
 			} else if(message.length() > 6 && message.substring(0, 6).equals("\u0123kick ")) {
 				message = "\u00a74[-] \u00a7e" + name + "\u00a7e was kicked (" + message.substring(6) + ")!";
 			} else {
-				message = name + ":\u00a7f " + message;
+				message = name + "\u00a7f: " + message;
 			}
 			final Jedis jedis = RedisManager.readJedisPool.getResource();
 			//SERVER|USER|MESSAGE
