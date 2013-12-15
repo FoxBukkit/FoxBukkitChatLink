@@ -3,6 +3,16 @@
 	<groupId>de.doridian</groupId>
 	<artifactId>YiffBukkitChatLink</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
+	<properties>
+		<restart>false</restart>
+		<maven.deploy.skip>true</maven.deploy.skip>
+		<deployTargetUser>root</deployTargetUser>
+		<deployTargetHost>mc.arcticfox.doridian.net</deployTargetHost>
+		<deployTargetFolder>/home/minecraft/chat</deployTargetFolder>
+		<deployRestartCommand>/home/minecraft/chat/srv restart</deployRestartCommand>
+		<deployFileName>${project.name}.jar</deployFileName>
+		<deployKeyFile>${env.HOME}/.ssh/id_rsa</deployKeyFile>
+	</properties>
 	<build>
 		<plugins>
 			<plugin>
@@ -58,7 +68,66 @@
 					</execution>
 				</executions>
 			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>wagon-maven-plugin</artifactId>
+				<version>1.0-beta-4</version>
+				<executions>
+					<execution>
+						<id>deploy-jar</id>
+						<phase>deploy</phase>
+						<goals>
+							<goal>upload-single</goal>
+						</goals>
+						<configuration>
+							<serverId>arcticfox-mc</serverId>
+							<fromFile>${project.build.directory}/${project.build.finalName}.jar</fromFile>
+							<url>scpexe://${deployTargetUser}@${deployTargetHost}${deployTargetFolder}</url>
+							<toFile>${deployFileName}</toFile>
+						</configuration>
+					</execution>
+				</executions>
+				<dependencies>
+					<dependency>
+						<groupId>org.codehaus.plexus</groupId>
+						<artifactId>plexus-utils</artifactId>
+						<version>1.5.4</version>
+					</dependency>
+				</dependencies>
+			</plugin>
+			<plugin>
+				<groupId>com.github.goldin</groupId>
+				<artifactId>sshexec-maven-plugin</artifactId>
+				<version>0.2.5</version>
+				<executions>
+					<execution>
+						<id>restart-server</id>
+						<phase>deploy</phase>
+						<goals>
+							<goal>sshexec</goal>
+						</goals>
+						<configuration>
+							<runIf>{{ restart }}</runIf>
+							<keyfile>${deployKeyFile}</keyfile>
+							<location>scp://${deployTargetUser}:dummy@${deployTargetHost}:/</location>
+							<command>${deployRestartCommand}</command>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
+		<extensions>
+			<extension>
+				<groupId>org.apache.maven.wagon</groupId>
+				<artifactId>wagon-ssh-external</artifactId>
+				<version>2.4</version>
+			</extension>
+			<extension>
+				<groupId>org.apache.maven.wagon</groupId>
+				<artifactId>wagon-ssh</artifactId>
+				<version>2.4</version>
+			</extension>
+		</extensions>
 		<pluginManagement>
 			<plugins>
 				<!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
