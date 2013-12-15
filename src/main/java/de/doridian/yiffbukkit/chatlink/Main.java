@@ -7,5 +7,10 @@ public class Main {
 				new RedisHandler();
 			}
 		}.start();
+		new Thread() {
+			public void run() {
+				new XmlRedisHandler();
+			}
+		}.start();
 	}
 }
