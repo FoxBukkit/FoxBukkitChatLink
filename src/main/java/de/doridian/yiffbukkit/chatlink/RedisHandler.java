@@ -1,21 +1,10 @@
 package de.doridian.yiffbukkit.chatlink;
 
 import redis.clients.jedis.Jedis;
-import redis.clients.jedis.JedisPubSub;
 
-public class RedisHandler extends JedisPubSub {
-	private RedisHandler() {
+public class RedisHandler extends AbstractJedisPubSub {
+	public RedisHandler() {
 		RedisManager.readJedisPool.getResource().subscribe(this, "yiffbukkit:from_server");
-	}
-
-	private static RedisHandler handler;
-
-	public static void initialize() {
-		new Thread() {
-			public void run() {
-				handler = new RedisHandler();
-			}
-		}.start();
 	}
 
 	@Override
@@ -44,30 +33,5 @@ public class RedisHandler extends JedisPubSub {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-	}
-
-	@Override
-	public void onPMessage(String s, String s2, String s3) {
-
-	}
-
-	@Override
-	public void onSubscribe(String s, int i) {
-
-	}
-
-	@Override
-	public void onUnsubscribe(String s, int i) {
-
-	}
-
-	@Override
-	public void onPUnsubscribe(String s, int i) {
-
-	}
-
-	@Override
-	public void onPSubscribe(String s, int i) {
-
 	}
 }
