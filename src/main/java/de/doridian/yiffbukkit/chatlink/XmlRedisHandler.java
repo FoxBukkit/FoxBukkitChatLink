@@ -25,7 +25,7 @@ public class XmlRedisHandler extends AbstractJedisPubSub {
 
 			final String[] params = formatMessage(ply, message);
 
-			// SERVER\0 USER\0 format\0 param1\0 param2\0
+			// SERVER\0 USER\0 format\0 param1\0 param2
 			final List<String> strings = new ArrayList<>(Arrays.asList(server, ply.toLowerCase()));
 			strings.addAll(Arrays.asList(params));
 
@@ -84,9 +84,13 @@ public class XmlRedisHandler extends AbstractJedisPubSub {
 
 	private String serialize(List<String> strings) {
 		final StringBuilder sb = new StringBuilder();
+		boolean first = true;
 		for (String string : strings) {
+			if (!first) {
+				sb.append('\0');
+			}
+			first = false;
 			sb.append(string);
-			sb.append('\0');
 		}
 		return sb.toString();
 	}
