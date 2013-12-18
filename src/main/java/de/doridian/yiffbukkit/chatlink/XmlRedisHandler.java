@@ -12,6 +12,11 @@ public class XmlRedisHandler extends AbstractJedisPubSub {
 	}
 
 	private static final String PLAYER_FORMAT = "<span onClick=\"suggest_command('/pm %1$s ')\">%2$s</span>";
+	private static final String MESSAGE_FORMAT = PLAYER_FORMAT + "<color name=\"white\">: %3$s</color>";
+	private static final String KICK_FORMAT = "<color name=\"dark_red\">[-]</color> " + PLAYER_FORMAT + " <color name=\"yellow\">was kicked (%3$s)!</color>";
+	private static final String EMOTE_FORMAT = "* " + PLAYER_FORMAT + " <color name=\"gray\">%3$s</color>";
+	private static final String QUIT_FORMAT = "<color name=\"dark_red\">[-]</color> " + PLAYER_FORMAT + " <color name=\"yellow\">disconnected!</color>";
+	private static final String JOIN_FORMAT = "<color name=\"dark_green\">[+]</color> " + PLAYER_FORMAT + " <color name=\"yellow\">joined!</color>";
 
 	@Override
 	public void onMessage(final String channel, final String c_message) {
@@ -46,13 +51,13 @@ public class XmlRedisHandler extends AbstractJedisPubSub {
 				PlayerHelper.addCaseCorrect(ply);
 
 				return new String[] {
-						"<color name=\"dark_green\">[+]</color> " + PLAYER_FORMAT + " <color name=\"yellow\">joined!</color>",
+						JOIN_FORMAT,
 						ply, formattedName
 				};
 
 			case "\u0123quit":
 				return new String[] {
-						"<color name=\"dark_red\">[-]</color> " + PLAYER_FORMAT + " <color name=\"yellow\">disconnected!</color>",
+						QUIT_FORMAT,
 						ply, formattedName
 				};
 
@@ -61,7 +66,7 @@ public class XmlRedisHandler extends AbstractJedisPubSub {
 					final String param = message.substring(4);
 
 					return new String[] {
-							"* " + PLAYER_FORMAT + " <color name=\"gray\">%3$s</color>",
+							EMOTE_FORMAT,
 							ply, formattedName, param
 					};
 				}
@@ -69,13 +74,13 @@ public class XmlRedisHandler extends AbstractJedisPubSub {
 					final String param = message.substring(6);
 
 					return new String[] {
-							"<color name=\"dark_red\">[-]</color> " + PLAYER_FORMAT + " <color name=\"yellow\">was kicked (%3$s)!</color>",
+							KICK_FORMAT,
 							ply, formattedName, param
 					};
 				}
 				else {
 					return new String[] {
-							PLAYER_FORMAT + "<color name=\"white\">: %3$s</color>",
+							MESSAGE_FORMAT,
 							ply, formattedName, message
 					};
 				}
