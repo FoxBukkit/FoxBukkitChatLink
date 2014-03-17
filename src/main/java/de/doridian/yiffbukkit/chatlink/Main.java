@@ -4,6 +4,7 @@ import java.io.File;
 
 public class Main {
 	public static void main(String[] args) {
+		RedisManager.initialize();
 		new Thread() {
 			public void run() {
 				new RedisHandler();
