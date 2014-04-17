@@ -5,6 +5,7 @@ import redis.clients.jedis.Jedis;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 public class XmlRedisHandler extends AbstractJedisPubSub {
 	public XmlRedisHandler() {
@@ -21,17 +22,18 @@ public class XmlRedisHandler extends AbstractJedisPubSub {
 	@Override
 	public void onMessage(final String channel, final String c_message) {
 		try {
-			final String[] split = c_message.split("\\|", 3);
+			final String[] split = c_message.split("\\|", 4);
 
-			//SERVER|USER|MESSAGE
+			//SERVER|UUID|NAME|MESSAGE
 			final String server = split[0];
-			final String ply = split[1];
-			final String message = split[2];
+			final UUID plyU = UUID.fromString(split[1]);
+			final String plyN = split[2];
+			final String message = split[3];
 
-			final String[] params = formatMessage(ply, message);
+			final String[] params = formatMessage(plyU, plyN, message);
 
-			// SERVER\0 USER\0 format\0 param1\0 param2
-			final List<String> strings = new ArrayList<>(Arrays.asList(server, ply.toLowerCase()));
+			// SERVER\0 UUID\0 NAME\0 format\0 param1\0 param2
+			final List<String> strings = new ArrayList<>(Arrays.asList(server, plyU.toString(), plyN));
 			strings.addAll(Arrays.asList(params));
 
 			final Jedis jedis = RedisManager.readJedisPool.getResource();
@@ -43,22 +45,20 @@ public class XmlRedisHandler extends AbstractJedisPubSub {
 		}
 	}
 
-	private static String[] formatMessage(String ply, String message) {
-		final String formattedName = PlayerHelper.getFullPlayerName(ply);
+	private static String[] formatMessage(UUID plyU, String plyN, String message) {
+		final String formattedName = PlayerHelper.getFullPlayerName(plyU, plyN);
 
 		switch (message) {
 			case "\u0123join":
-				PlayerHelper.addCaseCorrect(ply);
-
 				return new String[] {
 						JOIN_FORMAT,
-						ply, formattedName
+						plyN, formattedName
 				};
 
 			case "\u0123quit":
 				return new String[] {
 						QUIT_FORMAT,
-						ply, formattedName
+						plyN, formattedName
 				};
 
 			default:
@@ -67,7 +67,7 @@ public class XmlRedisHandler extends AbstractJedisPubSub {
 
 					return new String[] {
 							EMOTE_FORMAT,
-							ply, formattedName, param
+							plyN, formattedName, param
 					};
 				}
 				else if (message.startsWith("\u0123kick ")) {
@@ -75,13 +75,13 @@ public class XmlRedisHandler extends AbstractJedisPubSub {
 
 					return new String[] {
 							KICK_FORMAT,
-							ply, formattedName, param
+							plyN, formattedName, param
 					};
 				}
 				else {
 					return new String[] {
 							MESSAGE_FORMAT,
-							ply, formattedName, message
+							plyN, formattedName, message
 					};
 				}
 		}

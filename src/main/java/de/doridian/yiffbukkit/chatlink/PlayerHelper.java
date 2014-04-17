@@ -1,6 +1,7 @@
 package de.doridian.yiffbukkit.chatlink;
 
 import java.util.Map;
+import java.util.UUID;
 
 public class PlayerHelper {
 	private static Map<String,String> rankTags = RedisManager.createKeptMap("ranktags");
@@ -8,11 +9,10 @@ public class PlayerHelper {
 	private static Map<String,String> playerRankTags = RedisManager.createKeptMap("playerRankTags");
 
 
-	private static String getPlayerRankTag(String name) {
-		name = name.toLowerCase();
-		final String rank = getPlayerRank(name).toLowerCase();
-		if (playerRankTags.containsKey(name))
-			return playerRankTags.get(name);
+	private static String getPlayerRankTag(UUID uuid) {
+		final String rank = getPlayerRank(uuid).toLowerCase();
+		if (playerRankTags.containsKey(uuid.toString()))
+			return playerRankTags.get(uuid.toString());
 
 		if (rankTags.containsKey(rank))
 			return rankTags.get(rank);
@@ -20,44 +20,36 @@ public class PlayerHelper {
 		return "\u00a77";
 	}
 
-	public static String getPlayerTag(String name) {
-		name = name.toLowerCase();
-		final String rankTag = getPlayerRankTag(name);
+	public static String getPlayerTag(UUID uuid) {
+		final String rankTag = getPlayerRankTag(uuid);
 
-		if (playerTags.containsKey(name))
-			return playerTags.get(name) + " " + rankTag;
+		if (playerTags.containsKey(uuid.toString()))
+			return playerTags.get(uuid.toString()) + " " + rankTag;
 
 		return rankTag;
 	}
 
-	private static Map<String,String> caseCorrectNames = RedisManager.createKeptMap("playercasecorret");
-	public static void addCaseCorrect(String name) {
-		caseCorrectNames.put(name.toLowerCase(), name);
-	}
-
 	private static Map<String,String> playernicks = RedisManager.createKeptMap("playernicks");
-	public static String getPlayerNick(String name) {
-		name = name.toLowerCase();
-		if(playernicks.containsKey(name))
-			return playernicks.get(name);
+	public static String getPlayerNick(UUID uuid) {
+		if(playernicks.containsKey(uuid.toString()))
+			return playernicks.get(uuid.toString());
 		else
 			return null;
 	}
 
 	private static Map<String,String> playerGroups = RedisManager.createKeptMap("playergroups");
-	public static String getPlayerRank(String name) {
-		final String rank = playerGroups.get(name.toLowerCase());
+	public static String getPlayerRank(UUID uuid) {
+		final String rank = playerGroups.get(uuid.toString());
 		if (rank == null)
 			return "guest";
 
 		return rank;
 	}
 
-	public static String getFullPlayerName(String ply) {
-		String nick = getPlayerNick(ply);
-		if(nick == null) {
-			nick = ply;
-		}
-		return getPlayerTag(ply) + nick;
+	public static String getFullPlayerName(UUID plyU, String plyN) {
+		String nick = getPlayerNick(plyU);
+		if(nick == null)
+			nick = plyN;
+		return getPlayerTag(plyU) + nick;
 	}
 }
