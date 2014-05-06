@@ -138,11 +138,7 @@ public class RedisManager {
 
 		@Override
 		public void clear() {
-			for(JedisPool writeJedisPool : writeJedisPools) {
-				Jedis jedis = writeJedisPool.getResource();
-				jedis.del(name);
-				writeJedisPool.returnResource(jedis);
-			}
+			throw new RuntimeException();
 		}
 	}
 
