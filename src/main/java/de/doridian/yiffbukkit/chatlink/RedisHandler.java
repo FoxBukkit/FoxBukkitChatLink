@@ -6,7 +6,14 @@ import java.util.UUID;
 
 public class RedisHandler extends AbstractJedisPubSub {
 	public RedisHandler() {
-		RedisManager.readJedisPool.getResource().subscribe(this, "yiffbukkit:from_server");
+		while(true) {
+			try {
+				Thread.sleep(1000);
+				RedisManager.readJedisPool.getResource().subscribe(this, "yiffbukkit:from_server");
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
 	}
 
 	@Override
