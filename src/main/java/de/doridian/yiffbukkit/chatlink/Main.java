@@ -5,32 +5,33 @@ import java.io.File;
 public class Main {
 	public static void main(String[] args) {
 		RedisManager.initialize();
-		new Thread() {
+		Thread t;
+		t = new Thread() {
 			public void run() {
 				new RedisHandler();
 			}
-		}.start();
-		new Thread() {
+		};
+		t.setDaemon(true);
+		t.start();
+		t = new Thread() {
 			public void run() {
 				new XmlRedisHandler();
 			}
-		}.start();
+		};
+		t.setDaemon(true);
+		t.start();
 
-		new Thread() {
-			public void run() {
-				while(true) {
-					try {
-						if(new File("YiffBukkitChatLink.jar.deploy").exists()) {
-							RedisManager.readJedisPool.destroy();
-							System.exit(0);
-							return;
-						}
-						Thread.sleep(5000);
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
+		while(true) {
+			try {
+				if(new File("YiffBukkitChatLink.jar.deploy").exists()) {
+					RedisManager.readJedisPool.destroy();
+					System.exit(0);
+					return;
 				}
+				Thread.sleep(5000);
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
-		}.start();
+		}
 	}
 }
