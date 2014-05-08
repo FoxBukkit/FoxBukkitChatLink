@@ -9,7 +9,14 @@ import java.util.UUID;
 
 public class XmlRedisHandler extends AbstractJedisPubSub {
 	public XmlRedisHandler() {
-		RedisManager.readJedisPool.getResource().subscribe(this, "yiffbukkit:from_server");
+		while(true) {
+			try {
+				Thread.sleep(1000);
+				RedisManager.readJedisPool.getResource().subscribe(this, "yiffbukkit:from_server");
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
 	}
 
 	private static final String PLAYER_FORMAT = "<span onClick=\"suggest_command('/pm %1$s ')\">%2$s</span>";
