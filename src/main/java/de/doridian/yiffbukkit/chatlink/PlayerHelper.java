@@ -4,9 +4,9 @@ import java.util.Map;
 import java.util.UUID;
 
 public class PlayerHelper {
-	private static Map<String,String> rankTags = RedisManager.createKeptMap("ranktags");
-	private static Map<String,String> playerTags = RedisManager.createKeptMap("playerTags");
-	private static Map<String,String> playerRankTags = RedisManager.createKeptMap("playerRankTags");
+	private static Map<String,String> rankTags = RedisManager.createCachedRedisMap("ranktags");
+	private static Map<String,String> playerTags = RedisManager.createCachedRedisMap("playerTags");
+	private static Map<String,String> playerRankTags = RedisManager.createCachedRedisMap("playerRankTags");
 
 
 	private static String getPlayerRankTag(UUID uuid) {
@@ -29,7 +29,7 @@ public class PlayerHelper {
 		return rankTag;
 	}
 
-	private static Map<String,String> playernicks = RedisManager.createKeptMap("playernicks");
+	private static Map<String,String> playernicks = RedisManager.createCachedRedisMap("playernicks");
 	public static String getPlayerNick(UUID uuid) {
 		if(playernicks.containsKey(uuid.toString()))
 			return playernicks.get(uuid.toString());
@@ -37,7 +37,7 @@ public class PlayerHelper {
 			return null;
 	}
 
-	private static Map<String,String> playerGroups = RedisManager.createKeptMap("playergroups");
+	private static Map<String,String> playerGroups = RedisManager.createCachedRedisMap("playergroups");
 	public static String getPlayerRank(UUID uuid) {
 		final String rank = playerGroups.get(uuid.toString());
 		if (rank == null)
