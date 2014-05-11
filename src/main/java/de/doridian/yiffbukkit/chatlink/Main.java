@@ -24,7 +24,6 @@ public class Main {
 		while(true) {
 			try {
 				if(new File("YiffBukkitChatLink.jar.deploy").exists()) {
-					RedisManager.readJedisPool.destroy();
 					System.exit(0);
 					return;
 				}
