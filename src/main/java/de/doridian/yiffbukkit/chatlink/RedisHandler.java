@@ -6,18 +6,14 @@ import java.util.UUID;
 
 public class RedisHandler extends AbstractJedisPubSub {
 	public RedisHandler() {
-		while(true) {
-            Jedis jedis = null;
+        while(true) {
             try {
                 Thread.sleep(1000);
-                jedis = RedisManager.readJedisPool.getResource();
-                jedis.subscribe(this, "yiffbukkit:from_server");
+                RedisManager.subscribe("yiffbukkit:from_server", this);
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            if(jedis != null)
-                RedisManager.readJedisPool.returnBrokenResource(jedis);
-		}
+        }
 	}
 
 	@Override
@@ -38,10 +34,8 @@ public class RedisHandler extends AbstractJedisPubSub {
 			} else {
 				message = name + "\u00a7f: " + message;
 			}
-			final Jedis jedis = RedisManager.readJedisPool.getResource();
 			//SERVER|USER|MESSAGE
-			jedis.publish("yiffbukkit:to_server", split[0]+"|"+split[1]+"|"+split[2]+"|"+message);
-			RedisManager.readJedisPool.returnResource(jedis);
+			RedisManager.publish("yiffbukkit:to_server", split[0]+"|"+split[1]+"|"+split[2]+"|"+message);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

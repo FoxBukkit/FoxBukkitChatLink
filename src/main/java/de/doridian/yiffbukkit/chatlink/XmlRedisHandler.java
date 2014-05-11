@@ -10,16 +10,12 @@ import java.util.UUID;
 public class XmlRedisHandler extends AbstractJedisPubSub {
 	public XmlRedisHandler() {
 		while(true) {
-            Jedis jedis = null;
             try {
                 Thread.sleep(1000);
-                jedis = RedisManager.readJedisPool.getResource();
-                jedis.subscribe(this, "yiffbukkit:from_server");
+                RedisManager.subscribe("yiffbukkit:from_server", this);
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            if(jedis != null)
-                RedisManager.readJedisPool.returnBrokenResource(jedis);
 		}
 	}
 
@@ -47,9 +43,7 @@ public class XmlRedisHandler extends AbstractJedisPubSub {
 			final List<String> strings = new ArrayList<>(Arrays.asList(server, plyU.toString(), plyN));
 			strings.addAll(Arrays.asList(params));
 
-			final Jedis jedis = RedisManager.readJedisPool.getResource();
-			jedis.publish("yiffbukkit:to_server_xml", serialize(strings));
-			RedisManager.readJedisPool.returnResource(jedis);
+			RedisManager.publish("yiffbukkit:to_server_xml", serialize(strings));
 		}
 		catch (Exception e) {
 			e.printStackTrace();
