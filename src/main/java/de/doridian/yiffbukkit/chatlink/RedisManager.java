@@ -22,7 +22,14 @@ public class RedisManager {
 	}
 
 	private static JedisPool createPool(String host) {
-		return new JedisPool(new JedisPoolConfig(), host, 6379, 20000, REDIS_PASSWORD, REDIS_DB);
+        JedisPoolConfig jedisPoolConfig = new JedisPoolConfig();
+        jedisPoolConfig.setMaxActive(500);
+        jedisPoolConfig.setMaxIdle(100);
+        jedisPoolConfig.setMaxWait(100);
+        jedisPoolConfig.setTestOnBorrow(true);
+        jedisPoolConfig.setTestOnReturn(true);
+        jedisPoolConfig.setTestWhileIdle(true);
+        return new JedisPool(jedisPoolConfig, host, 6379, 1000, REDIS_PASSWORD, REDIS_DB);
 	}
 
 	public static class RedisMap implements Map<String, String> {

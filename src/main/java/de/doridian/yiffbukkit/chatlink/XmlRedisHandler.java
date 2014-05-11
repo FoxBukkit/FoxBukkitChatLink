@@ -10,12 +10,16 @@ import java.util.UUID;
 public class XmlRedisHandler extends AbstractJedisPubSub {
 	public XmlRedisHandler() {
 		while(true) {
-			try {
-				Thread.sleep(1000);
-				RedisManager.readJedisPool.getResource().subscribe(this, "yiffbukkit:from_server");
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
+            Jedis jedis = null;
+            try {
+                Thread.sleep(1000);
+                jedis = RedisManager.readJedisPool.getResource();
+                jedis.subscribe(this, "yiffbukkit:from_server");
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            if(jedis != null)
+                RedisManager.readJedisPool.returnBrokenResource(jedis);
 		}
 	}
 
