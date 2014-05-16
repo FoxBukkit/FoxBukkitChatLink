@@ -22,9 +22,9 @@ public class RedisManager {
 
     private static JedisPool createPool(String host) {
         JedisPoolConfig jedisPoolConfig = new JedisPoolConfig();
-        jedisPoolConfig.setMaxActive(500);
+        jedisPoolConfig.setMaxTotal(500);
         jedisPoolConfig.setMaxIdle(100);
-        jedisPoolConfig.setMaxWait(100);
+        jedisPoolConfig.setMaxWaitMillis(1000);
         jedisPoolConfig.setTestOnBorrow(true);
         jedisPoolConfig.setTestOnReturn(true);
         jedisPoolConfig.setTestWhileIdle(true);

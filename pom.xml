@@ -3,35 +3,11 @@
 	<groupId>de.doridian</groupId>
 	<artifactId>YiffBukkitChatLink</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<properties>
-		<restart>false</restart>
-		<maven.deploy.skip>true</maven.deploy.skip>
-		<deployTargetUser>root</deployTargetUser>
-		<deployTargetHost>mc.arcticfox.doridian.net</deployTargetHost>
-		<deployTargetFolder>/home/minecraft/chat</deployTargetFolder>
-		<deployRestartCommand>/home/minecraft/chat/srv restart</deployRestartCommand>
-		<deployFileName>${project.name}.jar</deployFileName>
-		<deployKeyFile>${env.HOME}/.ssh/id_rsa</deployKeyFile>
-	</properties>
 	<build>
 		<plugins>
 			<plugin>
-				<groupId>org.zeroturnaround</groupId>
-				<artifactId>javarebel-maven-plugin</artifactId>
-				<version>1.0.5</version>
-				<executions>
-					<execution>
-						<id>generate-rebel-xml</id>
-						<phase>process-resources</phase>
-						<goals>
-							<goal>generate</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>2.3.2</version>
+				<version>3.1</version>
 				<configuration>
 					<source>1.7</source>
 					<target>1.7</target>
@@ -41,11 +17,11 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-shade-plugin</artifactId>
-				<version>2.0</version>
+				<version>2.3</version>
 				<executions>
 					<execution>
 						<configuration>
-							<minimizeJar>true</minimizeJar>
+							<minimizeJar>false</minimizeJar>
 							<filters>
 								<filter>
 									<artifact>*:*</artifact>
@@ -68,108 +44,20 @@
 					</execution>
 				</executions>
 			</plugin>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>wagon-maven-plugin</artifactId>
-				<version>1.0-beta-4</version>
-				<executions>
-					<execution>
-						<id>deploy-jar</id>
-						<phase>deploy</phase>
-						<goals>
-							<goal>upload-single</goal>
-						</goals>
-						<configuration>
-							<serverId>arcticfox-mc</serverId>
-							<fromFile>${project.build.directory}/${project.build.finalName}.jar</fromFile>
-							<url>scpexe://${deployTargetUser}@${deployTargetHost}${deployTargetFolder}</url>
-							<toFile>${deployFileName}</toFile>
-						</configuration>
-					</execution>
-				</executions>
-				<dependencies>
-					<dependency>
-						<groupId>org.codehaus.plexus</groupId>
-						<artifactId>plexus-utils</artifactId>
-						<version>1.5.4</version>
-					</dependency>
-				</dependencies>
-			</plugin>
-			<plugin>
-				<groupId>com.github.goldin</groupId>
-				<artifactId>sshexec-maven-plugin</artifactId>
-				<version>0.2.5</version>
-				<executions>
-					<execution>
-						<id>restart-server</id>
-						<phase>deploy</phase>
-						<goals>
-							<goal>sshexec</goal>
-						</goals>
-						<configuration>
-							<runIf>{{ restart }}</runIf>
-							<keyfile>${deployKeyFile}</keyfile>
-							<location>scp://${deployTargetUser}:dummy@${deployTargetHost}:/</location>
-							<command>${deployRestartCommand}</command>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
 		</plugins>
-		<extensions>
-			<extension>
-				<groupId>org.apache.maven.wagon</groupId>
-				<artifactId>wagon-ssh-external</artifactId>
-				<version>2.4</version>
-			</extension>
-			<extension>
-				<groupId>org.apache.maven.wagon</groupId>
-				<artifactId>wagon-ssh</artifactId>
-				<version>2.4</version>
-			</extension>
-		</extensions>
-		<pluginManagement>
-			<plugins>
-				<!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
-				<plugin>
-					<groupId>org.eclipse.m2e</groupId>
-					<artifactId>lifecycle-mapping</artifactId>
-					<version>1.0.0</version>
-					<configuration>
-						<lifecycleMappingMetadata>
-							<pluginExecutions>
-								<pluginExecution>
-									<pluginExecutionFilter>
-										<groupId>
-											org.zeroturnaround
-										</groupId>
-										<artifactId>
-											javarebel-maven-plugin
-										</artifactId>
-										<versionRange>
-											[1.0.5,)
-										</versionRange>
-										<goals>
-											<goal>generate</goal>
-										</goals>
-									</pluginExecutionFilter>
-									<action>
-										<ignore></ignore>
-									</action>
-								</pluginExecution>
-							</pluginExecutions>
-						</lifecycleMappingMetadata>
-					</configuration>
-				</plugin>
-			</plugins>
-		</pluginManagement>
 	</build>
 	<dependencies>
 		<dependency>
 			<groupId>redis.clients</groupId>
 			<artifactId>jedis</artifactId>
-			<version>2.1.0</version>
+			<version>2.4.2</version>
 			<type>jar</type>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.directory.studio</groupId>
+			<artifactId>org.apache.commons.pool</artifactId>
+			<version>1.6</version>
 			<scope>compile</scope>
 		</dependency>
 	</dependencies>
@@ -187,11 +75,4 @@
 			<url>http://mvn2.sk89q.com/repo</url>
 		</repository>
 	</repositories>
-	<pluginRepositories>
-		<pluginRepository>
-			<id>zt-repo</id>
-			<name>Zero turnaround repo</name>
-			<url>dav:http://repos.zeroturnaround.com/maven2</url>
-		</pluginRepository>
-	</pluginRepositories>
 </project>
