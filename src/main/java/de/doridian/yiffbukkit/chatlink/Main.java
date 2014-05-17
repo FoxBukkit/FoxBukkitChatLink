@@ -33,4 +33,8 @@ public class Main {
 			}
 		}
 	}
+
+    public static File getDataFolder() {
+        return new File(".");
+    }
 }

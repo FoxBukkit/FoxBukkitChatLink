@@ -15,9 +15,9 @@ public class RedisManager {
     private static int REDIS_DB;
 
     public static void initialize() {
-        REDIS_PASSWORD = Configuration.getValue("redis-pw", "");
+        REDIS_PASSWORD = Configuration.getValue("redis-pw", "password");
         REDIS_DB = Integer.parseInt(Configuration.getValue("redis-db", "1"));
-        jedisPool = createPool(Configuration.getValue("redis-host", ""));
+        jedisPool = createPool(Configuration.getValue("redis-host", "localhost"));
     }
 
     private static JedisPool createPool(String host) {
