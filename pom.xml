@@ -69,18 +69,4 @@
 			<scope>compile</scope>
 		</dependency>
 	</dependencies>
-	<repositories>
-		<repository>
-			<id>spout-repo</id>
-			<url>http://repo.spout.org</url>
-		</repository>
-		<repository>
-			<id>mikeprimm-repo</id>
-			<url>http://repo.mikeprimm.com</url>
-		</repository>
-		<repository>
-			<id>sk89q-repo</id>
-			<url>http://mvn2.sk89q.com/repo</url>
-		</repository>
-	</repositories>
 </project>
