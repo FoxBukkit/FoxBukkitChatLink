@@ -1,5 +1,7 @@
 package de.doridian.yiffbukkit.chatlink;
 
+import de.doridian.dependencies.redis.AbstractRedisHandler;
+import de.doridian.dependencies.redis.RedisManager;
 import redis.clients.jedis.Jedis;
 
 import java.util.ArrayList;
@@ -7,17 +9,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
-public class XmlRedisHandler extends AbstractJedisPubSub {
-	public XmlRedisHandler() {
-		while(true) {
-            try {
-                Thread.sleep(1000);
-                RedisManager.subscribe("yiffbukkit:from_server", this);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-		}
-	}
+public class XmlRedisHandler extends AbstractRedisHandler {
+    public XmlRedisHandler() {
+        super("yiffbukkit:from_server");
+    }
 
 	private static final String PLAYER_FORMAT = "<span onClick=\"suggest_command('/pm %1$s ')\">%2$s</span>";
 	private static final String MESSAGE_FORMAT = PLAYER_FORMAT + "<color name=\"white\">: %3$s</color>";
@@ -27,7 +22,7 @@ public class XmlRedisHandler extends AbstractJedisPubSub {
 	private static final String JOIN_FORMAT = "<color name=\"dark_green\">[+]</color> " + PLAYER_FORMAT + " <color name=\"yellow\">joined!</color>";
 
 	@Override
-	public void onMessage(final String channel, final String c_message) {
+	public void onMessage(final String c_message) {
 		try {
 			final String[] split = c_message.split("\\|", 4);
 

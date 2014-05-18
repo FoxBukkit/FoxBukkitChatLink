@@ -1,10 +1,16 @@
 package de.doridian.yiffbukkit.chatlink;
 
+import de.doridian.dependencies.config.Configuration;
+import de.doridian.dependencies.redis.RedisManager;
+
 import java.io.File;
 
 public class Main {
+    public static Configuration configuration;
+
 	public static void main(String[] args) {
-		RedisManager.initialize();
+        configuration = new Configuration(getDataFolder());
+		RedisManager.initialize(configuration);
 		Thread t;
 		t = new Thread() {
 			public void run() {

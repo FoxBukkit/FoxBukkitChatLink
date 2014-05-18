@@ -1,23 +1,18 @@
 package de.doridian.yiffbukkit.chatlink;
 
+import de.doridian.dependencies.redis.AbstractRedisHandler;
+import de.doridian.dependencies.redis.RedisManager;
 import redis.clients.jedis.Jedis;
 
 import java.util.UUID;
 
-public class RedisHandler extends AbstractJedisPubSub {
-	public RedisHandler() {
-        while(true) {
-            try {
-                Thread.sleep(1000);
-                RedisManager.subscribe("yiffbukkit:from_server", this);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-	}
+public class RedisHandler extends AbstractRedisHandler {
+    public RedisHandler() {
+        super("yiffbukkit:from_server");
+    }
 
-	@Override
-	public void onMessage(final String channel, final String c_message) {
+    @Override
+	public void onMessage(final String c_message) {
 		try {
 			//SERVER|USER|MESSAGE
 			final String[] split = c_message.split("\\|", 4);
@@ -35,7 +30,7 @@ public class RedisHandler extends AbstractJedisPubSub {
 				message = name + "\u00a7f: " + message;
 			}
 			//SERVER|USER|MESSAGE
-			RedisManager.publish("yiffbukkit:to_server", split[0]+"|"+split[1]+"|"+split[2]+"|"+message);
+			RedisManager.publish("yiffbukkit:to_server", split[0] + "|" + split[1] + "|" + split[2] + "|" + message);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

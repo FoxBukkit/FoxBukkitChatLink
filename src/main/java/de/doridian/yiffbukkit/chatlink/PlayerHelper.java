@@ -1,5 +1,7 @@
 package de.doridian.yiffbukkit.chatlink;
 
+import de.doridian.dependencies.redis.RedisManager;
+
 import java.util.Map;
 import java.util.UUID;
 
