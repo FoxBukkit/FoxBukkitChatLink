@@ -167,6 +167,8 @@ public class RedisManager {
     }
 
     public static void subscribe(String key, JedisPubSub listener) throws Exception {
+        if(jedisPool == null)
+            return;
         Jedis jedis = null;
         try {
             jedis = jedisPool.getResource();

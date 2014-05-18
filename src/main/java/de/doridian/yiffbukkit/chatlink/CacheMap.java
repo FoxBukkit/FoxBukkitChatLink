@@ -43,8 +43,6 @@ public class CacheMap implements Map<String, String> {
 
         this.jedisPubSubListener = new JedisPubSubListener();
 
-        final CacheMap _this = this;
-
         Thread cleanupThread = new Thread() {
             @Override
             public void run() {
