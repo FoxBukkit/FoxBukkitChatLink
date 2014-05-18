@@ -11,21 +11,9 @@ public class Main {
 	public static void main(String[] args) {
         configuration = new Configuration(getDataFolder());
 		RedisManager.initialize(configuration);
-		Thread t;
-		t = new Thread() {
-			public void run() {
-				new RedisHandler();
-			}
-		};
-		t.setDaemon(true);
-		t.start();
-		t = new Thread() {
-			public void run() {
-				new XmlRedisHandler();
-			}
-		};
-		t.setDaemon(true);
-		t.start();
+
+		new RedisHandler();
+        new XmlRedisHandler();
 
 		while(true) {
 			try {
