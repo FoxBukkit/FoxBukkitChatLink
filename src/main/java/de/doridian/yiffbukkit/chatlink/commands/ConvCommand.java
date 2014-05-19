@@ -57,10 +57,10 @@ public class ConvCommand extends ICommand {
         if(args.length > 0 && !args[0].isEmpty()) {
             Player target = PlayerHelper.matchPlayerSingle(args[0]);
             conversationMap.put(message.from.uuid, target.uuid);
-            message.contents = new MessageContents("\u00a7d[YBCL] \u00a7fStarted conversation with " + target.name);
+            message.contents = new MessageContents("\u00a75[YBCL] \u00a7fStarted conversation with " + target.name);
         } else {
             conversationMap.remove(message.from.uuid);
-            message.contents = new MessageContents("\u00a7d[YBCL] \u00a7fClosed conversation");
+            message.contents = new MessageContents("\u00a75[YBCL] \u00a7fClosed conversation");
         }
         return message;
     }
