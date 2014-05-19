@@ -60,7 +60,7 @@ public class ConvCommand extends ICommand {
             message.contents = new MessageContents("\u00a7d[YBCL] \u00a7fStarted conversation with " + target.name);
         } else {
             conversationMap.remove(message.from.uuid);
-            message.contents = new MessageContents("\u00a7d[YBCL] \u00a7Closed conversation");
+            message.contents = new MessageContents("\u00a7d[YBCL] \u00a7fClosed conversation");
         }
         return message;
     }
