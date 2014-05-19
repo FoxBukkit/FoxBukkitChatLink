@@ -148,6 +148,9 @@ public class RedisHandler extends AbstractRedisHandler {
                     );
 				}
 				else {
+                    if(ConvCommand.handleConvMessage(message, formattedName, messageStr, false))
+                        return null;
+
                     return runFormatAndStore(message,
                             MESSAGE_FORMAT,
                             new String[] {
