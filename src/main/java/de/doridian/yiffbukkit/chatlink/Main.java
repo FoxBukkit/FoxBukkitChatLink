@@ -13,7 +13,6 @@ public class Main {
 		RedisManager.initialize(configuration);
 
 		new RedisHandler();
-        new XmlRedisHandler();
 
 		while(true) {
 			try {
