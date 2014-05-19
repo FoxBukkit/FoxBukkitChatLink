@@ -10,8 +10,8 @@ import de.doridian.yiffbukkit.chatlink.util.PlayerHelper;
 import de.doridian.yiffbukkit.chatlink.util.Utils;
 
 public class PMCommand extends ICommand {
-    private static final String PM_SEND_FORMAT = "<color name=\"yellow\">[PM >]</color> " + RedisHandler.MESSAGE_FORMAT;
-    private static final String PM_RECEIVE_FORMAT = "<color name=\"yellow\">[PM <]</color> " + RedisHandler.MESSAGE_FORMAT;
+    private static final String PM_SEND_FORMAT = "<color name=\"yellow\">[PM &gt;]</color> " + RedisHandler.MESSAGE_FORMAT;
+    private static final String PM_RECEIVE_FORMAT = "<color name=\"yellow\">[PM &lt;]</color> " + RedisHandler.MESSAGE_FORMAT;
 
     @Override
     public String[] getNames() {
