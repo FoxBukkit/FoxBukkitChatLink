@@ -3,10 +3,7 @@ package de.doridian.yiffbukkit.chatlink;
 import com.google.gson.Gson;
 import de.doridian.dependencies.redis.AbstractRedisHandler;
 import de.doridian.dependencies.redis.RedisManager;
-import de.doridian.yiffbukkit.chatlink.commands.ConvCommand;
-import de.doridian.yiffbukkit.chatlink.commands.ICommand;
-import de.doridian.yiffbukkit.chatlink.commands.MeCommand;
-import de.doridian.yiffbukkit.chatlink.commands.PMCommand;
+import de.doridian.yiffbukkit.chatlink.commands.*;
 import de.doridian.yiffbukkit.chatlink.json.ChatMessage;
 import de.doridian.yiffbukkit.chatlink.json.MessageContents;
 import de.doridian.yiffbukkit.chatlink.json.UserInfo;
@@ -36,6 +33,7 @@ public class RedisHandler extends AbstractRedisHandler {
         __addCommand(new MeCommand());
         __addCommand(new ConvCommand());
         __addCommand(new PMCommand());
+        __addCommand(new OpChatCommand());
     }
 
     private static void __addCommand(ICommand command) {
