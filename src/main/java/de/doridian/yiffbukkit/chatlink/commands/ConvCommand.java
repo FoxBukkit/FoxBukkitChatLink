@@ -52,6 +52,8 @@ public class ConvCommand extends ICommand {
 
     @Override
     public ChatMessage run(ChatMessage message, String formattedName, String[] args) throws CommandException {
+        message.to.type = "player";
+        message.to.filter = new String[] { message.from.uuid.toString() };
         if(args.length > 0 && !args[0].isEmpty()) {
             Player target = PlayerHelper.matchPlayerSingle(args[0]);
             conversationMap.put(message.from.uuid, target.uuid);
