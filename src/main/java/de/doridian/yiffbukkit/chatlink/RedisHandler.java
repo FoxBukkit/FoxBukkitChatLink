@@ -103,13 +103,13 @@ public class RedisHandler extends AbstractRedisHandler {
 
 			default:
 				if (messageStr.charAt(0) == '/') {
-                    messageStr = messageStr.trim();
+                    messageStr = messageStr.substring(1).trim();
                     int argPos = messageStr.indexOf(' ');
                     final String argStr;
                     final String commandName;
                     if(argPos > 0) {
                         argStr = messageStr.substring(argPos + 1);
-                        commandName = messageStr.substring(1, argPos);
+                        commandName = messageStr.substring(0, argPos);
                     } else {
                         argStr = "";
                         commandName = messageStr;
