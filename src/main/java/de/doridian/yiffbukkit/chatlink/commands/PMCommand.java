@@ -23,7 +23,7 @@ public class PMCommand extends ICommand {
         final String messageText = Utils.concatArray(args, 1, "");
         final Player target = PlayerHelper.matchPlayerSingle(args[0]);
 
-        message.contents = new MessageContents("\u00a7f* " + formattedName + "\u00a77 " + messageText,
+        message.contents = new MessageContents("\u00a7e[PM <] \u00a7f" + formattedName + ": " + messageText,
                 PM_RECEIVE_FORMAT,
                 new String[] {
                         message.from.name, formattedName, messageText
@@ -31,10 +31,11 @@ public class PMCommand extends ICommand {
         message.to = new MessageTarget("player", new String[] { target.uuid.toString() });
         RedisHandler.sendMessage(message);
 
-        message.contents = new MessageContents("\u00a7f* " + formattedName + "\u00a77 " + messageText,
+        formattedName = PlayerHelper.getFullPlayerName(target.uuid, target.name);
+        message.contents = new MessageContents("\u00a7e[PM >] \u00a7f" + formattedName + ": " + messageText,
                 PM_SEND_FORMAT,
                 new String[] {
-                        target.name, PlayerHelper.getFullPlayerName(target.uuid, target.name), messageText
+                        target.name, formattedName, messageText
                 });
         message.to = new MessageTarget("player", new String[] { message.from.uuid.toString() });
         message.from.uuid = target.uuid;
