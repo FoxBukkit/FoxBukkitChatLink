@@ -1,6 +1,7 @@
 package de.doridian.yiffbukkit.chatlink.util;
 
 import de.doridian.dependencies.redis.RedisManager;
+import de.doridian.yiffbukkit.chatlink.Main;
 import de.doridian.yiffbukkit.chatlink.Player;
 
 import java.util.ArrayList;
@@ -11,9 +12,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class PlayerHelper {
-	private static Map<String,String> rankTags = RedisManager.createCachedRedisMap("ranktags");
-	private static Map<String,String> playerTags = RedisManager.createCachedRedisMap("playerTags");
-	private static Map<String,String> playerRankTags = RedisManager.createCachedRedisMap("playerRankTags");
+	private static Map<String,String> rankTags = Main.redisManager.createCachedRedisMap("ranktags");
+	private static Map<String,String> playerTags = Main.redisManager.createCachedRedisMap("playerTags");
+	private static Map<String,String> playerRankTags = Main.redisManager.createCachedRedisMap("playerRankTags");
 
 
 	private static String getPlayerRankTag(UUID uuid) {
@@ -36,7 +37,7 @@ public class PlayerHelper {
 		return rankTag;
 	}
 
-	private static Map<String,String> playernicks = RedisManager.createCachedRedisMap("playernicks");
+	private static Map<String,String> playernicks = Main.redisManager.createCachedRedisMap("playernicks");
 	public static String getPlayerNick(UUID uuid) {
 		if(playernicks.containsKey(uuid.toString()))
 			return playernicks.get(uuid.toString());
@@ -44,7 +45,7 @@ public class PlayerHelper {
 			return null;
 	}
 
-	private static Map<String,String> playerGroups = RedisManager.createCachedRedisMap("playergroups");
+	private static Map<String,String> playerGroups = Main.redisManager.createCachedRedisMap("playergroups");
 	public static String getPlayerRank(UUID uuid) {
 		final String rank = playerGroups.get(uuid.toString());
 		if (rank == null)
@@ -60,8 +61,8 @@ public class PlayerHelper {
 		return getPlayerTag(plyU) + nick;
 	}
 
-    public static Map<String,String> playerNameToUUID = RedisManager.createCachedRedisMap("playerNameToUUID");
-    public static Map<String,String> playerUUIDToName = RedisManager.createCachedRedisMap("playerUUIDToName");
+    public static Map<String,String> playerNameToUUID = Main.redisManager.createCachedRedisMap("playerNameToUUID");
+    public static Map<String,String> playerUUIDToName = Main.redisManager.createCachedRedisMap("playerUUIDToName");
 
     public static Player literalMatch(String name) {
         return new Player(UUID.fromString(playerNameToUUID.get(name)),name);
@@ -90,7 +91,7 @@ public class PlayerHelper {
     }
 
     public static List<Player> getOnlinePlayersOnServer(String name) {
-        final List<String> onlineUUIDs = RedisManager.lrange("playersOnline:" + name, 0, -1);
+        final List<String> onlineUUIDs = Main.redisManager.lrange("playersOnline:" + name, 0, -1);
         final List<Player> onlinePlayers = new ArrayList<>();
         if(onlineUUIDs == null)
             return onlinePlayers;
@@ -100,7 +101,7 @@ public class PlayerHelper {
     }
 
     public static List<String> getAllServers() {
-        return RedisManager.lrange("activeServers", 0, -1);
+        return Main.redisManager.lrange("activeServers", 0, -1);
     }
 
     public static List<Player> getOnlinePlayersOnAllServers() {

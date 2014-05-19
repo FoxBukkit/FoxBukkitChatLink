@@ -8,9 +8,11 @@ import java.io.File;
 public class Main {
     public static Configuration configuration;
 
+    public static RedisManager redisManager;
+
 	public static void main(String[] args) {
         configuration = new Configuration(getDataFolder());
-		RedisManager.initialize(configuration);
+        redisManager = new RedisManager(configuration);
 
 		new RedisHandler();
 

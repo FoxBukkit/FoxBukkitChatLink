@@ -15,7 +15,7 @@ import java.util.*;
 
 public class RedisHandler extends AbstractRedisHandler {
     public RedisHandler() {
-        super("yiffbukkit:from_server");
+        super(Main.redisManager, "yiffbukkit:from_server");
     }
 
 	public static final String PLAYER_FORMAT = "<span onClick=\"suggest_command('/pm %1$s ')\">%2$s</span>";
@@ -68,7 +68,7 @@ public class RedisHandler extends AbstractRedisHandler {
         synchronized (gson) {
             outMsg = gson.toJson(message);
         }
-        RedisManager.publish("yiffbukkit:to_server", outMsg);
+        Main.redisManager.publish("yiffbukkit:to_server", outMsg);
     }
 
     private static ChatMessage runFormatAndStore(ChatMessage message, String format, String[] formatArgs, String plain) {
