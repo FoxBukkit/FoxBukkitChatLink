@@ -132,7 +132,7 @@ public class RedisHandler extends AbstractRedisHandler {
                             new String[] {
                                     plyN, formattedName, messageStr
                             },
-                            formattedName + "\u00a7f: " + message
+                            formattedName + "\u00a7f: " + messageStr
                     );
 				}
 		}
