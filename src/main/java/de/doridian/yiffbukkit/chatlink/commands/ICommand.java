@@ -5,7 +5,7 @@ import de.doridian.yiffbukkit.chatlink.util.CommandException;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 public abstract class ICommand {
-    public abstract String getName();
+    public abstract String[] getNames();
 
     public ChatMessage run(ChatMessage message, String formattedName, String[] args) throws CommandException {
         throw new CommandException("Not implemented");

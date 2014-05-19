@@ -35,7 +35,8 @@ public class RedisHandler extends AbstractRedisHandler {
     }
 
     private static void __addCommand(ICommand command) {
-        commandMap.put(command.getName().toLowerCase(), command);
+        for(String name : command.getNames())
+            commandMap.put(name.toLowerCase(), command);
     }
 
 	@Override

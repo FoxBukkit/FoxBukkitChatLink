@@ -8,8 +8,8 @@ public class MeCommand extends ICommand {
     private static final String EMOTE_FORMAT = "* " + RedisHandler.PLAYER_FORMAT + " <color name=\"gray\">%3$s</color>";
 
     @Override
-    public String getName() {
-        return "me";
+    public String[] getNames() {
+        return new String[] { "me", "emote" };
     }
 
     @Override

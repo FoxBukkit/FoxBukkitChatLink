@@ -14,8 +14,8 @@ public class PMCommand extends ICommand {
     private static final String PM_RECEIVE_FORMAT = "<color name=\"yellow\">[PM <]</color> " + RedisHandler.MESSAGE_FORMAT;
 
     @Override
-    public String getName() {
-        return "pm";
+    public String[] getNames() {
+        return new String[] { "pm", "msg", "tell" };
     }
 
     @Override
