@@ -19,4 +19,22 @@ public class Player {
         final String nick = PlayerHelper.getPlayerNick(uuid);
         this.displayName = (nick != null) ? nick : name;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || !(o instanceof Player))
+            return false;
+        Player player = (Player) o;
+        return displayName.equals(player.displayName) && name.equals(player.name) && uuid.equals(player.uuid);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = uuid.hashCode();
+        result = 31 * result + name.hashCode();
+        result = 31 * result + displayName.hashCode();
+        return result;
+    }
 }
