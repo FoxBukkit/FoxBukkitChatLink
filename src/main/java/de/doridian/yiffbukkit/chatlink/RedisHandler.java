@@ -8,6 +8,9 @@ import de.doridian.yiffbukkit.chatlink.commands.MeCommand;
 import de.doridian.yiffbukkit.chatlink.json.ChatMessage;
 import de.doridian.yiffbukkit.chatlink.json.MessageContents;
 import de.doridian.yiffbukkit.chatlink.json.UserInfo;
+import de.doridian.yiffbukkit.chatlink.util.CommandException;
+import de.doridian.yiffbukkit.chatlink.util.PlayerHelper;
+import redis.clients.jedis.Protocol;
 
 import java.util.*;
 
@@ -17,10 +20,10 @@ public class RedisHandler extends AbstractRedisHandler {
     }
 
 	public static final String PLAYER_FORMAT = "<span onClick=\"suggest_command('/pm %1$s ')\">%2$s</span>";
-	private static final String MESSAGE_FORMAT = PLAYER_FORMAT + "<color name=\"white\">: %3$s</color>";
-	private static final String KICK_FORMAT = "<color name=\"dark_red\">[-]</color> " + PLAYER_FORMAT + " <color name=\"yellow\">was kicked (%3$s)!</color>";
-	private static final String QUIT_FORMAT = "<color name=\"dark_red\">[-]</color> " + PLAYER_FORMAT + " <color name=\"yellow\">disconnected!</color>";
-	private static final String JOIN_FORMAT = "<color name=\"dark_green\">[+]</color> " + PLAYER_FORMAT + " <color name=\"yellow\">joined!</color>";
+    public static final String MESSAGE_FORMAT = PLAYER_FORMAT + "<color name=\"white\">: %3$s</color>";
+    public static final String KICK_FORMAT = "<color name=\"dark_red\">[-]</color> " + PLAYER_FORMAT + " <color name=\"yellow\">was kicked (%3$s)!</color>";
+    public static final String QUIT_FORMAT = "<color name=\"dark_red\">[-]</color> " + PLAYER_FORMAT + " <color name=\"yellow\">disconnected!</color>";
+    public static final String JOIN_FORMAT = "<color name=\"dark_green\">[+]</color> " + PLAYER_FORMAT + " <color name=\"yellow\">joined!</color>";
 
     private static final Gson gson = new Gson();
 
@@ -50,16 +53,20 @@ public class RedisHandler extends AbstractRedisHandler {
             if(message == null)
                 return;
 
-            final String outMsg;
-            synchronized (gson) {
-                outMsg = gson.toJson(message);
-            }
-            RedisManager.publish("yiffbukkit:to_server", outMsg);
+            sendMessage(message);
 		}
 		catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
+
+    public static void sendMessage(ChatMessage message) {
+        final String outMsg;
+        synchronized (gson) {
+            outMsg = gson.toJson(message);
+        }
+        RedisManager.publish("yiffbukkit:to_server", outMsg);
+    }
 
     private static ChatMessage runFormatAndStore(ChatMessage message, String format, String[] formatArgs, String plain) {
         message.contents = new MessageContents(plain, format, formatArgs);
@@ -109,12 +116,19 @@ public class RedisHandler extends AbstractRedisHandler {
                         command = commandMap.get(commandName.toLowerCase());
                     }
                     if(command != null) {
-                        return command.run(message, formattedName, argStr);
+                        try {
+                            return command.run(message, formattedName, argStr);
+                        } catch (CommandException e) {
+                            message.contents.plain = "\u00a74[YBCL] " + e.getMessage();
+                            message.contents.xml_format = "<color name=\"dark_red\">[YBCL] " + e.getMessage() + "</color>";
+                            message.contents.xml_format_args = null;
+                            return message;
+                        }
                     }
                     message.contents.plain = "\u00a74[YBCL] Unknown command";
                     message.contents.xml_format = "<color name=\"dark_red\">[YBCL] Unknown command</color>";
                     message.contents.xml_format_args = null;
-					return null;
+					return message;
 				}
 				else if (messageStr.startsWith("\u0123kick ")) {
 					final String param = messageStr.substring(6);
