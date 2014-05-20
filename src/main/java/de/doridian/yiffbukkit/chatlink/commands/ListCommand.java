@@ -8,7 +8,7 @@ import de.doridian.yiffbukkit.chatlink.util.CommandException;
 import de.doridian.yiffbukkit.chatlink.util.PlayerHelper;
 
 public class ListCommand extends ICommand {
-    private static final String LIST_FORMAT = "<color name=\"white\">%1$s: %2$s</color>";
+    private static final String LIST_FORMAT = "<color name=\"white\">%1$s:</color> %2$s";
 
     @Override
     public String[] getNames() {
@@ -21,7 +21,7 @@ public class ListCommand extends ICommand {
         for(String server : PlayerHelper.getAllServers()) {
             StringBuilder listTextB = new StringBuilder();
             for(Player ply : PlayerHelper.getOnlinePlayersOnServer(server)) {
-                listTextB.append("\u00a7f, ");
+                listTextB.append(", \u00a7f");
                 listTextB.append(PlayerHelper.getPlayerRankTagRaw(ply.uuid));
                 listTextB.append(ply.name);
             }
