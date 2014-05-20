@@ -25,7 +25,7 @@ public class ListCommand extends ICommand {
                 listTextB.append(PlayerHelper.getPlayerRankTagRaw(ply.uuid));
                 listTextB.append(ply.name);
             }
-            String listText = "\u00a7f" + listTextB.substring(3);
+            String listText = "\u00a7f" + listTextB.substring(4);
             message.contents = new MessageContents("\u00a7f" + server + ": " + listText,
                     LIST_FORMAT,
                     new String[]{
