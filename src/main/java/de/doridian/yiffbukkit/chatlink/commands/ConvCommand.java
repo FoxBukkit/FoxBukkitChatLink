@@ -27,7 +27,18 @@ public class ConvCommand extends ICommand {
         UUID targetUUID = conversationMap.get(message.from.uuid);
         if(targetUUID == null)
             return false;
+
         Player target = new Player(targetUUID);
+
+        if(!target.isOnline()) {
+            message.to.type = "player";
+            message.to.filter = new String[] { message.from.uuid.toString() };
+            message.contents.plain = "\u00a74[YBCL] Conversation target is not online";
+            message.contents.xml_format = "<color name=\"dark_red\">[YBCL] Conversation target is not online</color>";
+            message.contents.xml_format_args = null;
+            RedisHandler.sendMessage(message);
+            return true;
+        }
 
         if(isEmote) {
             message.contents = new MessageContents("\u00a7e[CONV] \u00a7f* " + formattedName + "\u00a77 " + messageText,

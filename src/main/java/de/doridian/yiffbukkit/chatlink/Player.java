@@ -2,6 +2,7 @@ package de.doridian.yiffbukkit.chatlink;
 
 import de.doridian.yiffbukkit.chatlink.util.PlayerHelper;
 
+import java.util.List;
 import java.util.UUID;
 
 public class Player {
@@ -18,6 +19,10 @@ public class Player {
         this.name = name;
         final String nick = PlayerHelper.getPlayerNick(uuid);
         this.displayName = (nick != null) ? nick : name;
+    }
+
+    public boolean isOnline() {
+        return PlayerHelper.getOnlinePlayersOnAllServers().contains(this);
     }
 
     @Override
