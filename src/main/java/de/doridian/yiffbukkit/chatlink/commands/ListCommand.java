@@ -21,11 +21,11 @@ public class ListCommand extends ICommand {
         for(String server : PlayerHelper.getAllServers()) {
             StringBuilder listTextB = new StringBuilder();
             for(Player ply : PlayerHelper.getOnlinePlayersOnServer(server)) {
-                listTextB.append(", \u00a7f");
+                listTextB.append("\u00a7f, ");
                 listTextB.append(PlayerHelper.getPlayerRankTagRaw(ply.uuid));
                 listTextB.append(ply.name);
             }
-            String listText = listTextB.substring(2);
+            String listText = "\u00a7f" + listTextB.substring(3);
             message.contents = new MessageContents("\u00a7f" + server + ": " + listText,
                     LIST_FORMAT,
                     new String[]{
