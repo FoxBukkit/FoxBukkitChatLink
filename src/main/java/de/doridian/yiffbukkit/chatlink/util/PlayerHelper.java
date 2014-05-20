@@ -118,7 +118,7 @@ public class PlayerHelper {
             if(players.contains(ply))
                 continue;
 
-            if (!ply.name.contains(lowerCase) && !stripColor(ply.displayName.toLowerCase()).contains(lowerCase))
+            if (!ply.name.toLowerCase().contains(lowerCase) && !stripColor(ply.displayName.toLowerCase()).contains(lowerCase))
                 continue;
 
             players.add(ply);
