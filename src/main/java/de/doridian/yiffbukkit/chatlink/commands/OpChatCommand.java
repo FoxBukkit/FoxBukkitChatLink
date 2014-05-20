@@ -15,7 +15,7 @@ public class OpChatCommand extends ICommand {
 
     @Override
     public ChatMessage run(ChatMessage message, String formattedName, String argStr) throws CommandException {
-        message.contents = new MessageContents("\u00a7e[#OP] \u00a7f" + formattedName + ": " + argStr,
+        message.contents = new MessageContents("\u00a7e[#OP] \u00a7f" + formattedName + "\u00a7f: " + argStr,
                 OPCHAT_FORMAT,
                 new String[] {
                         message.from.name, formattedName, argStr
