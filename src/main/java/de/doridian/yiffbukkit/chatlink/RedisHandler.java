@@ -34,6 +34,7 @@ public class RedisHandler extends AbstractRedisHandler {
         __addCommand(new ConvCommand());
         __addCommand(new PMCommand());
         __addCommand(new OpChatCommand());
+        __addCommand(new ListCommand());
     }
 
     private static void __addCommand(ICommand command) {
