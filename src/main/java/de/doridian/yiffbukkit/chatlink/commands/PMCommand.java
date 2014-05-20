@@ -20,7 +20,7 @@ public class PMCommand extends ICommand {
 
     @Override
     public ChatMessage run(ChatMessage message, String formattedName, String[] args) throws CommandException {
-        final String messageText = Utils.concatArray(args, 1, "");
+        final String messageText = Utils.concatArray(" ", args, 1, "");
         final Player target = PlayerHelper.matchPlayerSingle(args[0]);
 
         message.contents = new MessageContents("\u00a7e[PM <] \u00a7f" + formattedName + "\u00a7f: " + messageText,

@@ -31,12 +31,7 @@ public class ConvCommand extends ICommand {
         Player target = new Player(targetUUID);
 
         if(!target.isOnline()) {
-            message.to.type = "player";
-            message.to.filter = new String[] { message.from.uuid.toString() };
-            message.contents.plain = "\u00a74[YBCL] Conversation target is not online";
-            message.contents.xml_format = "<color name=\"dark_red\">[YBCL] Conversation target is not online</color>";
-            message.contents.xml_format_args = null;
-            RedisHandler.sendMessage(message);
+            RedisHandler.sendMessage(makeError(message, "Conversation target is not online"));
             return true;
         }
 
@@ -63,8 +58,7 @@ public class ConvCommand extends ICommand {
 
     @Override
     public ChatMessage run(ChatMessage message, String formattedName, String[] args) throws CommandException {
-        message.to.type = "player";
-        message.to.filter = new String[] { message.from.uuid.toString() };
+        makeReply(message);
         if(args.length > 0 && !args[0].isEmpty()) {
             Player target = PlayerHelper.matchPlayerSingle(args[0]);
             conversationMap.put(message.from.uuid, target.uuid);

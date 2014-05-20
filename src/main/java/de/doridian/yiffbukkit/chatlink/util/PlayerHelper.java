@@ -17,15 +17,19 @@ public class PlayerHelper {
 	private static Map<String,String> playerRankTags = Main.redisManager.createCachedRedisMap("playerRankTags");
 
 
-	private static String getPlayerRankTag(UUID uuid) {
+    public static String getPlayerRankTagRaw(UUID uuid) {
+        final String rank = getPlayerRank(uuid).toLowerCase();
+        if (rankTags.containsKey(rank))
+            return rankTags.get(rank);
+        return "\u00a77";
+    }
+
+	public static String getPlayerRankTag(UUID uuid) {
 		final String rank = getPlayerRank(uuid).toLowerCase();
 		if (playerRankTags.containsKey(uuid.toString()))
 			return playerRankTags.get(uuid.toString());
 
-		if (rankTags.containsKey(rank))
-			return rankTags.get(rank);
-
-		return "\u00a77";
+		return getPlayerRankTagRaw(uuid);
 	}
 
 	public static String getPlayerTag(UUID uuid) {

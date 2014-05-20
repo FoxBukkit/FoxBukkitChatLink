@@ -122,20 +122,10 @@ public class RedisHandler extends AbstractRedisHandler {
                         try {
                             return command.run(message, formattedName, argStr);
                         } catch (CommandException e) {
-                            message.to.type = "player";
-                            message.to.filter = new String[] { message.from.uuid.toString() };
-                            message.contents.plain = "\u00a74[YBCL] " + e.getMessage();
-                            message.contents.xml_format = "<color name=\"dark_red\">[YBCL] " + e.getMessage() + "</color>";
-                            message.contents.xml_format_args = null;
-                            return message;
+                            return ICommand.makeError(message, e.getMessage());
                         }
                     }
-                    message.to.type = "player";
-                    message.to.filter = new String[] { message.from.uuid.toString() };
-                    message.contents.plain = "\u00a74[YBCL] Unknown command";
-                    message.contents.xml_format = "<color name=\"dark_red\">[YBCL] Unknown command</color>";
-                    message.contents.xml_format_args = null;
-					return message;
+					return ICommand.makeError(message, "Unknown command");
 				}
 				else if (messageStr.startsWith("\u0123kick ")) {
 					final String param = messageStr.substring(6);
