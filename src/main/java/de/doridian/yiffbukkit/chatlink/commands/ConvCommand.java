@@ -48,7 +48,7 @@ public class ConvCommand extends ICommand {
                     }
             );
         } else {
-            message.contents = new MessageContents("\u00a7e[CONV] \u00a7f" + formattedName + ": " + messageText,
+            message.contents = new MessageContents("\u00a7e[CONV] \u00a7f" + formattedName + "\u00a7f: " + messageText,
                     CONV_FORMAT,
                     new String[]{
                             message.from.name, formattedName, messageText
