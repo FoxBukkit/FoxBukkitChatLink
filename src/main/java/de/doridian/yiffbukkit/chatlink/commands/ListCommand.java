@@ -23,6 +23,8 @@ import de.doridian.yiffbukkit.chatlink.json.MessageContents;
 import de.doridian.yiffbukkit.chatlink.util.CommandException;
 import de.doridian.yiffbukkit.chatlink.util.PlayerHelper;
 
+import java.util.List;
+
 public class ListCommand extends ICommand {
     private static final String LIST_FORMAT = "<color name=\"dark_gray\">[%1$s]</color> %2$s";
 
@@ -36,12 +38,18 @@ public class ListCommand extends ICommand {
         message = makeReply(message);
         for(String server : PlayerHelper.getAllServers()) {
             StringBuilder listTextB = new StringBuilder();
-            for(Player ply : PlayerHelper.getOnlinePlayersOnServer(server)) {
-                listTextB.append("\u00a7f, ");
-                listTextB.append(PlayerHelper.getPlayerRankTagRaw(ply.uuid));
-                listTextB.append(ply.name);
+            List<Player> players = PlayerHelper.getOnlinePlayersOnServer(server);
+            String listText;
+            if(players.isEmpty()) {
+                listText = "\u00a7fEmpty";
+            } else {
+                for (Player ply : PlayerHelper.getOnlinePlayersOnServer(server)) {
+                    listTextB.append("\u00a7f, ");
+                    listTextB.append(PlayerHelper.getPlayerRankTagRaw(ply.uuid));
+                    listTextB.append(ply.name);
+                }
+                listText = "\u00a7f" + listTextB.substring(4);
             }
-            String listText = "\u00a7f" + listTextB.substring(4);
             message.contents = new MessageContents("\u00a78[" + server + "] " + listText,
                     LIST_FORMAT,
                     new String[]{
