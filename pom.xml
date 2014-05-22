@@ -128,4 +128,10 @@
             <version>2.2.4</version>
         </dependency>
 	</dependencies>
+	<repositories>
+		<repository>
+			<id>doridian-repo</id>
+			<url>http://repo.doridian.de</url>
+		</repository>
+	</repositories>
 </project>
