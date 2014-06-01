@@ -30,8 +30,8 @@ public abstract class ICommand {
 
     public static ChatMessage makeError(ChatMessage message, String error) {
         message = makeReply(message);
-        message.contents.plain = "\u00a74[YBCL] " + error;
-        message.contents.xml_format = "<color name=\"dark_red\">[YBCL] " + error + "</color>";
+        message.contents.plain = "\u00a74[FBCL] " + error;
+        message.contents.xml_format = "<color name=\"dark_red\">[FBCL] " + error + "</color>";
         message.contents.xml_format_args = null;
         return message;
     }
