@@ -1,25 +1,25 @@
 <!--
 
-    This file is part of YiffBukkitChatLink.
+    This file is part of FoxBukkitChatLink.
 
-    YiffBukkitChatLink is free software: you can redistribute it and/or modify
+    FoxBukkitChatLink is free software: you can redistribute it and/or modify
     it under the terms of the GNU Lesser General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
-    YiffBukkitChatLink is distributed in the hope that it will be useful,
+    FoxBukkitChatLink is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU Lesser General Public License for more details.
 
     You should have received a copy of the GNU Lesser General Public License
-    along with YiffBukkitChatLink.  If not, see <http://www.gnu.org/licenses/>.
+    along with FoxBukkitChatLink.  If not, see <http://www.gnu.org/licenses/>.
 
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>de.doridian</groupId>
-	<artifactId>YiffBukkitChatLink</artifactId>
+	<artifactId>FoxBukkitChatLink</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<build>
 		<plugins>
@@ -71,7 +71,7 @@
                         <index>true</index>
                         <manifest>
                             <addClasspath>true</addClasspath>
-                            <mainClass>de.doridian.yiffbukkit.chatlink.Main</mainClass>
+                            <mainClass>de.doridian.foxbukkit.chatlink.Main</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
