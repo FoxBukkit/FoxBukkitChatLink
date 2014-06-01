@@ -37,7 +37,7 @@ public class OpChatCommand extends ICommand {
                         message.from.name, formattedName, argStr
                 });
         message.to.type = "permission";
-        message.to.filter = new String[] { "yiffbukkit.opchat" };
+        message.to.filter = new String[] { "foxbukkit.opchat" };
         return message;
     }
 }
