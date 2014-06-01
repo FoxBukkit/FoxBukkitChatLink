@@ -14,12 +14,12 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with FoxBukkitChatLink.  If not, see <http://www.gnu.org/licenses/>.
  */
-package de.doridian.foxbukkit.chatlink.commands;
+package com.foxelbox.foxbukkit.chatlink.commands;
 
-import de.doridian.foxbukkit.chatlink.RedisHandler;
-import de.doridian.foxbukkit.chatlink.json.ChatMessage;
-import de.doridian.foxbukkit.chatlink.json.MessageContents;
-import de.doridian.foxbukkit.chatlink.util.CommandException;
+import com.foxelbox.foxbukkit.chatlink.RedisHandler;
+import com.foxelbox.foxbukkit.chatlink.json.ChatMessage;
+import com.foxelbox.foxbukkit.chatlink.json.MessageContents;
+import com.foxelbox.foxbukkit.chatlink.util.CommandException;
 
 public class OpChatCommand extends ICommand {
     private static final String OPCHAT_FORMAT = "<color name=\"yellow\">[#OP]</color> " + RedisHandler.MESSAGE_FORMAT;

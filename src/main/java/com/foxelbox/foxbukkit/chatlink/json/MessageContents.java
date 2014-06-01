@@ -14,16 +14,20 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with FoxBukkitChatLink.  If not, see <http://www.gnu.org/licenses/>.
  */
-package de.doridian.foxbukkit.chatlink.util;
+package com.foxelbox.foxbukkit.chatlink.json;
 
-public class PlayerNotFoundException extends PlayerFindException {
-	private static final long serialVersionUID = 1L;
+public class MessageContents {
+    public MessageContents(String plain, String formatXML, String[] formatXMLArgs) {
+        this.plain = plain;
+        this.xml_format = formatXML;
+        this.xml_format_args = formatXMLArgs;
+    }
 
-	public PlayerNotFoundException() {
-		super("Sorry, no player found!");
-	}
+    public MessageContents(String plain) {
+        this.plain = plain;
+    }
 
-	public PlayerNotFoundException(Throwable cause) {
-		super("Sorry, no player found!", cause);
-	}
+    public String plain;
+    public String xml_format;
+    public String[] xml_format_args;
 }

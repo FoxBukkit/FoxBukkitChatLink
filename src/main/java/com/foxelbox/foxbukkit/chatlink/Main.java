@@ -14,10 +14,10 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with FoxBukkitChatLink.  If not, see <http://www.gnu.org/licenses/>.
  */
-package de.doridian.foxbukkit.chatlink;
+package com.foxelbox.foxbukkit.chatlink;
 
-import de.doridian.dependencies.config.Configuration;
-import de.doridian.dependencies.redis.RedisManager;
+import com.foxelbox.dependencies.config.Configuration;
+import com.foxelbox.dependencies.redis.RedisManager;
 
 import java.io.File;
 

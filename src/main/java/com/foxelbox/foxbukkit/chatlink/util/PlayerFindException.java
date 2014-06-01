@@ -14,14 +14,21 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with FoxBukkitChatLink.  If not, see <http://www.gnu.org/licenses/>.
  */
-package de.doridian.foxbukkit.chatlink.json;
+package com.foxelbox.foxbukkit.chatlink.util;
 
-public class MessageTarget {
-    public MessageTarget(String type, String[] filter) {
-        this.type = type;
-        this.filter = filter;
-    }
+public class PlayerFindException extends CommandException {
+	private static final long serialVersionUID = 1L;
 
-    public String type;
-    public String[] filter;
+	public PlayerFindException(String message, Throwable cause) {
+		super(message, cause);
+	}
+
+	public PlayerFindException(String message) {
+		super(message);
+	}
+
+	public PlayerFindException(Throwable cause) {
+		super(cause);
+	}
+
 }

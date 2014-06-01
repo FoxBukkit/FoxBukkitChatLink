@@ -14,31 +14,16 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with FoxBukkitChatLink.  If not, see <http://www.gnu.org/licenses/>.
  */
-package de.doridian.foxbukkit.chatlink.util;
+package com.foxelbox.foxbukkit.chatlink.json;
 
-public class CommandException extends Exception {
-	private static final long serialVersionUID = 1L;
-	
-	private char color = '5';
+import java.util.UUID;
 
-	public CommandException(String message) {
-		super(message);
-	}
+public class UserInfo {
+    public UserInfo(UUID uuid, String name) {
+        this.uuid = uuid;
+        this.name = name;
+    }
 
-	public CommandException(Throwable cause) {
-		super(cause);
-	}
-
-	public CommandException(String message, Throwable cause) {
-		super(message, cause);
-	}
-
-	public CommandException setColor(char color) {
-		this.color = color;
-		return this;
-	}
-
-	public char getColor() {
-		return color;
-	}
+    public UUID uuid;
+    public String name;
 }

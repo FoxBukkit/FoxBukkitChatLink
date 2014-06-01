@@ -14,15 +14,15 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with FoxBukkitChatLink.  If not, see <http://www.gnu.org/licenses/>.
  */
-package de.doridian.foxbukkit.chatlink.commands;
+package com.foxelbox.foxbukkit.chatlink.commands;
 
-import de.doridian.foxbukkit.chatlink.Player;
-import de.doridian.foxbukkit.chatlink.RedisHandler;
-import de.doridian.foxbukkit.chatlink.json.ChatMessage;
-import de.doridian.foxbukkit.chatlink.json.MessageContents;
-import de.doridian.foxbukkit.chatlink.json.MessageTarget;
-import de.doridian.foxbukkit.chatlink.util.CommandException;
-import de.doridian.foxbukkit.chatlink.util.PlayerHelper;
+import com.foxelbox.foxbukkit.chatlink.Player;
+import com.foxelbox.foxbukkit.chatlink.RedisHandler;
+import com.foxelbox.foxbukkit.chatlink.json.ChatMessage;
+import com.foxelbox.foxbukkit.chatlink.json.MessageContents;
+import com.foxelbox.foxbukkit.chatlink.json.MessageTarget;
+import com.foxelbox.foxbukkit.chatlink.util.CommandException;
+import com.foxelbox.foxbukkit.chatlink.util.PlayerHelper;
 
 import java.util.HashMap;
 import java.util.Map;

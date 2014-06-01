@@ -14,20 +14,18 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with FoxBukkitChatLink.  If not, see <http://www.gnu.org/licenses/>.
  */
-package de.doridian.foxbukkit.chatlink.json;
+package com.foxelbox.foxbukkit.chatlink.json;
 
-public class MessageContents {
-    public MessageContents(String plain, String formatXML, String[] formatXMLArgs) {
-        this.plain = plain;
-        this.xml_format = formatXML;
-        this.xml_format_args = formatXMLArgs;
+public class ChatMessage {
+    public ChatMessage(String server, UserInfo from, String plain) {
+        this.server = server;
+        this.from = from;
+        this.to = new MessageTarget("all", null);
+        this.contents = new MessageContents(plain);
     }
 
-    public MessageContents(String plain) {
-        this.plain = plain;
-    }
-
-    public String plain;
-    public String xml_format;
-    public String[] xml_format_args;
+    public String server;
+    public UserInfo from;
+    public MessageTarget to;
+    public MessageContents contents;
 }

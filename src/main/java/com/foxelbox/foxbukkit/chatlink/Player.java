@@ -14,9 +14,9 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with FoxBukkitChatLink.  If not, see <http://www.gnu.org/licenses/>.
  */
-package de.doridian.foxbukkit.chatlink;
+package com.foxelbox.foxbukkit.chatlink;
 
-import de.doridian.foxbukkit.chatlink.util.PlayerHelper;
+import com.foxelbox.foxbukkit.chatlink.util.PlayerHelper;
 
 import java.util.UUID;
 

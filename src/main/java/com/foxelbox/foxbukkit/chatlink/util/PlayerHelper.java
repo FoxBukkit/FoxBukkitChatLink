@@ -14,10 +14,10 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with FoxBukkitChatLink.  If not, see <http://www.gnu.org/licenses/>.
  */
-package de.doridian.foxbukkit.chatlink.util;
+package com.foxelbox.foxbukkit.chatlink.util;
 
-import de.doridian.foxbukkit.chatlink.Main;
-import de.doridian.foxbukkit.chatlink.Player;
+import com.foxelbox.foxbukkit.chatlink.Main;
+import com.foxelbox.foxbukkit.chatlink.Player;
 
 import java.util.ArrayList;
 import java.util.List;
