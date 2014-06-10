@@ -50,7 +50,7 @@ public class ListCommand extends ICommand {
                 }
                 listText = "\u00a7f" + listTextB.substring(4);
             }
-            message.contents = new MessageContents("\u00a78[" + server + "] " + listText,
+            message.contents = new MessageContents("\u00a75[FBCL] \u00a78[" + server + "] " + listText,
                     LIST_FORMAT,
                     new String[]{
                             server, listText
