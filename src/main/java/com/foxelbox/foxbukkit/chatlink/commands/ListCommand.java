@@ -26,7 +26,7 @@ import com.foxelbox.foxbukkit.chatlink.util.PlayerHelper;
 import java.util.List;
 
 public class ListCommand extends ICommand {
-    private static final String LIST_FORMAT = "<color name=\"purple\">[FBCL]</color> <color name=\"dark_gray\">[%1$s]</color> %2$s";
+    private static final String LIST_FORMAT = "<color name=\"dark_purple\">[FBCL]</color> <color name=\"dark_gray\">[%1$s]</color> %2$s";
 
     @Override
     public String[] getNames() {
