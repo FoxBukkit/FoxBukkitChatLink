@@ -97,6 +97,9 @@ public class RedisHandler extends AbstractRedisHandler {
 
         String messageStr = message.contents.plain;
 
+        if(messageStr.charAt(0) == '#')
+            messageStr = "/opchat " +  messageStr.substring(1);
+
 		switch (messageStr) {
 			case "\u0123join":
                 return runFormatAndStore(message,
