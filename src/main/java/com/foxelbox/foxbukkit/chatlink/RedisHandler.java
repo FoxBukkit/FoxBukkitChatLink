@@ -26,11 +26,14 @@ import com.foxelbox.foxbukkit.chatlink.util.CommandException;
 import com.foxelbox.foxbukkit.chatlink.util.PlayerHelper;
 
 import java.util.*;
+import java.util.regex.Pattern;
 
 public class RedisHandler extends AbstractRedisHandler {
     public RedisHandler() {
         super(Main.redisManager, "foxbukkit:from_server");
     }
+
+    private static final Pattern REMOVE_COLOR_CODE = Pattern.compile("\u00a7.?");
 
 	public static final String PLAYER_FORMAT = "<span onClick=\"suggest_command('/pm %1$s ')\">%2$s</span>";
     public static final String MESSAGE_FORMAT = PLAYER_FORMAT + "<color name=\"white\">: %3$s</color>";
@@ -95,7 +98,7 @@ public class RedisHandler extends AbstractRedisHandler {
         final String plyN = message.from.name;
 		final String formattedName = PlayerHelper.getFullPlayerName(message.from.uuid, plyN);
 
-        String messageStr = message.contents.plain;
+        String messageStr = REMOVE_COLOR_CODE.matcher(message.contents.plain).replaceAll("");
 
         if(messageStr.charAt(0) == '#')
             messageStr = "/opchat " +  messageStr.substring(1);
