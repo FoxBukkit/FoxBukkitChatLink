@@ -45,7 +45,7 @@ public class FoxBukkitPermissionHandler {
 		groupPermissions.clear();
 		groupProhibitions.clear();
 
-        final File file = new File("./permissions.txt");
+        final File file = new File(Main.getDataFolder(), "permissions.txt");
 
         try {
             String currentGroup = null;

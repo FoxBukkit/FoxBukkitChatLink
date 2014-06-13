@@ -19,6 +19,7 @@ package com.foxelbox.foxbukkit.chatlink;
 import com.foxelbox.dependencies.config.Configuration;
 import com.foxelbox.dependencies.redis.RedisManager;
 import com.foxelbox.foxbukkit.chatlink.commands.system.CommandSystem;
+import com.foxelbox.foxbukkit.chatlink.permissions.FoxBukkitPermissionHandler;
 
 import java.io.File;
 
@@ -32,6 +33,7 @@ public class Main {
         redisManager = new RedisManager(configuration);
 
         CommandSystem.instance.scanCommands();
+        FoxBukkitPermissionHandler.instance.load();
 
 		new RedisHandler();
 
