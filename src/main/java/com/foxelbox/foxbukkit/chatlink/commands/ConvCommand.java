@@ -76,7 +76,7 @@ public class ConvCommand extends ICommand {
     @Override
     public ChatMessage run(ChatMessage message, String formattedName, String[] args) throws CommandException {
         makeReply(message);
-        if(args.length > 0 && !args[0].isEmpty()) {
+        if(args.length > 0) {
             Player target = PlayerHelper.matchPlayerSingle(args[0]);
             conversationMap.put(message.from.uuid, target.uuid);
             message.contents = new MessageContents("\u00a75[FBCL] \u00a7fStarted conversation with " + target.name);

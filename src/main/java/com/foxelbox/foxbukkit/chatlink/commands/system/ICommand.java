@@ -202,7 +202,10 @@ public abstract class ICommand {
     }
 
     public ChatMessage run(ChatMessage message, String formattedName, String argStr) throws CommandException {
-        return run(message, formattedName, argStr.split(" "));
+        if(argStr != null && !argStr.isEmpty())
+            return run(message, formattedName, argStr.split(" "));
+        else
+            return run(message, formattedName, new String[0]);
     }
 
 
