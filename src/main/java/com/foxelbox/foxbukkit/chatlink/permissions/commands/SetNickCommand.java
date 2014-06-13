@@ -66,7 +66,7 @@ public class SetNickCommand extends ICommand {
                 MessageHelper.formatWithTag(modifiedPlayer),
                 MessageHelper.button(undoCommand, "undo", "blue", false)
         ));
-        message.contents.plain = String.format(format, MessageHelper.format(commandSender), MessageHelper.formatWithTag(commandSender));
+        message.contents.plain = "\u00a75[FBCL]\u00a7f " + String.format(format, MessageHelper.format(commandSender), MessageHelper.formatWithTag(commandSender));
         message.from.uuid = commandSender.uuid;
         message.from.name = commandSender.name;
         message.server = server;
