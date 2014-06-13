@@ -49,7 +49,7 @@ public class MCLinkCommand extends ICommand {
 
                     final String link = new BufferedReader(new InputStreamReader(conn.getInputStream())).readLine();
 
-                    message.contents = new MessageContents("\u00a75[YBCL]\u00a7f Go here to complete: " + link);
+                    message.contents = new MessageContents("\u00a75[FBCL]\u00a7f Go here to complete: " + link);
                     RedisHandler.sendMessage(message);
                 } catch(Exception e) {
                     RedisHandler.sendMessage(makeError(message, "Please try again later"));

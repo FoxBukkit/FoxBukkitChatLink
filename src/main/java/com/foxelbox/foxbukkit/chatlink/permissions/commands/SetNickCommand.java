@@ -61,7 +61,7 @@ public class SetNickCommand extends ICommand {
 			format = formatOther;
 
 		ChatMessage message = MessageHelper.sendServerMessage(String.format(
-                format + " %3$s",
+                "\u00a75[FBCL]\u00a7f " + format + " %3$s",
                 MessageHelper.format(commandSender),
                 MessageHelper.formatWithTag(modifiedPlayer),
                 MessageHelper.button(undoCommand, "undo", "blue", false)

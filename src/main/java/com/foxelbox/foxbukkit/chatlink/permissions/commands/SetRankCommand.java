@@ -39,7 +39,7 @@ public class SetRankCommand extends ICommand {
         args = parseFlags(args);
 
 		String otherName = args[0];
-		UUID otherUUID = UUID.fromString(PlayerHelper.playerNameToUUID.get(args[0]));
+		UUID otherUUID = UUID.fromString(PlayerHelper.playerNameToUUID.get(args[0].toLowerCase()));
 		String newRank = args[1];
 		String oldRank = PlayerHelper.getPlayerRank(otherUUID);
 		
