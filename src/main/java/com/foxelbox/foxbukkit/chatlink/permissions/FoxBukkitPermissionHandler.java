@@ -34,12 +34,6 @@ public class FoxBukkitPermissionHandler {
 	private final Map<String,String> playerGroups = Main.redisManager.createCachedRedisMap("playergroups");
 	private final HashMap<String,HashSet<String>> groupPermissions = new HashMap<>();
 	private final HashMap<String,HashSet<String>> groupProhibitions = new HashMap<>();
-	
-	private String defaultWorld = "world";
-
-	public void setDefaultWorld(String world) {
-		defaultWorld = world;
-	}
 
 	public void load() {
 		if(loaded) return;
@@ -106,10 +100,10 @@ public class FoxBukkitPermissionHandler {
 
 
 	public boolean has(Player player, String permission) {
-		return has("world", player.uuid, permission);
+		return has(player.uuid, permission);
 	}
 
-	public boolean has(String worldName, UUID uuid, String permission) {
+	public boolean has(UUID uuid, String permission) {
 		permission = permission.toLowerCase();
 
 		String currentGroup = getGroup(uuid);
@@ -142,10 +136,6 @@ public class FoxBukkitPermissionHandler {
 		return false;
 	}
 
-	public boolean has(UUID uuid, String permission) {
-		return has(defaultWorld, uuid, permission);
-	}
-
 	public String getGroup(UUID uuid) {
 		String result = playerGroups.get(uuid.toString());
 		if(result == null)
@@ -159,11 +149,7 @@ public class FoxBukkitPermissionHandler {
 		save();
 	}
 
-	public boolean inGroup(String world, UUID uuid, String group) {
-		return getGroup(uuid).equalsIgnoreCase(group);
-	}
-
 	public boolean inGroup(UUID uuid, String group) {
-		return inGroup(defaultWorld, uuid, group);
+		return getGroup(uuid).equalsIgnoreCase(group);
 	}
 }

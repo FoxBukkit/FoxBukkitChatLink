@@ -18,6 +18,7 @@ package com.foxelbox.foxbukkit.chatlink.util;
 
 import com.foxelbox.foxbukkit.chatlink.Main;
 import com.foxelbox.foxbukkit.chatlink.Player;
+import com.foxelbox.foxbukkit.chatlink.permissions.FoxBukkitPermissionHandler;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,10 +40,6 @@ public class PlayerHelper {
 
     public static int getPlayerLevel(UUID uuid) {
         return getRankLevel(getPlayerRank(uuid));
-    }
-
-    public static void setPlayerRank(UUID uuid, String rank) {
-        playerGroups.put(uuid.toString(), rank);
     }
 
     public static String getPlayerRankTagRaw(UUID uuid) {
@@ -97,13 +94,8 @@ public class PlayerHelper {
             playernicks.put(uuid.toString(), nick);
     }
 
-    public static Map<String,String> playerGroups = Main.redisManager.createCachedRedisMap("playergroups");
 	public static String getPlayerRank(UUID uuid) {
-		final String rank = playerGroups.get(uuid.toString());
-		if (rank == null)
-			return "guest";
-
-		return rank;
+		return FoxBukkitPermissionHandler.instance.getGroup(uuid);
 	}
 
 	public static String getFullPlayerName(UUID plyU, String plyN) {

@@ -20,6 +20,7 @@ import com.foxelbox.foxbukkit.chatlink.Player;
 import com.foxelbox.foxbukkit.chatlink.commands.system.ICommand;
 import com.foxelbox.foxbukkit.chatlink.json.ChatMessage;
 import com.foxelbox.foxbukkit.chatlink.json.MessageContents;
+import com.foxelbox.foxbukkit.chatlink.permissions.FoxBukkitPermissionHandler;
 import com.foxelbox.foxbukkit.chatlink.util.CommandException;
 import com.foxelbox.foxbukkit.chatlink.util.PermissionDeniedException;
 import com.foxelbox.foxbukkit.chatlink.util.PlayerHelper;
@@ -78,7 +79,7 @@ public class SetRankCommand extends ICommand {
 		if(booleanFlags.contains('p') && newlvl < oldlvl)
 			throw new PermissionDeniedException();
 
-        PlayerHelper.setPlayerRank(otherUUID, newRank);
+        FoxBukkitPermissionHandler.instance.setGroup(otherUUID, newRank);
 
         message.contents = new MessageContents(message.from.name + " set rank of " + otherName + " to " + newRank);
         return message;
