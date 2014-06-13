@@ -24,6 +24,7 @@ import com.foxelbox.foxbukkit.chatlink.json.ChatMessage;
 import com.foxelbox.foxbukkit.chatlink.json.MessageContents;
 import com.foxelbox.foxbukkit.chatlink.util.CommandException;
 
+import java.util.Arrays;
 import java.util.Map;
 import java.util.PriorityQueue;
 
@@ -35,6 +36,9 @@ public class HelpCommand extends ICommand {
     @Override
     public ChatMessage run(ChatMessage message, String formattedName, String[] args) throws CommandException {
         Map<String, ICommand> commands = CommandSystem.instance.getCommands();
+
+        System.out.println(Arrays.asList(args));
+        System.out.println(args.length);
 
         final Player commandSender = new Player(message.from);
         makeReply(message);
