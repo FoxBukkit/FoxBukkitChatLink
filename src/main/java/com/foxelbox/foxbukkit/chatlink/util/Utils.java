@@ -18,9 +18,11 @@ package com.foxelbox.foxbukkit.chatlink.util;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.security.CodeSource;
 import java.security.ProtectionDomain;
 import java.util.ArrayList;
@@ -51,6 +53,15 @@ public class Utils {
             ret.append(array[i]);
         }
         return ret.toString();
+    }
+
+    @SuppressWarnings("deprecation")
+    public static String URLEncode(String str) {
+        try {
+            return URLEncoder.encode(str, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            return URLEncoder.encode(str);
+        }
     }
 
     public static <T> List<Class<? extends T>> getSubClasses(Class<T> baseClass, String packageName) {
