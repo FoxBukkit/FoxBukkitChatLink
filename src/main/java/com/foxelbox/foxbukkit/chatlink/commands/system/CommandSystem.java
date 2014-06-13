@@ -88,7 +88,7 @@ public class CommandSystem {
 					String logmsg = "FBCL Command: " + playerName + ": "  + cmd + " " + argStr;
                     System.err.println(logmsg);
 				}
-				return icmd.run(message, PlayerHelper.getFullPlayerName(message.from.uuid, message.from.name), argStr);
+				return icmd.run(message, PlayerHelper.getFullPlayerName(message.from.uuid, message.from.name), argStr.trim());
 			}
 			catch (PermissionDeniedException e) {
 				String logmsg = "FBCL Command denied: " + playerName + ": "  + cmd + " " + argStr;
