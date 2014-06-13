@@ -42,7 +42,7 @@ public class HelpCommand extends ICommand {
         if(args.length > 0) {
             ICommand val = commands.get(args[0]);
             if (val == null || !val.canPlayerUseCommand(commandSender)) {
-                throw new CommandException("Command not found!");
+                throw new CommandException("No help for that command available!");
             }
 
             for (String line : val.getHelp().split("\n")) {
