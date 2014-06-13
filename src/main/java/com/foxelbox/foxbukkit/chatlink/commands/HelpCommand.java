@@ -16,11 +16,57 @@
  */
 package com.foxelbox.foxbukkit.chatlink.commands;
 
+import com.foxelbox.foxbukkit.chatlink.Player;
+import com.foxelbox.foxbukkit.chatlink.RedisHandler;
+import com.foxelbox.foxbukkit.chatlink.commands.system.CommandSystem;
 import com.foxelbox.foxbukkit.chatlink.commands.system.ICommand;
+import com.foxelbox.foxbukkit.chatlink.json.ChatMessage;
+import com.foxelbox.foxbukkit.chatlink.json.MessageContents;
+import com.foxelbox.foxbukkit.chatlink.util.CommandException;
 
-@ICommand.Names({ "help", "?", "h" })
-@ICommand.Help("Gets command help")
-@ICommand.Usage("[command]")
+import java.util.Map;
+import java.util.PriorityQueue;
+
+@ICommand.Names({"help", "?", "h"})
+@ICommand.Help("Prints a list of available commands or information about the specified command.")
+@ICommand.Usage("[<command>]")
 @ICommand.Permission("foxbukkit.help")
 public class HelpCommand extends ICommand {
+    @Override
+    public ChatMessage run(ChatMessage message, String formattedName, String[] args) throws CommandException {
+        Map<String, ICommand> commands = CommandSystem.instance.getCommands();
+
+        final Player commandSender = new Player(message.from);
+        makeReply(message);
+
+        if(args.length > 0) {
+            ICommand val = commands.get(args[0]);
+            if (val == null || !val.canPlayerUseCommand(commandSender)) {
+                throw new CommandException("Command not found!");
+            }
+
+            for (String line : val.getHelp().split("\n")) {
+                message.contents = new MessageContents(line);
+                RedisHandler.sendMessage(message);
+            }
+            message.contents = new MessageContents("Usage: /" + args[0] + " " + val.getUsage());
+            return message;
+        }
+        else {
+            String ret = "Available commands: /";
+            for (String key : new PriorityQueue<>(commands.keySet())) {
+                if (key == "\u00a7")
+                    continue;
+
+                ICommand val = commands.get(key);
+                if (!val.canPlayerUseCommand(commandSender))
+                    continue;
+
+                ret += key + ", /";
+            }
+            ret = ret.substring(0,ret.length() - 3);
+            message.contents = new MessageContents(ret);
+            return message;
+        }
+    }
 }
