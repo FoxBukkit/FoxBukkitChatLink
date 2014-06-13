@@ -27,10 +27,23 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class PlayerHelper {
-	private static Map<String,String> rankTags = Main.redisManager.createCachedRedisMap("ranktags");
-	private static Map<String,String> playerTags = Main.redisManager.createCachedRedisMap("playerTags");
-	private static Map<String,String> playerRankTags = Main.redisManager.createCachedRedisMap("playerRankTags");
+	public static Map<String,String> rankTags = Main.redisManager.createCachedRedisMap("ranktags");
+    public static Map<String,String> playerTags = Main.redisManager.createCachedRedisMap("playerTags");
+    public static Map<String,String> playerRankTags = Main.redisManager.createCachedRedisMap("playerRankTags");
 
+    public static Map<String,String> rankLevels = Main.redisManager.createCachedRedisMap("ranklevels");
+
+    public static int getRankLevel(String rank) {
+        return Integer.parseInt(rankLevels.get(rank));
+    }
+
+    public static int getPlayerLevel(UUID uuid) {
+        return getRankLevel(getPlayerRank(uuid));
+    }
+
+    public static void setPlayerRank(UUID uuid, String rank) {
+        playerGroups.put(uuid.toString(), rank);
+    }
 
     public static String getPlayerRankTagRaw(UUID uuid) {
         final String rank = getPlayerRank(uuid).toLowerCase();
@@ -56,7 +69,20 @@ public class PlayerHelper {
 		return rankTag;
 	}
 
-	private static Map<String,String> playernicks = Main.redisManager.createCachedRedisMap("playernicks");
+    public static String getPlayerTagRaw(UUID uuid, boolean rankTag) {
+        final Map<String, String> tags = rankTag ? playerRankTags : playerTags;
+        return tags.get(uuid.toString());
+    }
+
+    public static void setPlayerTag(UUID uuid, String tag, boolean rankTag) {
+        final Map<String, String> tags = rankTag ? playerRankTags : playerTags;
+        if (tag == null)
+            tags.remove(uuid.toString());
+        else
+            tags.put(uuid.toString(), tag);
+    }
+
+    public static Map<String,String> playernicks = Main.redisManager.createCachedRedisMap("playernicks");
 	public static String getPlayerNick(UUID uuid) {
 		if(playernicks.containsKey(uuid.toString()))
 			return playernicks.get(uuid.toString());
@@ -64,7 +90,14 @@ public class PlayerHelper {
 			return null;
 	}
 
-	private static Map<String,String> playerGroups = Main.redisManager.createCachedRedisMap("playergroups");
+    public static void setPlayerNick(UUID uuid, String nick) {
+        if(nick == null)
+            playernicks.remove(uuid.toString());
+        else
+            playernicks.put(uuid.toString(), nick);
+    }
+
+    public static Map<String,String> playerGroups = Main.redisManager.createCachedRedisMap("playergroups");
 	public static String getPlayerRank(UUID uuid) {
 		final String rank = playerGroups.get(uuid.toString());
 		if (rank == null)

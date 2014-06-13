@@ -18,6 +18,7 @@ package com.foxelbox.foxbukkit.chatlink.commands;
 
 import com.foxelbox.foxbukkit.chatlink.Player;
 import com.foxelbox.foxbukkit.chatlink.RedisHandler;
+import com.foxelbox.foxbukkit.chatlink.commands.system.ICommand;
 import com.foxelbox.foxbukkit.chatlink.json.ChatMessage;
 import com.foxelbox.foxbukkit.chatlink.json.MessageContents;
 import com.foxelbox.foxbukkit.chatlink.util.CommandException;
@@ -25,13 +26,12 @@ import com.foxelbox.foxbukkit.chatlink.util.PlayerHelper;
 
 import java.util.List;
 
+@ICommand.Names({ "who", "list" })
+@ICommand.Help("Prints user list if used without parameters or information about the specified user")
+@ICommand.Usage("")
+@ICommand.Permission("foxbukkit.who")
 public class ListCommand extends ICommand {
     private static final String LIST_FORMAT = "<color name=\"dark_purple\">[FBCL]</color> <color name=\"dark_gray\">[%1$s]</color> %2$s";
-
-    @Override
-    public String[] getNames() {
-        return new String[] { "who", "list" };
-    }
 
     @Override
     public ChatMessage run(ChatMessage message, String formattedName, String[] args) throws CommandException {

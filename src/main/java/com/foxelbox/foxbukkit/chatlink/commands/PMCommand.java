@@ -18,6 +18,7 @@ package com.foxelbox.foxbukkit.chatlink.commands;
 
 import com.foxelbox.foxbukkit.chatlink.Player;
 import com.foxelbox.foxbukkit.chatlink.RedisHandler;
+import com.foxelbox.foxbukkit.chatlink.commands.system.ICommand;
 import com.foxelbox.foxbukkit.chatlink.json.ChatMessage;
 import com.foxelbox.foxbukkit.chatlink.json.MessageContents;
 import com.foxelbox.foxbukkit.chatlink.json.MessageTarget;
@@ -25,14 +26,14 @@ import com.foxelbox.foxbukkit.chatlink.util.CommandException;
 import com.foxelbox.foxbukkit.chatlink.util.PlayerHelper;
 import com.foxelbox.foxbukkit.chatlink.util.Utils;
 
+@ICommand.Names({"pm", "msg", "tell"})
+@ICommand.Help("Sends a private message to the specified user, that cannot be seen by anyone but the target and yourself.")
+@ICommand.Usage("<name> <text>")
+@ICommand.Permission("foxbukkit.communication.pm")
+@ICommand.NoLogging
 public class PMCommand extends ICommand {
     private static final String PM_SEND_FORMAT = "<color name=\"yellow\">[PM &gt;]</color> " + RedisHandler.MESSAGE_FORMAT;
     private static final String PM_RECEIVE_FORMAT = "<color name=\"yellow\">[PM &lt;]</color> " + RedisHandler.MESSAGE_FORMAT;
-
-    @Override
-    public String[] getNames() {
-        return new String[] { "pm", "msg", "tell" };
-    }
 
     @Override
     public ChatMessage run(ChatMessage message, String formattedName, String[] args) throws CommandException {

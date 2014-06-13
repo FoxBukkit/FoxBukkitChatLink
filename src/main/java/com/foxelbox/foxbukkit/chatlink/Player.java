@@ -16,6 +16,8 @@
  */
 package com.foxelbox.foxbukkit.chatlink;
 
+import com.foxelbox.foxbukkit.chatlink.json.UserInfo;
+import com.foxelbox.foxbukkit.chatlink.permissions.FoxBukkitPermissionHandler;
 import com.foxelbox.foxbukkit.chatlink.util.PlayerHelper;
 
 import java.util.UUID;
@@ -25,8 +27,24 @@ public class Player {
     public final String name;
     public final String displayName;
 
+    public Player(UserInfo userInfo) {
+        this(userInfo.uuid, userInfo.name);
+    }
+
     public Player(UUID uuid) {
         this(uuid, PlayerHelper.playerUUIDToName.get(uuid.toString()));
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getDisplayName() {
+        return displayName;
+    }
+
+    public UUID getUniqueId() {
+        return uuid;
     }
 
     public Player(UUID uuid, String name) {
@@ -34,6 +52,10 @@ public class Player {
         this.name = name;
         final String nick = PlayerHelper.getPlayerNick(uuid);
         this.displayName = (nick != null) ? nick : name;
+    }
+
+    public boolean hasPermission(String permission) {
+        return FoxBukkitPermissionHandler.instance.has(this, permission);
     }
 
     public boolean isOnline() {

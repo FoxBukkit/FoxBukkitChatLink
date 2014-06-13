@@ -16,6 +16,7 @@
  */
 package com.foxelbox.foxbukkit.chatlink;
 
+import com.foxelbox.foxbukkit.chatlink.commands.system.CommandSystem;
 import com.google.gson.Gson;
 import com.foxelbox.dependencies.redis.AbstractRedisHandler;
 import com.foxelbox.foxbukkit.chatlink.commands.*;
@@ -42,22 +43,6 @@ public class RedisHandler extends AbstractRedisHandler {
     public static final String JOIN_FORMAT = "<color name=\"dark_green\">[+]</color> " + PLAYER_FORMAT + " <color name=\"yellow\">joined!</color>";
 
     private static final Gson gson = new Gson();
-
-    private static final Map<String, ICommand> commandMap;
-
-    static {
-        commandMap = new HashMap<>();
-        __addCommand(new MeCommand());
-        __addCommand(new ConvCommand());
-        __addCommand(new PMCommand());
-        __addCommand(new OpChatCommand());
-        __addCommand(new ListCommand());
-    }
-
-    private static void __addCommand(ICommand command) {
-        for(String name : command.getNames())
-            commandMap.put(name.toLowerCase(), command);
-    }
 
 	@Override
 	public void onMessage(final String c_message) {
@@ -135,18 +120,7 @@ public class RedisHandler extends AbstractRedisHandler {
                         argStr = "";
                         commandName = messageStr;
                     }
-                    final ICommand command;
-                    synchronized (commandMap) {
-                        command = commandMap.get(commandName.toLowerCase());
-                    }
-                    if(command != null) {
-                        try {
-                            return command.run(message, formattedName, argStr);
-                        } catch (CommandException e) {
-                            return ICommand.makeError(message, e.getMessage());
-                        }
-                    }
-					return ICommand.makeError(message, "Unknown command");
+                    return CommandSystem.instance.runCommand(message, commandName, argStr);
 				}
 				else if (messageStr.startsWith("\u0123kick ")) {
 					final String param = messageStr.substring(6);

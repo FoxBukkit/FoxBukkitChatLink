@@ -17,16 +17,16 @@
 package com.foxelbox.foxbukkit.chatlink.commands;
 
 import com.foxelbox.foxbukkit.chatlink.RedisHandler;
+import com.foxelbox.foxbukkit.chatlink.commands.system.ICommand;
 import com.foxelbox.foxbukkit.chatlink.json.ChatMessage;
 import com.foxelbox.foxbukkit.chatlink.json.MessageContents;
 
+@ICommand.Names({"me", "emote"})
+@ICommand.Help("Well, it's /me, durp")
+@ICommand.Usage("<stuff here>")
+@ICommand.Permission("foxbukkit.communication.emote")
 public class MeCommand extends ICommand {
     public static final String EMOTE_FORMAT = "* " + RedisHandler.PLAYER_FORMAT + " <color name=\"gray\">%3$s</color>";
-
-    @Override
-    public String[] getNames() {
-        return new String[] { "me", "emote" };
-    }
 
     @Override
     public ChatMessage run(ChatMessage message, String formattedName, String argStr) {

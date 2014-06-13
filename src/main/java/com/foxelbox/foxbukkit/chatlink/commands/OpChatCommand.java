@@ -17,17 +17,17 @@
 package com.foxelbox.foxbukkit.chatlink.commands;
 
 import com.foxelbox.foxbukkit.chatlink.RedisHandler;
+import com.foxelbox.foxbukkit.chatlink.commands.system.ICommand;
 import com.foxelbox.foxbukkit.chatlink.json.ChatMessage;
 import com.foxelbox.foxbukkit.chatlink.json.MessageContents;
 import com.foxelbox.foxbukkit.chatlink.util.CommandException;
 
+@ICommand.Names({"opchat"})
+@ICommand.Help("Sends message to op chat.")
+@ICommand.Usage("<name> <text>")
+@ICommand.Permission("foxbukkit.opchat")
 public class OpChatCommand extends ICommand {
     private static final String OPCHAT_FORMAT = "<color name=\"yellow\">[#OP]</color> " + RedisHandler.MESSAGE_FORMAT;
-
-    @Override
-    public String[] getNames() {
-        return new String[] { "opchat" };
-    }
 
     @Override
     public ChatMessage run(ChatMessage message, String formattedName, String argStr) throws CommandException {

@@ -18,6 +18,7 @@ package com.foxelbox.foxbukkit.chatlink.commands;
 
 import com.foxelbox.foxbukkit.chatlink.Player;
 import com.foxelbox.foxbukkit.chatlink.RedisHandler;
+import com.foxelbox.foxbukkit.chatlink.commands.system.ICommand;
 import com.foxelbox.foxbukkit.chatlink.json.ChatMessage;
 import com.foxelbox.foxbukkit.chatlink.json.MessageContents;
 import com.foxelbox.foxbukkit.chatlink.json.MessageTarget;
@@ -28,14 +29,14 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+@ICommand.Names({"conv", "conversation"})
+@ICommand.Help("Opens or closes a conversation with the given player. This means that all your chat is going to them until you close the conversation by running the command without parameters.")
+@ICommand.Usage("[<name>]")
+@ICommand.Permission("foxbukkit.communication.conversation")
+@ICommand.NoLogging
 public class ConvCommand extends ICommand {
     private static final String CONV_FORMAT = "<color name=\"yellow\">[CONV]</color> " + RedisHandler.MESSAGE_FORMAT;
     private static final String CONV_EMOTE_FORMAT = "<color name=\"yellow\">[CONV]</color> " + MeCommand.EMOTE_FORMAT;
-
-    @Override
-    public String[] getNames() {
-        return new String[] { "conv" };
-    }
 
     private static final Map<UUID, UUID> conversationMap = new HashMap<>();
 
