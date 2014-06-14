@@ -1,10 +1,8 @@
 package com.foxelbox.foxbukkit.chatlink;
 
-import java.util.UUID;
-
 public class ConsolePlayer extends Player {
     public ConsolePlayer(String name) {
-        super(UUID.nameUUIDFromBytes(name.getBytes()), name);
+        super(Player.CONSOLE_UUID, name);
     }
 
     @Override
