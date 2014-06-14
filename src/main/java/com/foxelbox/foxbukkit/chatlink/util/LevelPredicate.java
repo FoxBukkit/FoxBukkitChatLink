@@ -30,6 +30,6 @@ public class LevelPredicate implements Predicate<Player> {
 	public boolean apply(Player player) {
 		if(player == null)
 			return false;
-		return PlayerHelper.getPlayerLevel(player.getUniqueId()) >= minLevel;
+		return player.getLevel() >= minLevel;
 	}
 }

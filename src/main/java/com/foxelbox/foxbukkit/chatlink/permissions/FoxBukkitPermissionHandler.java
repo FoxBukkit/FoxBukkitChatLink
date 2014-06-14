@@ -100,7 +100,7 @@ public class FoxBukkitPermissionHandler {
 
 
 	public boolean has(Player player, String permission) {
-		return has(player.uuid, permission);
+		return has(player.getUniqueId(), permission);
 	}
 
 	public boolean has(UUID uuid, String permission) {

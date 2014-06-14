@@ -38,12 +38,12 @@ public class SetTagCommand extends ICommand {
     public ChatMessage run(ChatMessage message, String formattedName, String[] args) throws CommandException {
 		args = parseFlags(args);
 
-        final Player commandSender = new Player(message.from);
+        final Player commandSender = Player.getPlayerFromMessage(message);
 
 		final Player otherPly = PlayerHelper.matchPlayerSingle(args[0], false);
 
 		final String newTag = Utils.concatArray(" ", args, 1, "").replace('$', '\u00a7');
-		if (PlayerHelper.getPlayerLevel(commandSender.uuid) < PlayerHelper.getPlayerLevel(otherPly.uuid))
+		if (commandSender.getLevel() < otherPly.getLevel())
 			throw new PermissionDeniedException();
 
 		final boolean useRankTag = booleanFlags.contains('r');

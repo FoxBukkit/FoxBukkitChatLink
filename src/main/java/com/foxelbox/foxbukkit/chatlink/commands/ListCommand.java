@@ -45,8 +45,8 @@ public class ListCommand extends ICommand {
             } else {
                 for (Player ply : PlayerHelper.getOnlinePlayersOnServer(server)) {
                     listTextB.append("\u00a7f, ");
-                    listTextB.append(PlayerHelper.getPlayerRankTagRaw(ply.uuid));
-                    listTextB.append(ply.name);
+                    listTextB.append(PlayerHelper.getPlayerRankTagRaw(ply.getUniqueId()));
+                    listTextB.append(ply.getName());
                 }
                 listText = "\u00a7f" + listTextB.substring(4);
             }

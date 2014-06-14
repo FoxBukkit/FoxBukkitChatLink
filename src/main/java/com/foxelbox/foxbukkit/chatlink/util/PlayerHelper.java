@@ -162,7 +162,7 @@ public class PlayerHelper {
             if(players.contains(ply))
                 continue;
 
-            if (!ply.name.toLowerCase().contains(lowerCase) && !stripColor(ply.displayName.toLowerCase()).contains(lowerCase))
+            if (!ply.getName().toLowerCase().contains(lowerCase) && !stripColor(ply.getDisplayName().toLowerCase()).contains(lowerCase))
                 continue;
 
             players.add(ply);
@@ -187,7 +187,7 @@ public class PlayerHelper {
             return subString;
 
         if (c == 1)
-            return otherplys.get(0).name;
+            return otherplys.get(0).getName();
 
         return null;
     }

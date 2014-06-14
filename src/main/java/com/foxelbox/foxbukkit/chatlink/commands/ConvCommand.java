@@ -45,7 +45,7 @@ public class ConvCommand extends ICommand {
         if(targetUUID == null)
             return false;
 
-        Player target = new Player(targetUUID);
+        Player target = Player.getPlayerFromMessage(message);
 
         if(!target.isOnline()) {
             RedisHandler.sendMessage(makeError(message, "Conversation target is not online"));
@@ -67,7 +67,7 @@ public class ConvCommand extends ICommand {
                     }
             );
         }
-        message.to = new MessageTarget("player", new String[] { target.uuid.toString(), message.from.uuid.toString() });
+        message.to = new MessageTarget("player", new String[] { target.getUniqueId().toString(), message.from.uuid.toString() });
         RedisHandler.sendMessage(message);
 
         return true;
@@ -78,8 +78,8 @@ public class ConvCommand extends ICommand {
         makeReply(message);
         if(args.length > 0) {
             Player target = PlayerHelper.matchPlayerSingle(args[0]);
-            conversationMap.put(message.from.uuid, target.uuid);
-            message.contents = new MessageContents("\u00a75[FBCL] \u00a7fStarted conversation with " + target.name);
+            conversationMap.put(message.from.uuid, target.getUniqueId());
+            message.contents = new MessageContents("\u00a75[FBCL] \u00a7fStarted conversation with " + target.getName());
         } else {
             conversationMap.remove(message.from.uuid);
             message.contents = new MessageContents("\u00a75[FBCL] \u00a7fClosed conversation");

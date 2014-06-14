@@ -16,6 +16,7 @@
  */
 package com.foxelbox.foxbukkit.chatlink;
 
+import com.foxelbox.foxbukkit.chatlink.json.ChatMessage;
 import com.foxelbox.foxbukkit.chatlink.json.UserInfo;
 import com.foxelbox.foxbukkit.chatlink.permissions.FoxBukkitPermissionHandler;
 import com.foxelbox.foxbukkit.chatlink.util.PlayerHelper;
@@ -23,12 +24,16 @@ import com.foxelbox.foxbukkit.chatlink.util.PlayerHelper;
 import java.util.UUID;
 
 public class Player {
-    public final UUID uuid;
-    public final String name;
-    public final String displayName;
+    private final UUID uuid;
+    private final String name;
+    private String displayName;
 
-    public Player(UserInfo userInfo) {
-        this(userInfo.uuid, userInfo.name);
+    public static final UUID CONSOLE_UUID = UUID.nameUUIDFromBytes("COMMANDSENDER:CONSOLE".getBytes());
+
+    public static Player getPlayerFromMessage(ChatMessage message) {
+        if(message.from.uuid == null || message.from.uuid.equals(CONSOLE_UUID))
+            return new ConsolePlayer(message.from.name);
+        return new Player(message.from.uuid, message.from.name);
     }
 
     public Player(UUID uuid) {
@@ -50,12 +55,18 @@ public class Player {
     public Player(UUID uuid, String name) {
         this.uuid = uuid;
         this.name = name;
-        final String nick = PlayerHelper.getPlayerNick(uuid);
-        this.displayName = (nick != null) ? nick : name;
+        if(uuid != null) {
+            final String nick = PlayerHelper.getPlayerNick(uuid);
+            this.displayName = (nick != null) ? nick : name;
+        }
     }
 
     public boolean hasPermission(String permission) {
         return FoxBukkitPermissionHandler.instance.has(this, permission);
+    }
+
+    public int getLevel() {
+        return PlayerHelper.getPlayerLevel(getUniqueId());
     }
 
     public boolean isOnline() {

@@ -35,13 +35,13 @@ import java.util.UUID;
 public class SetRankCommand extends ICommand {
 	@Override
     public ChatMessage run(ChatMessage message, String formattedName, String[] args) throws CommandException {
-        Player from = new Player(message.from);
+        Player commandSender = Player.getPlayerFromMessage(message);
         args = parseFlags(args);
 
 		String otherName = args[0];
-		UUID otherUUID = UUID.fromString(PlayerHelper.playerNameToUUID.get(args[0].toLowerCase()));
+		Player otherPly = new Player(UUID.fromString(PlayerHelper.playerNameToUUID.get(args[0].toLowerCase())));
 		String newRank = args[1];
-		String oldRank = PlayerHelper.getPlayerRank(otherUUID);
+		String oldRank = PlayerHelper.getPlayerRank(otherPly.getUniqueId());
 		
 		if(oldRank.equalsIgnoreCase("banned")) {
 			throw new CommandException("Player is banned! /unban first!");
@@ -58,8 +58,8 @@ public class SetRankCommand extends ICommand {
 			throw new CommandException("Rank does not exist!");
 		}
 
-		int selflvl = PlayerHelper.getPlayerLevel(message.from.uuid);
-		int oldlvl = PlayerHelper.getPlayerLevel(otherUUID);
+		int selflvl = commandSender.getLevel();
+		int oldlvl = otherPly.getLevel();
 		int newlvl = PlayerHelper.getRankLevel(newRank);
 
 		if(selflvl <= oldlvl)
@@ -70,16 +70,16 @@ public class SetRankCommand extends ICommand {
 
 		int opLvl = PlayerHelper.getRankLevel("op");
 
-		if(PlayerHelper.getRankLevel(newRank) >= opLvl && !from.hasPermission("foxbukkit.users.makestaff"))
+		if(PlayerHelper.getRankLevel(newRank) >= opLvl && !commandSender.hasPermission("foxbukkit.users.makestaff"))
 			throw new PermissionDeniedException();
 		
-		if(PlayerHelper.getPlayerLevel(otherUUID) >= opLvl && !from.hasPermission("foxbukkit.users.modifystaff"))
+		if(newlvl >= opLvl && !commandSender.hasPermission("foxbukkit.users.modifystaff"))
 			throw new PermissionDeniedException();
 
 		if(booleanFlags.contains('p') && newlvl < oldlvl)
 			throw new PermissionDeniedException();
 
-        FoxBukkitPermissionHandler.instance.setGroup(otherUUID, newRank);
+        FoxBukkitPermissionHandler.instance.setGroup(otherPly.getUniqueId(), newRank);
 
         message.contents = new MessageContents(message.from.name + " set rank of " + otherName + " to " + newRank);
         return message;

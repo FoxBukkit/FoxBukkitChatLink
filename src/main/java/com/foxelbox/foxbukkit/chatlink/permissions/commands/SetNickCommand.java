@@ -34,7 +34,7 @@ public class SetNickCommand extends ICommand {
 		final Player otherPly = PlayerHelper.matchPlayerSingle(args[0], false);
 
 		final String newNick = Utils.concatArray(" ", args, 1, "").replace('$', '\u00a7');
-		if (PlayerHelper.getPlayerLevel(message.from.uuid) < PlayerHelper.getPlayerLevel(otherPly.getUniqueId()))
+		if (Player.getPlayerFromMessage(message).getLevel() < otherPly.getLevel())
 			throw new PermissionDeniedException();
 
 		final String undoCommand;
@@ -45,11 +45,11 @@ public class SetNickCommand extends ICommand {
 
 		if (newNick.equals("none")) {
 			PlayerHelper.setPlayerNick(otherPly.getUniqueId(), null);
-			return announceTagChange(message.server, "%1$s reset nickname of %2$s!", "%2$s reset their own nickname!", new Player(message.from), otherPly, undoCommand);
+			return announceTagChange(message.server, "%1$s reset nickname of %2$s!", "%2$s reset their own nickname!", Player.getPlayerFromMessage(message), otherPly, undoCommand);
 		}
 		else {
             PlayerHelper.setPlayerNick(otherPly.getUniqueId(), newNick);
-			return announceTagChange(message.server, "%1$s set nickname of %2$s!", "%2$s set their own nickname!", new Player(message.from), otherPly, undoCommand);
+			return announceTagChange(message.server, "%1$s set nickname of %2$s!", "%2$s set their own nickname!", Player.getPlayerFromMessage(message), otherPly, undoCommand);
 		}
 	}
 
@@ -67,8 +67,8 @@ public class SetNickCommand extends ICommand {
                 MessageHelper.button(undoCommand, "undo", "blue", false)
         ));
         message.contents.plain = "\u00a75[FBCL]\u00a7f " + String.format(format, MessageHelper.format(commandSender), MessageHelper.formatWithTag(commandSender));
-        message.from.uuid = commandSender.uuid;
-        message.from.name = commandSender.name;
+        message.from.uuid = commandSender.getUniqueId();
+        message.from.name = commandSender.getName();
         message.server = server;
         return message;
     }

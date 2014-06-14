@@ -37,7 +37,7 @@ public class HelpCommand extends ICommand {
     public ChatMessage run(ChatMessage message, String formattedName, String[] args) throws CommandException {
         Map<String, ICommand> commands = CommandSystem.instance.getCommands();
 
-        final Player commandSender = new Player(message.from);
+        final Player commandSender = Player.getPlayerFromMessage(message);
         makeReply(message);
 
         if(args.length > 0) {

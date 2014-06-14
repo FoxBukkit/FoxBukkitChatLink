@@ -76,8 +76,8 @@ public class CommandSystem {
 
 	public ChatMessage runCommand(ChatMessage message, String cmd, String argStr) {
 		if (commands.containsKey(cmd)) {
-            final Player player = new Player(message.from);
-			final String playerName = player.name;
+            final Player player = Player.getPlayerFromMessage(message);
+			final String playerName = player.getName();
 			final ICommand icmd = commands.get(cmd);
 			try {
 				if(!icmd.canPlayerUseCommand(player))

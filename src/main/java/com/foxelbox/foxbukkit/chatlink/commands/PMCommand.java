@@ -45,18 +45,18 @@ public class PMCommand extends ICommand {
                 new String[] {
                         message.from.name, formattedName, messageText
                 });
-        message.to = new MessageTarget("player", new String[] { target.uuid.toString() });
+        message.to = new MessageTarget("player", new String[] { target.getUniqueId().toString() });
         RedisHandler.sendMessage(message);
 
-        formattedName = PlayerHelper.getFullPlayerName(target.uuid, target.name);
+        formattedName = PlayerHelper.getFullPlayerName(target.getUniqueId(), target.getName());
         message.contents = new MessageContents("\u00a7e[PM >] \u00a7f" + formattedName + "\u00a7f: " + messageText,
                 PM_SEND_FORMAT,
                 new String[] {
-                        target.name, formattedName, messageText
+                        target.getName(), formattedName, messageText
                 });
         message.to = new MessageTarget("player", new String[] { message.from.uuid.toString() });
-        message.from.uuid = target.uuid;
-        message.from.name = target.name;
+        message.from.uuid = target.getUniqueId();
+        message.from.name = target.getName();
         RedisHandler.sendMessage(message);
 
         return null;

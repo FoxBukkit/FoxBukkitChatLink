@@ -53,14 +53,6 @@ public class MessageHelper {
 		return format(commandSender.getUniqueId(), commandSender, true);
 	}
 
-	public static String format(UUID uuid) {
-		return format(uuid, new Player(uuid), false);
-	}
-
-	public static String formatWithTag(UUID uuid) {
-		return format(uuid, new Player(uuid), true);
-	}
-
 	private static String format(UUID uuid, Player commandSender, boolean withTag) {
 		final String onHover;
 		String displayName, name;
@@ -126,7 +118,7 @@ public class MessageHelper {
 		}
 
         ChatMessage result = new ChatMessage("", new UserInfo(null, ""), "");
-        result.to = new MessageTarget("player", new String[] { commandSender.uuid.toString() });
+        result.to = new MessageTarget("player", new String[] { commandSender.getUniqueId().toString() });
         result.contents = new MessageContents(null, format, params);
         return result;
 	}
