@@ -81,7 +81,7 @@ public class SetRankCommand extends ICommand {
 
         FoxBukkitPermissionHandler.instance.setGroup(otherPly.getUniqueId(), newRank);
 
-        message.contents = new MessageContents(message.from.name + " set rank of " + otherName + " to " + newRank);
+        message.contents = new MessageContents("\u00a75[FBCL]\u00a7f " + message.from.name + " set rank of " + otherName + " to " + newRank);
         return message;
 	}
 }
