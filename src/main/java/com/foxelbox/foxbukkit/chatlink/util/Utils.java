@@ -64,6 +64,16 @@ public class Utils {
         }
     }
 
+    public static String XMLEscape(String s) {
+        s = s.replace("&", "&amp;");
+        s = s.replace("\"", "&quot;");
+        s = s.replace("'", "&apos;");
+        s = s.replace("<", "&lt;");
+        s = s.replace(">", "&gt;");
+
+        return s;
+    }
+
     public static <T> List<Class<? extends T>> getSubClasses(Class<T> baseClass, String packageName) {
         final List<Class<? extends T>> ret = new ArrayList<>();
         final File file;

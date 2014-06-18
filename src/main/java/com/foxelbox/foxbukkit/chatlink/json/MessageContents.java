@@ -16,11 +16,19 @@
  */
 package com.foxelbox.foxbukkit.chatlink.json;
 
+import com.foxelbox.foxbukkit.chatlink.util.Utils;
+
 public class MessageContents {
     public MessageContents(String plain, String formatXML, String[] formatXMLArgs) {
         this.plain = plain;
-        this.xml_format = formatXML;
-        this.xml_format_args = formatXMLArgs;
+        this.xml = String.format(formatXML, xmlEscapeArray(formatXMLArgs));
+    }
+
+    private static String[] xmlEscapeArray(String[] in) {
+        final String[] out = new String[in.length];
+        for(int i = 0; i < in.length; i++)
+            out[i] = Utils.XMLEscape(in[i]);
+        return out;
     }
 
     public MessageContents(String plain) {
@@ -28,6 +36,5 @@ public class MessageContents {
     }
 
     public String plain;
-    public String xml_format;
-    public String[] xml_format_args;
+    public String xml;
 }
