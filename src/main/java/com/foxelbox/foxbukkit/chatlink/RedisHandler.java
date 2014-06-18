@@ -31,7 +31,7 @@ import java.util.regex.Pattern;
 
 public class RedisHandler extends AbstractRedisHandler {
     public RedisHandler() {
-        super(Main.redisManager, "foxbukkit:from_server");
+        super(Main.redisManager, RedisHandlerType.BOTH, "foxbukkit:from_server");
     }
 
     private static final Pattern REMOVE_COLOR_CODE = Pattern.compile("\u00a7.");
