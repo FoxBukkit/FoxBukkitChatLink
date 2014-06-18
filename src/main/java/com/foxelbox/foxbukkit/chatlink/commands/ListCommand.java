@@ -19,7 +19,8 @@ package com.foxelbox.foxbukkit.chatlink.commands;
 import com.foxelbox.foxbukkit.chatlink.Player;
 import com.foxelbox.foxbukkit.chatlink.RedisHandler;
 import com.foxelbox.foxbukkit.chatlink.commands.system.ICommand;
-import com.foxelbox.foxbukkit.chatlink.json.ChatMessage;
+import com.foxelbox.foxbukkit.chatlink.json.ChatMessageIn;
+import com.foxelbox.foxbukkit.chatlink.json.ChatMessageOut;
 import com.foxelbox.foxbukkit.chatlink.json.MessageContents;
 import com.foxelbox.foxbukkit.chatlink.util.CommandException;
 import com.foxelbox.foxbukkit.chatlink.util.PlayerHelper;
@@ -34,8 +35,8 @@ public class ListCommand extends ICommand {
     private static final String LIST_FORMAT = "<color name=\"dark_purple\">[FBCL]</color> <color name=\"dark_gray\">[%1$s]</color> %2$s";
 
     @Override
-    public ChatMessage run(ChatMessage message, String formattedName, String[] args) throws CommandException {
-        message = makeReply(message);
+    public ChatMessageOut run(ChatMessageIn messageIn, String formattedName, String[] args) throws CommandException {
+        ChatMessageOut message = makeReply(messageIn);
         for(String server : PlayerHelper.getAllServers()) {
             StringBuilder listTextB = new StringBuilder();
             List<Player> players = PlayerHelper.getOnlinePlayersOnServer(server);

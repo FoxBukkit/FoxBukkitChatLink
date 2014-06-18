@@ -18,7 +18,8 @@ package com.foxelbox.foxbukkit.chatlink.permissions.commands;
 
 import com.foxelbox.foxbukkit.chatlink.Player;
 import com.foxelbox.foxbukkit.chatlink.commands.system.ICommand;
-import com.foxelbox.foxbukkit.chatlink.json.ChatMessage;
+import com.foxelbox.foxbukkit.chatlink.json.ChatMessageIn;
+import com.foxelbox.foxbukkit.chatlink.json.ChatMessageOut;
 import com.foxelbox.foxbukkit.chatlink.json.MessageContents;
 import com.foxelbox.foxbukkit.chatlink.permissions.FoxBukkitPermissionHandler;
 import com.foxelbox.foxbukkit.chatlink.util.CommandException;
@@ -34,8 +35,8 @@ import java.util.UUID;
 @ICommand.Permission("foxbukkit.users.setrank")
 public class SetRankCommand extends ICommand {
 	@Override
-    public ChatMessage run(ChatMessage message, String formattedName, String[] args) throws CommandException {
-        Player commandSender = Player.getPlayerFromMessage(message);
+    public ChatMessageOut run(ChatMessageIn messageIn, String formattedName, String[] args) throws CommandException {
+        Player commandSender = Player.getPlayerFromMessage(messageIn);
         args = parseFlags(args);
 
 		String otherName = args[0];
@@ -81,7 +82,8 @@ public class SetRankCommand extends ICommand {
 
         FoxBukkitPermissionHandler.instance.setGroup(otherPly.getUniqueId(), newRank);
 
-        message.contents = new MessageContents("\u00a75[FBCL]\u00a7f " + message.from.name + " set rank of " + otherName + " to " + newRank);
+        ChatMessageOut message = new ChatMessageOut(messageIn);
+        message.contents = new MessageContents("\u00a75[FBCL]\u00a7f " + messageIn.from.name + " set rank of " + otherName + " to " + newRank);
         return message;
 	}
 }

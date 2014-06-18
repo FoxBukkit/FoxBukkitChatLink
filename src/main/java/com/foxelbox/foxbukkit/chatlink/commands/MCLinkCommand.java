@@ -19,7 +19,8 @@ package com.foxelbox.foxbukkit.chatlink.commands;
 import com.foxelbox.foxbukkit.chatlink.Main;
 import com.foxelbox.foxbukkit.chatlink.RedisHandler;
 import com.foxelbox.foxbukkit.chatlink.commands.system.ICommand;
-import com.foxelbox.foxbukkit.chatlink.json.ChatMessage;
+import com.foxelbox.foxbukkit.chatlink.json.ChatMessageIn;
+import com.foxelbox.foxbukkit.chatlink.json.ChatMessageOut;
 import com.foxelbox.foxbukkit.chatlink.json.MessageContents;
 import com.foxelbox.foxbukkit.chatlink.util.CommandException;
 import com.foxelbox.foxbukkit.chatlink.util.Utils;
@@ -35,12 +36,12 @@ import java.net.URLConnection;
 @ICommand.Permission("foxbukkit.mclink")
 public class MCLinkCommand extends ICommand {
     @Override
-    public ChatMessage run(final ChatMessage message, String formattedName, String argStr) throws CommandException {
-        makeReply(message);
+    public ChatMessageOut run(final ChatMessageIn messageIn, String formattedName, String argStr) throws CommandException {
+        final ChatMessageOut message = makeReply(messageIn);
         new Thread() {
             public void run() {
                 try {
-                    URL url = new URL(Main.configuration.getValue("mclink-url", "http://foxelbox.com/mclink_int.php?scode=SOMECODE&uuid=") + Utils.URLEncode(message.from.uuid.toString()));
+                    URL url = new URL(Main.configuration.getValue("mclink-url", "http://foxelbox.com/mclink_int.php?scode=SOMECODE&uuid=") + Utils.URLEncode(messageIn.from.uuid.toString()));
                     URLConnection conn = url.openConnection();
                     System.setProperty("http.agent", "");
                     conn.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/534.30 (KHTML, like Gecko) Chrome/12.0.742.100 Safari/534.30");
@@ -52,7 +53,7 @@ public class MCLinkCommand extends ICommand {
                     message.contents = new MessageContents("\u00a75[FBCL]\u00a7f Go here to complete: " + link);
                     RedisHandler.sendMessage(message);
                 } catch(Exception e) {
-                    RedisHandler.sendMessage(makeError(message, "Please try again later"));
+                    RedisHandler.sendMessage(makeError(messageIn, "Please try again later"));
                 }
             }
         }.start();

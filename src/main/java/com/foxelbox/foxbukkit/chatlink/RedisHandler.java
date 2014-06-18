@@ -17,13 +17,13 @@
 package com.foxelbox.foxbukkit.chatlink;
 
 import com.foxelbox.foxbukkit.chatlink.commands.system.CommandSystem;
+import com.foxelbox.foxbukkit.chatlink.json.ChatMessageIn;
+import com.foxelbox.foxbukkit.chatlink.json.ChatMessageOut;
 import com.google.gson.Gson;
 import com.foxelbox.dependencies.redis.AbstractRedisHandler;
 import com.foxelbox.foxbukkit.chatlink.commands.*;
-import com.foxelbox.foxbukkit.chatlink.json.ChatMessage;
 import com.foxelbox.foxbukkit.chatlink.json.MessageContents;
 import com.foxelbox.foxbukkit.chatlink.json.UserInfo;
-import com.foxelbox.foxbukkit.chatlink.util.CommandException;
 import com.foxelbox.foxbukkit.chatlink.util.PlayerHelper;
 
 import java.util.*;
@@ -34,7 +34,8 @@ public class RedisHandler extends AbstractRedisHandler {
         super(Main.redisManager, "foxbukkit:from_server");
     }
 
-    private static final Pattern REMOVE_COLOR_CODE = Pattern.compile("\u00a7.?");
+    private static final Pattern REMOVE_COLOR_CODE = Pattern.compile("\u00a7.");
+    private static final Pattern REMOVE_DISALLOWED_CHARS = Pattern.compile("[\u00a7\r\n\t]");
 
 	public static final String PLAYER_FORMAT = "<span onClick=\"suggest_command('/pm %1$s ')\">%2$s</span>";
     public static final String MESSAGE_FORMAT = PLAYER_FORMAT + "<color name=\"white\">: %3$s</color>";
@@ -47,14 +48,12 @@ public class RedisHandler extends AbstractRedisHandler {
 	@Override
 	public void onMessage(final String c_message) {
 		try {
-			final String[] split = c_message.split("\\|", 4);
+            final ChatMessageIn chatMessageIn;
+            synchronized (gson) {
+                chatMessageIn = gson.fromJson(c_message, ChatMessageIn.class);
+            }
 
-			//SERVER|UUID|NAME|MESSAGE
-			final String server = split[0];
-			final UUID plyU = UUID.fromString(split[1]);
-			final String plyN = split[2];
-
-            ChatMessage message = formatMessage(new ChatMessage(server, new UserInfo(plyU, plyN), split[3]));
+            ChatMessageOut message = formatMessage(chatMessageIn);
 
             if(message == null)
                 return;
@@ -66,7 +65,7 @@ public class RedisHandler extends AbstractRedisHandler {
 		}
 	}
 
-    public static void sendMessage(ChatMessage message) {
+    public static void sendMessage(ChatMessageOut message) {
         final String outMsg;
         synchronized (gson) {
             outMsg = gson.toJson(message);
@@ -74,41 +73,58 @@ public class RedisHandler extends AbstractRedisHandler {
         Main.redisManager.publish("foxbukkit:to_server", outMsg);
     }
 
-    private static ChatMessage runFormatAndStore(ChatMessage message, String format, String[] formatArgs, String plain) {
-        message.contents = new MessageContents(plain, format, formatArgs);
-        return message;
+    private static ChatMessageOut runFormatAndStore(ChatMessageIn messageIn, String format, String[] formatArgs, String plain) {
+        ChatMessageOut messageOut = new ChatMessageOut(messageIn);
+        messageOut.contents = new MessageContents(plain, format, formatArgs);
+        return messageOut;
     }
 
-	private static ChatMessage formatMessage(ChatMessage message) {
-        final String plyN = message.from.name;
-		final String formattedName = PlayerHelper.getFullPlayerName(message.from.uuid, plyN);
+	private static ChatMessageOut formatMessage(ChatMessageIn messageIn) {
+        final String plyN = messageIn.from.name;
+        final String formattedName = PlayerHelper.getFullPlayerName(messageIn.from.uuid, plyN);
 
-        String messageStr = REMOVE_COLOR_CODE.matcher(message.contents.plain).replaceAll("");
+        String messageStr = REMOVE_DISALLOWED_CHARS.matcher(messageIn.contents).replaceAll("");
 
-        if(messageStr.charAt(0) == '#')
-            messageStr = "/opchat " +  messageStr.substring(1);
+        if (messageStr.charAt(0) == '#')
+            messageStr = "/opchat " + messageStr.substring(1);
 
-		switch (messageStr) {
-			case "\u0123join":
-                return runFormatAndStore(message,
-                        JOIN_FORMAT,
-                        new String[] {
-                            plyN, formattedName
-                        },
-                        "\u00a72[+] \u00a7e" + formattedName + "\u00a7e joined!"
-                );
+        switch (messageIn.type) {
+            case "playerstate":
+                switch (messageStr) {
+                    case "join":
+                        return runFormatAndStore(messageIn,
+                                JOIN_FORMAT,
+                                new String[]{
+                                        plyN, formattedName
+                                },
+                                "\u00a72[+] \u00a7e" + formattedName + "\u00a7e joined!"
+                        );
 
-			case "\u0123quit":
-                return runFormatAndStore(message,
-                        QUIT_FORMAT,
-                        new String[]{
-                                plyN, formattedName
-                        },
-                        "\u00a74[-] \u00a7e" + formattedName + "\u00a7e disconnected!"
-                );
+                    case "quit":
+                        return runFormatAndStore(messageIn,
+                                QUIT_FORMAT,
+                                new String[]{
+                                        plyN, formattedName
+                                },
+                                "\u00a74[-] \u00a7e" + formattedName + "\u00a7e disconnected!"
+                        );
+                }
 
-			default:
-				if (messageStr.charAt(0) == '/') {
+                if (messageStr.startsWith("kick ")) {
+                    final String param = messageStr.substring(5);
+                    return runFormatAndStore(messageIn,
+                            KICK_FORMAT,
+                            new String[]{
+                                    plyN, formattedName, param
+                            },
+                            "\u00a74[-] \u00a7e" + formattedName + "\u00a7e was kicked (" + messageStr.substring(6) + ")!"
+                    );
+                }
+
+                break;
+
+            case "text":
+                if (messageStr.charAt(0) == '/') {
                     messageStr = messageStr.substring(1).trim();
                     int argPos = messageStr.indexOf(' ');
                     final String argStr;
@@ -120,30 +136,22 @@ public class RedisHandler extends AbstractRedisHandler {
                         argStr = "";
                         commandName = messageStr;
                     }
-                    return CommandSystem.instance.runCommand(message, commandName, argStr);
-				}
-				else if (messageStr.startsWith("\u0123kick ")) {
-					final String param = messageStr.substring(6);
-                    return runFormatAndStore(message,
-                            KICK_FORMAT,
-                            new String[] {
-                                    plyN, formattedName, param
-                            },
-                            "\u00a74[-] \u00a7e" + formattedName + "\u00a7e was kicked (" + messageStr.substring(6) + ")!"
-                    );
-				}
-				else {
-                    if(ConvCommand.handleConvMessage(message, formattedName, messageStr, false))
+                    return CommandSystem.instance.runCommand(messageIn, commandName, argStr);
+                }
+                else {
+                    if(ConvCommand.handleConvMessage(messageIn, formattedName, messageStr, false))
                         return null;
 
-                    return runFormatAndStore(message,
+                    return runFormatAndStore(messageIn,
                             MESSAGE_FORMAT,
                             new String[] {
                                     plyN, formattedName, messageStr
                             },
                             formattedName + "\u00a7f: " + messageStr
                     );
-				}
-		}
+                }
+        }
+
+        throw new RuntimeException("Unprocessable message: " + messageIn.type + " => " + messageStr);
 	}
 }

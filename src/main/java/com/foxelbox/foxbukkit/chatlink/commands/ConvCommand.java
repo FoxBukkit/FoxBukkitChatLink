@@ -19,7 +19,8 @@ package com.foxelbox.foxbukkit.chatlink.commands;
 import com.foxelbox.foxbukkit.chatlink.Player;
 import com.foxelbox.foxbukkit.chatlink.RedisHandler;
 import com.foxelbox.foxbukkit.chatlink.commands.system.ICommand;
-import com.foxelbox.foxbukkit.chatlink.json.ChatMessage;
+import com.foxelbox.foxbukkit.chatlink.json.ChatMessageIn;
+import com.foxelbox.foxbukkit.chatlink.json.ChatMessageOut;
 import com.foxelbox.foxbukkit.chatlink.json.MessageContents;
 import com.foxelbox.foxbukkit.chatlink.json.MessageTarget;
 import com.foxelbox.foxbukkit.chatlink.util.CommandException;
@@ -40,17 +41,19 @@ public class ConvCommand extends ICommand {
 
     private static final Map<UUID, UUID> conversationMap = new HashMap<>();
 
-    public static boolean handleConvMessage(ChatMessage message, String formattedName, String messageText, boolean isEmote) {
-        UUID targetUUID = conversationMap.get(message.from.uuid);
+    public static boolean handleConvMessage(ChatMessageIn messageIn, String formattedName, String messageText, boolean isEmote) {
+        UUID targetUUID = conversationMap.get(messageIn.from.uuid);
         if(targetUUID == null)
             return false;
 
-        Player target = Player.getPlayerFromMessage(message);
+        Player target = Player.getPlayerFromMessage(messageIn);
 
         if(!target.isOnline()) {
-            RedisHandler.sendMessage(makeError(message, "Conversation target is not online"));
+            RedisHandler.sendMessage(makeError(messageIn, "Conversation target is not online"));
             return true;
         }
+
+        ChatMessageOut message = new ChatMessageOut(messageIn);
 
         if(isEmote) {
             message.contents = new MessageContents("\u00a7e[CONV] \u00a7f* " + formattedName + "\u00a77 " + messageText,
@@ -74,14 +77,14 @@ public class ConvCommand extends ICommand {
     }
 
     @Override
-    public ChatMessage run(ChatMessage message, String formattedName, String[] args) throws CommandException {
-        makeReply(message);
+    public ChatMessageOut run(ChatMessageIn messageIn, String formattedName, String[] args) throws CommandException {
+        ChatMessageOut message = makeReply(messageIn);
         if(args.length > 0) {
             Player target = PlayerHelper.matchPlayerSingle(args[0]);
-            conversationMap.put(message.from.uuid, target.getUniqueId());
+            conversationMap.put(messageIn.from.uuid, target.getUniqueId());
             message.contents = new MessageContents("\u00a75[FBCL] \u00a7fStarted conversation with " + target.getName());
         } else {
-            conversationMap.remove(message.from.uuid);
+            conversationMap.remove(messageIn.from.uuid);
             message.contents = new MessageContents("\u00a75[FBCL] \u00a7fClosed conversation");
         }
         return message;

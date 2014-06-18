@@ -18,7 +18,8 @@ package com.foxelbox.foxbukkit.chatlink.permissions.commands;
 
 import com.foxelbox.foxbukkit.chatlink.Player;
 import com.foxelbox.foxbukkit.chatlink.commands.system.ICommand;
-import com.foxelbox.foxbukkit.chatlink.json.ChatMessage;
+import com.foxelbox.foxbukkit.chatlink.json.ChatMessageIn;
+import com.foxelbox.foxbukkit.chatlink.json.ChatMessageOut;
 import com.foxelbox.foxbukkit.chatlink.util.CommandException;
 import com.foxelbox.foxbukkit.chatlink.util.PermissionDeniedException;
 import com.foxelbox.foxbukkit.chatlink.util.PlayerHelper;
@@ -35,10 +36,10 @@ import com.foxelbox.foxbukkit.chatlink.util.Utils;
 @ICommand.Permission("foxbukkit.users.settag")
 public class SetTagCommand extends ICommand {
     @Override
-    public ChatMessage run(ChatMessage message, String formattedName, String[] args) throws CommandException {
+    public ChatMessageOut run(ChatMessageIn messageIn, String formattedName, String[] args) throws CommandException {
 		args = parseFlags(args);
 
-        final Player commandSender = Player.getPlayerFromMessage(message);
+        final Player commandSender = Player.getPlayerFromMessage(messageIn);
 
 		final Player otherPly = PlayerHelper.matchPlayerSingle(args[0], false);
 
@@ -61,14 +62,14 @@ public class SetTagCommand extends ICommand {
 
 		if (newTag.equals("none")) {
 			PlayerHelper.setPlayerTag(otherPly.getUniqueId(), null, useRankTag);
-			return SetNickCommand.announceTagChange(message.server, "%1$s reset "+tagTypeName+" of %2$s!", "%2$s reset their own "+tagTypeName+"!", commandSender, otherPly, undoCommand);
+			return SetNickCommand.announceTagChange(messageIn.server, "%1$s reset "+tagTypeName+" of %2$s!", "%2$s reset their own "+tagTypeName+"!", commandSender, otherPly, undoCommand);
 		}
 		else if (!useRankTag && !force && newTag.matches("^.*\u00a7.$")) {
 			throw new CommandException("Player tag ends in color code. This belongs into the rank tag now (-r flag).");
 		}
 		else {
             PlayerHelper.setPlayerTag(otherPly.getUniqueId(), newTag, useRankTag);
-			return SetNickCommand.announceTagChange(message.server, "%1$s set "+tagTypeName+" of %2$s!", "%2$s set their own "+tagTypeName+"!", commandSender, otherPly, undoCommand);
+			return SetNickCommand.announceTagChange(messageIn.server, "%1$s set "+tagTypeName+" of %2$s!", "%2$s set their own "+tagTypeName+"!", commandSender, otherPly, undoCommand);
 		}
 	}
 }

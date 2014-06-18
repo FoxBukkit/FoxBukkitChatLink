@@ -18,7 +18,8 @@ package com.foxelbox.foxbukkit.chatlink.commands.system;
 
 import com.foxelbox.foxbukkit.chatlink.Main;
 import com.foxelbox.foxbukkit.chatlink.Player;
-import com.foxelbox.foxbukkit.chatlink.json.ChatMessage;
+import com.foxelbox.foxbukkit.chatlink.json.ChatMessageIn;
+import com.foxelbox.foxbukkit.chatlink.json.ChatMessageOut;
 import com.foxelbox.foxbukkit.chatlink.util.CommandException;
 import com.foxelbox.foxbukkit.chatlink.util.PermissionDeniedException;
 import com.foxelbox.foxbukkit.chatlink.util.PlayerHelper;
@@ -74,7 +75,7 @@ public class CommandSystem {
 		return commands;
 	}
 
-	public ChatMessage runCommand(ChatMessage message, String cmd, String argStr) {
+	public ChatMessageOut runCommand(ChatMessageIn message, String cmd, String argStr) {
 		if (commands.containsKey(cmd)) {
             final Player player = Player.getPlayerFromMessage(message);
 			final String playerName = player.getName();

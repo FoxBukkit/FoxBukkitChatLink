@@ -18,7 +18,8 @@ package com.foxelbox.foxbukkit.chatlink.permissions.commands;
 
 import com.foxelbox.foxbukkit.chatlink.Player;
 import com.foxelbox.foxbukkit.chatlink.commands.system.ICommand;
-import com.foxelbox.foxbukkit.chatlink.json.ChatMessage;
+import com.foxelbox.foxbukkit.chatlink.json.ChatMessageIn;
+import com.foxelbox.foxbukkit.chatlink.json.ChatMessageOut;
 import com.foxelbox.foxbukkit.chatlink.util.*;
 
 @ICommand.Names("setnick")
@@ -30,11 +31,11 @@ import com.foxelbox.foxbukkit.chatlink.util.*;
 @ICommand.Permission("foxbukkit.users.setnick")
 public class SetNickCommand extends ICommand {
     @Override
-    public ChatMessage run(ChatMessage message, String formattedName, String[] args) throws CommandException {
+    public ChatMessageOut run(ChatMessageIn messageIn, String formattedName, String[] args) throws CommandException {
 		final Player otherPly = PlayerHelper.matchPlayerSingle(args[0], false);
 
 		final String newNick = Utils.concatArray(" ", args, 1, "").replace('$', '\u00a7');
-		if (Player.getPlayerFromMessage(message).getLevel() < otherPly.getLevel())
+		if (Player.getPlayerFromMessage(messageIn).getLevel() < otherPly.getLevel())
 			throw new PermissionDeniedException();
 
 		final String undoCommand;
@@ -45,22 +46,24 @@ public class SetNickCommand extends ICommand {
 
 		if (newNick.equals("none")) {
 			PlayerHelper.setPlayerNick(otherPly.getUniqueId(), null);
-			return announceTagChange(message.server, "%1$s reset nickname of %2$s!", "%2$s reset their own nickname!", Player.getPlayerFromMessage(message), otherPly, undoCommand);
+			return announceTagChange(messageIn.server, "%1$s reset nickname of %2$s!", "%2$s reset their own nickname!", Player.getPlayerFromMessage(messageIn), otherPly, undoCommand);
 		}
 		else {
             PlayerHelper.setPlayerNick(otherPly.getUniqueId(), newNick);
-			return announceTagChange(message.server, "%1$s set nickname of %2$s!", "%2$s set their own nickname!", Player.getPlayerFromMessage(message), otherPly, undoCommand);
+			return announceTagChange(messageIn.server, "%1$s set nickname of %2$s!", "%2$s set their own nickname!", Player.getPlayerFromMessage(messageIn), otherPly, undoCommand);
 		}
 	}
 
-	public static ChatMessage announceTagChange(String server, String formatOther, String formatOwn, Player commandSender, Player modifiedPlayer, String undoCommand) {
+	public static ChatMessageOut announceTagChange(String server, String formatOther, String formatOwn, Player commandSender, Player modifiedPlayer, String undoCommand) {
 		final String format;
 		if (commandSender == modifiedPlayer)
 			format = formatOwn;
 		else
 			format = formatOther;
 
-		ChatMessage message = MessageHelper.sendServerMessage(String.format(
+        modifiedPlayer = new Player(modifiedPlayer);
+
+		ChatMessageOut message = MessageHelper.sendServerMessage(String.format(
                 format + " %3$s",
                 MessageHelper.format(commandSender),
                 MessageHelper.formatWithTag(modifiedPlayer),

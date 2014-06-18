@@ -17,7 +17,7 @@
 package com.foxelbox.foxbukkit.chatlink.util;
 
 import com.foxelbox.foxbukkit.chatlink.Player;
-import com.foxelbox.foxbukkit.chatlink.json.ChatMessage;
+import com.foxelbox.foxbukkit.chatlink.json.ChatMessageOut;
 import com.foxelbox.foxbukkit.chatlink.json.MessageContents;
 import com.foxelbox.foxbukkit.chatlink.json.MessageTarget;
 import com.foxelbox.foxbukkit.chatlink.json.UserInfo;
@@ -81,43 +81,43 @@ public class MessageHelper {
 		return String.format("<color name=\"%3$s\" onClick=\"%4$s('%1$s')\" onHover=\"show_text('%1$s')\">[%2$s]</color>", escape(command), escape(label), escape(color), eventType);
 	}
 
-	public static ChatMessage sendServerMessage(String format, String... params) {
+	public static ChatMessageOut sendServerMessage(String format, String... params) {
 		return sendColoredServerMessage(FB_DEFAULT_COLOR, format, params);
 	}
 
-	public static ChatMessage sendColoredServerMessage(String color, String format, String... params) {
+	public static ChatMessageOut sendColoredServerMessage(String color, String format, String... params) {
 		return sendColoredServerMessage(color, Predicates.<Player>alwaysTrue(), format, params);
 	}
 
-	public static ChatMessage sendServerMessage(Predicate<? super Player> predicate, String format, String... params) {
+	public static ChatMessageOut sendServerMessage(Predicate<? super Player> predicate, String format, String... params) {
 		return sendColoredServerMessage(FB_DEFAULT_COLOR, predicate, format, params);
 	}
 
-	public static ChatMessage sendColoredServerMessage(String color, Predicate<? super Player> predicate, String format, String... params) {
+	public static ChatMessageOut sendColoredServerMessage(String color, Predicate<? super Player> predicate, String format, String... params) {
 		if (color != null) {
 			format = "<color name=\"" + color + "\">[FBCL]</color> " + format;
 		}
 
-        ChatMessage result = new ChatMessage("", new UserInfo(null, ""), "");
+        ChatMessageOut result = new ChatMessageOut("", new UserInfo(null, ""), "");
         result.to = new MessageTarget("all", new String[0]);
         result.contents = new MessageContents(null, format, params);
         return result;
 	}
 
-	public static ChatMessage sendMessage(Player commandSender, String format, String... params) {
+	public static ChatMessageOut sendMessage(Player commandSender, String format, String... params) {
 		return sendMessage(FB_DEFAULT_COLOR, commandSender, format, params);
 	}
 
-	public static ChatMessage sendErrorMessage(Player commandSender, String format, String... params) {
+	public static ChatMessageOut sendErrorMessage(Player commandSender, String format, String... params) {
 		return sendMessage(FB_ERROR_COLOR, commandSender, format, params);
 	}
 
-	public static ChatMessage sendMessage(String color, Player commandSender, String format, String... params) {
+	public static ChatMessageOut sendMessage(String color, Player commandSender, String format, String... params) {
 		if (color != null) {
 			format = "<color name=\"" + color + "\">[FBCL]</color> " + format;
 		}
 
-        ChatMessage result = new ChatMessage("", new UserInfo(null, ""), "");
+        ChatMessageOut result = new ChatMessageOut("", new UserInfo(null, ""), "");
         result.to = new MessageTarget("player", new String[] { commandSender.getUniqueId().toString() });
         result.contents = new MessageContents(null, format, params);
         return result;

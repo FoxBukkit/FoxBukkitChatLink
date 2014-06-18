@@ -16,8 +16,8 @@
  */
 package com.foxelbox.foxbukkit.chatlink;
 
-import com.foxelbox.foxbukkit.chatlink.json.ChatMessage;
-import com.foxelbox.foxbukkit.chatlink.json.UserInfo;
+import com.foxelbox.foxbukkit.chatlink.json.ChatMessageIn;
+import com.foxelbox.foxbukkit.chatlink.json.ChatMessageOut;
 import com.foxelbox.foxbukkit.chatlink.permissions.FoxBukkitPermissionHandler;
 import com.foxelbox.foxbukkit.chatlink.util.PlayerHelper;
 
@@ -30,7 +30,13 @@ public class Player {
 
     public static final UUID CONSOLE_UUID = UUID.nameUUIDFromBytes("COMMANDSENDER:CONSOLE".getBytes());
 
-    public static Player getPlayerFromMessage(ChatMessage message) {
+    public static Player getPlayerFromMessage(ChatMessageOut message) {
+        if(message.from.uuid == null || message.from.uuid.equals(CONSOLE_UUID))
+            return new ConsolePlayer(message.from.name);
+        return new Player(message.from.uuid, message.from.name);
+    }
+
+    public static Player getPlayerFromMessage(ChatMessageIn message) {
         if(message.from.uuid == null || message.from.uuid.equals(CONSOLE_UUID))
             return new ConsolePlayer(message.from.name);
         return new Player(message.from.uuid, message.from.name);
@@ -38,6 +44,10 @@ public class Player {
 
     public Player(UUID uuid) {
         this(uuid, PlayerHelper.playerUUIDToName.get(uuid.toString()));
+    }
+
+    public Player(Player ply) {
+        this(ply.uuid);
     }
 
     public String getName() {

@@ -20,11 +20,11 @@ import com.foxelbox.foxbukkit.chatlink.Player;
 import com.foxelbox.foxbukkit.chatlink.RedisHandler;
 import com.foxelbox.foxbukkit.chatlink.commands.system.CommandSystem;
 import com.foxelbox.foxbukkit.chatlink.commands.system.ICommand;
-import com.foxelbox.foxbukkit.chatlink.json.ChatMessage;
+import com.foxelbox.foxbukkit.chatlink.json.ChatMessageIn;
+import com.foxelbox.foxbukkit.chatlink.json.ChatMessageOut;
 import com.foxelbox.foxbukkit.chatlink.json.MessageContents;
 import com.foxelbox.foxbukkit.chatlink.util.CommandException;
 
-import java.util.Arrays;
 import java.util.Map;
 import java.util.PriorityQueue;
 
@@ -34,11 +34,11 @@ import java.util.PriorityQueue;
 @ICommand.Permission("foxbukkit.help")
 public class HelpCommand extends ICommand {
     @Override
-    public ChatMessage run(ChatMessage message, String formattedName, String[] args) throws CommandException {
+    public ChatMessageOut run(ChatMessageIn messageIn, String formattedName, String[] args) throws CommandException {
         Map<String, ICommand> commands = CommandSystem.instance.getCommands();
 
-        final Player commandSender = Player.getPlayerFromMessage(message);
-        makeReply(message);
+        final Player commandSender = Player.getPlayerFromMessage(messageIn);
+        ChatMessageOut message = makeReply(messageIn);
 
         if(args.length > 0) {
             ICommand val = commands.get(args[0]);

@@ -17,7 +17,8 @@
 package com.foxelbox.foxbukkit.chatlink.commands.system;
 
 import com.foxelbox.foxbukkit.chatlink.Player;
-import com.foxelbox.foxbukkit.chatlink.json.ChatMessage;
+import com.foxelbox.foxbukkit.chatlink.json.ChatMessageIn;
+import com.foxelbox.foxbukkit.chatlink.json.ChatMessageOut;
 import com.foxelbox.foxbukkit.chatlink.util.CommandException;
 import gnu.trove.map.TCharObjectMap;
 import gnu.trove.map.hash.TCharObjectHashMap;
@@ -183,29 +184,30 @@ public abstract class ICommand {
 		return Arrays.copyOfRange(args, nextArg, args.length);
 	}
 
-    public static ChatMessage makeReply(ChatMessage message) {
+    public static ChatMessageOut makeReply(ChatMessageIn messageIn) {
+        ChatMessageOut message = new ChatMessageOut(messageIn);
         message.to.type = "player";
         message.to.filter = new String[] { message.from.uuid.toString() };
         return message;
     }
 
-    public static ChatMessage makeError(ChatMessage message, String error) {
-        message = makeReply(message);
+    public static ChatMessageOut makeError(ChatMessageIn messageIn, String error) {
+        ChatMessageOut message = makeReply(messageIn);
         message.contents.plain = "\u00a74[FBCL] " + error;
         message.contents.xml_format = "<color name=\"dark_red\">[FBCL] " + error + "</color>";
         message.contents.xml_format_args = null;
         return message;
     }
 
-    public ChatMessage run(ChatMessage message, String formattedName, String[] args) throws CommandException {
+    public ChatMessageOut run(ChatMessageIn messageIn, String formattedName, String[] args) throws CommandException {
         throw new CommandException("Not implemented");
     }
 
-    public ChatMessage run(ChatMessage message, String formattedName, String argStr) throws CommandException {
+    public ChatMessageOut run(ChatMessageIn messageIn, String formattedName, String argStr) throws CommandException {
         if(argStr != null && !argStr.isEmpty())
-            return run(message, formattedName, argStr.split(" "));
+            return run(messageIn, formattedName, argStr.split(" "));
         else
-            return run(message, formattedName, new String[0]);
+            return run(messageIn, formattedName, new String[0]);
     }
 
 

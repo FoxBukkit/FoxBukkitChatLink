@@ -18,7 +18,8 @@ package com.foxelbox.foxbukkit.chatlink.commands;
 
 import com.foxelbox.foxbukkit.chatlink.RedisHandler;
 import com.foxelbox.foxbukkit.chatlink.commands.system.ICommand;
-import com.foxelbox.foxbukkit.chatlink.json.ChatMessage;
+import com.foxelbox.foxbukkit.chatlink.json.ChatMessageIn;
+import com.foxelbox.foxbukkit.chatlink.json.ChatMessageOut;
 import com.foxelbox.foxbukkit.chatlink.json.MessageContents;
 import com.foxelbox.foxbukkit.chatlink.util.CommandException;
 
@@ -30,11 +31,12 @@ public class OpChatCommand extends ICommand {
     private static final String OPCHAT_FORMAT = "<color name=\"yellow\">[#OP]</color> " + RedisHandler.MESSAGE_FORMAT;
 
     @Override
-    public ChatMessage run(ChatMessage message, String formattedName, String argStr) throws CommandException {
+    public ChatMessageOut run(ChatMessageIn messageIn, String formattedName, String argStr) throws CommandException {
+        final ChatMessageOut message = new ChatMessageOut(messageIn);
         message.contents = new MessageContents("\u00a7e[#OP] \u00a7f" + formattedName + "\u00a7f: " + argStr,
                 OPCHAT_FORMAT,
                 new String[] {
-                        message.from.name, formattedName, argStr
+                        messageIn.from.name, formattedName, argStr
                 });
         message.to.type = "permission";
         message.to.filter = new String[] { "foxbukkit.opchat" };
