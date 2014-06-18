@@ -109,7 +109,7 @@ public class PlayerHelper {
     public static Map<String,String> playerUUIDToName = Main.redisManager.createCachedRedisMap("playerUUIDToName");
 
     public static Player literalMatch(String name) {
-        return new Player(UUID.fromString(playerNameToUUID.get(name)),name);
+        return new Player(UUID.fromString(playerNameToUUID.get(name.toLowerCase())), name);
     }
 
     private static final Pattern quotePattern = Pattern.compile("^\"(.*)\"$");
