@@ -83,10 +83,7 @@ public class RedisHandler extends AbstractRedisHandler {
         final String plyN = messageIn.from.name;
         final String formattedName = PlayerHelper.getFullPlayerName(messageIn.from.uuid, plyN);
 
-        String messageStr = REMOVE_DISALLOWED_CHARS.matcher(messageIn.contents).replaceAll("");
-
-        if (messageStr.charAt(0) == '#')
-            messageStr = "/opchat " + messageStr.substring(1);
+        String messageStr = messageIn.contents;
 
         switch (messageIn.type) {
             case "playerstate":
@@ -124,6 +121,11 @@ public class RedisHandler extends AbstractRedisHandler {
                 break;
 
             case "text":
+                messageStr = REMOVE_DISALLOWED_CHARS.matcher(messageStr).replaceAll("");
+
+                if (messageStr.charAt(0) == '#')
+                    messageStr = "/opchat " + messageStr.substring(1);
+
                 if (messageStr.charAt(0) == '/') {
                     messageStr = messageStr.substring(1).trim();
                     int argPos = messageStr.indexOf(' ');
