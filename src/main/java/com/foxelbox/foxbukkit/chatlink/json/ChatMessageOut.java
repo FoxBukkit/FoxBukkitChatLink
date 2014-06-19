@@ -37,7 +37,10 @@ public class ChatMessageOut {
     public MessageTarget to;
 
     public long timestamp = System.currentTimeMillis() / 1000;
+
     public UUID context;
+    public boolean finalize_context = false;
+    public String type = "text";
 
     public MessageContents contents;
 }

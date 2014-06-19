@@ -191,6 +191,12 @@ public abstract class ICommand {
         return message;
     }
 
+	public static ChatMessageOut makeBlank(ChatMessageIn messageIn) {
+		ChatMessageOut message = makeReply(messageIn);
+		message.type = "blank";
+		return message;
+	}
+
     public static ChatMessageOut makeError(ChatMessageIn messageIn, String error) {
         ChatMessageOut message = makeReply(messageIn);
         message.contents.plain = "\u00a74[FBCL] " + error;

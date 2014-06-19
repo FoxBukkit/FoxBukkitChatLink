@@ -59,6 +59,7 @@ public class ListCommand extends ICommand {
             );
             RedisHandler.sendMessage(message);
         }
-        return null;
+
+        return makeBlank(messageIn);
     }
 }

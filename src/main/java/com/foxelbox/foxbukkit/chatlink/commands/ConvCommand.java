@@ -49,7 +49,9 @@ public class ConvCommand extends ICommand {
         Player target = Player.getPlayerFromMessage(messageIn);
 
         if(!target.isOnline()) {
-            RedisHandler.sendMessage(makeError(messageIn, "Conversation target is not online"));
+			ChatMessageOut message = makeError(messageIn, "Conversation target is not online");
+			message.finalize_context = true;
+            RedisHandler.sendMessage(message);
             return true;
         }
 
@@ -71,6 +73,7 @@ public class ConvCommand extends ICommand {
             );
         }
         message.to = new MessageTarget("player", new String[] { target.getUniqueId().toString(), message.from.uuid.toString() });
+		message.finalize_context = true;
         RedisHandler.sendMessage(message);
 
         return true;
