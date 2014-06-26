@@ -72,6 +72,7 @@ public class ConvCommand extends ICommand {
                     }
             );
         }
+        message.importance = 4;
         message.to = new MessageTarget("player", new String[] { target.getUniqueId().toString(), message.from.uuid.toString() });
 		message.finalize_context = true;
         RedisHandler.sendMessage(message);

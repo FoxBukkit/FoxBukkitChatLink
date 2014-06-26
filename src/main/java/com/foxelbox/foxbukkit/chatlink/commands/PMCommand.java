@@ -49,6 +49,7 @@ public class PMCommand extends ICommand {
                         messageIn.from.name, formattedName, messageText
                 });
         message.to = new MessageTarget("player", new String[] { target.getUniqueId().toString() });
+        message.importance = 4;
         RedisHandler.sendMessage(message);
 
         formattedName = PlayerHelper.getFullPlayerName(target.getUniqueId(), target.getName());
@@ -59,7 +60,7 @@ public class PMCommand extends ICommand {
                 new String[] {
                         target.getName(), formattedName, messageText
                 });
-
+        message.importance = 4;
         return message;
     }
 }
