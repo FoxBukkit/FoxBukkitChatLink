@@ -23,24 +23,22 @@ import com.foxelbox.foxbukkit.chatlink.json.ChatMessageOut;
 import com.foxelbox.foxbukkit.chatlink.json.MessageContents;
 import com.foxelbox.foxbukkit.chatlink.util.CommandException;
 
-@ICommand.Names({"opchat"})
-@ICommand.Help("Sends message to op chat.")
+@ICommand.Names({"staffnotice"})
+@ICommand.Help("Sends a highlighted staff message to all users")
 @ICommand.Usage("<text>")
-@ICommand.Permission("foxbukkit.opchat")
-public class OpChatCommand extends ICommand {
-    private static final String OPCHAT_FORMAT = "<color name=\"yellow\">[#OP]</color> " + RedisHandler.MESSAGE_FORMAT;
+@ICommand.Permission("foxbukkit.staffnotice")
+public class StaffNoticeCommand extends ICommand {
+    private static final String OPCHAT_FORMAT = "<color name=\"red\">[#!STAFF]</color> " + RedisHandler.MESSAGE_FORMAT;
 
     @Override
     public ChatMessageOut run(ChatMessageIn messageIn, String formattedName, String argStr) throws CommandException {
         final ChatMessageOut message = new ChatMessageOut(messageIn);
-        message.contents = new MessageContents("\u00a7e[#OP] \u00a7f" + formattedName + "\u00a7f: " + argStr,
+        message.contents = new MessageContents("\u00a74[#!STAFF] \u00a7f" + formattedName + "\u00a7f: " + argStr,
                 OPCHAT_FORMAT,
                 new String[] {
                         messageIn.from.name, formattedName, argStr
                 });
-        message.to.type = "permission";
         message.importance = 3;
-        message.to.filter = new String[] { "foxbukkit.opchat" };
         return message;
     }
 }

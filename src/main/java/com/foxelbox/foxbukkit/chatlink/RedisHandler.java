@@ -125,6 +125,11 @@ public class RedisHandler extends AbstractRedisHandler {
             case "text":
                 messageStr = REMOVE_DISALLOWED_CHARS.matcher(messageStr).replaceAll("");
 
+                if (messageStr.length() > 1) {
+                    if (messageStr.charAt(0) == '#' && messageStr.charAt(1) == '!')
+                        messageStr = "/staffnotice " + messageStr.substring(2);
+                }
+
                 if (messageStr.charAt(0) == '#')
                     messageStr = "/opchat " + messageStr.substring(1);
 
