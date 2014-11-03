@@ -36,7 +36,7 @@ public class StaffNoticeCommand extends ICommand {
         message.contents = new MessageContents("\u00a74[#!STAFF] \u00a7f" + formattedName + "\u00a7f: " + argStr,
                 OPCHAT_FORMAT,
                 new String[] {
-                        "SERVER", formattedName, argStr
+                        messageIn.from.name, formattedName, argStr
                 });
         message.importance = 3;
         return message;
