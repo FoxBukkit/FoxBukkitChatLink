@@ -25,7 +25,7 @@ import com.foxelbox.foxbukkit.chatlink.util.CommandException;
 
 @ICommand.Names({"opchat"})
 @ICommand.Help("Sends message to op chat.")
-@ICommand.Usage("<name> <text>")
+@ICommand.Usage("<text>")
 @ICommand.Permission("foxbukkit.opchat")
 public class OpChatCommand extends ICommand {
     private static final String OPCHAT_FORMAT = "<color name=\"yellow\">[#OP]</color> " + RedisHandler.MESSAGE_FORMAT;
