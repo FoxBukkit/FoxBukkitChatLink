@@ -22,7 +22,6 @@ import com.foxelbox.foxbukkit.chatlink.commands.system.CommandSystem;
 import com.foxelbox.foxbukkit.chatlink.commands.system.ICommand;
 import com.foxelbox.foxbukkit.chatlink.json.ChatMessageIn;
 import com.foxelbox.foxbukkit.chatlink.json.ChatMessageOut;
-import com.foxelbox.foxbukkit.chatlink.json.MessageContents;
 import com.foxelbox.foxbukkit.chatlink.util.CommandException;
 
 import java.util.Map;
@@ -47,10 +46,10 @@ public class HelpCommand extends ICommand {
             }
 
             for (String line : val.getHelp().split("\n")) {
-                message.contents = new MessageContents("\u00a75[FBCL]\u00a7f " + line);
+                message.contents = "\u00a75[FBCL]\u00a7f " + line;
                 RedisHandler.sendMessage(message);
             }
-            message.contents = new MessageContents("\u00a75[FBCL]\u00a7f Usage: /" + args[0] + " " + val.getUsage());
+            message.contents = "\u00a75[FBCL]\u00a7f Usage: /" + args[0] + " " + val.getUsage();
             return message;
         }
         else {
@@ -66,7 +65,7 @@ public class HelpCommand extends ICommand {
                 ret += key + ", /";
             }
             ret = ret.substring(0,ret.length() - 3);
-            message.contents = new MessageContents("\u00a75[FBCL]\u00a7f " + ret);
+            message.contents = "\u00a75[FBCL]\u00a7f " + ret;
             return message;
         }
     }

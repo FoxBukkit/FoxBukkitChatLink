@@ -16,17 +16,14 @@
  */
 package com.foxelbox.foxbukkit.chatlink;
 
+import com.foxelbox.dependencies.redis.AbstractRedisHandler;
+import com.foxelbox.foxbukkit.chatlink.commands.ConvCommand;
 import com.foxelbox.foxbukkit.chatlink.commands.system.CommandSystem;
 import com.foxelbox.foxbukkit.chatlink.json.ChatMessageIn;
 import com.foxelbox.foxbukkit.chatlink.json.ChatMessageOut;
-import com.google.gson.Gson;
-import com.foxelbox.dependencies.redis.AbstractRedisHandler;
-import com.foxelbox.foxbukkit.chatlink.commands.*;
-import com.foxelbox.foxbukkit.chatlink.json.MessageContents;
-import com.foxelbox.foxbukkit.chatlink.json.UserInfo;
 import com.foxelbox.foxbukkit.chatlink.util.PlayerHelper;
+import com.google.gson.Gson;
 
-import java.util.*;
 import java.util.regex.Pattern;
 
 public class RedisHandler extends AbstractRedisHandler {
@@ -75,10 +72,8 @@ public class RedisHandler extends AbstractRedisHandler {
         Main.redisManager.publish("foxbukkit:to_server", outMsg);
     }
 
-    private static ChatMessageOut runFormatAndStore(ChatMessageIn messageIn, String format, String[] formatArgs, String plain) {
-        ChatMessageOut messageOut = new ChatMessageOut(messageIn);
-        messageOut.contents = new MessageContents(plain, format, formatArgs);
-        return messageOut;
+    private static ChatMessageOut runFormatAndStore(ChatMessageIn messageIn, String format, String[] formatArgs) {
+        return new ChatMessageOut(messageIn, format, formatArgs);
     }
 
 	private static ChatMessageOut formatMessage(ChatMessageIn messageIn) {
@@ -95,8 +90,7 @@ public class RedisHandler extends AbstractRedisHandler {
                                 JOIN_FORMAT,
                                 new String[]{
                                         plyN, formattedName
-                                },
-                                "\u00a72[+] \u00a7e" + formattedName + "\u00a7e joined!"
+                                }
                         );
 
                     case "quit":
@@ -104,8 +98,7 @@ public class RedisHandler extends AbstractRedisHandler {
                                 QUIT_FORMAT,
                                 new String[]{
                                         plyN, formattedName
-                                },
-                                "\u00a74[-] \u00a7e" + formattedName + "\u00a7e disconnected!"
+                                }
                         );
                 }
 
@@ -115,8 +108,7 @@ public class RedisHandler extends AbstractRedisHandler {
                             KICK_FORMAT,
                             new String[]{
                                     plyN, formattedName, param
-                            },
-                            "\u00a74[-] \u00a7e" + formattedName + "\u00a7e was kicked (" + messageStr.substring(6) + ")!"
+                            }
                     );
                 }
 
@@ -155,8 +147,7 @@ public class RedisHandler extends AbstractRedisHandler {
                             MESSAGE_FORMAT,
                             new String[] {
                                     plyN, formattedName, messageStr
-                            },
-                            formattedName + "\u00a7f: " + messageStr
+                            }
                     );
                 }
         }

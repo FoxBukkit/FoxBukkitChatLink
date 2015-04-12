@@ -199,8 +199,7 @@ public abstract class ICommand {
 
     public static ChatMessageOut makeError(ChatMessageIn messageIn, String error) {
         ChatMessageOut message = makeReply(messageIn);
-        message.contents.plain = "\u00a74[FBCL] " + error;
-        message.contents.xml = "<color name=\"dark_red\">[FBCL] " + error + "</color>";
+        message.contents = "<color name=\"dark_red\">[FBCL] " + error + "</color>";
         return message;
     }
 

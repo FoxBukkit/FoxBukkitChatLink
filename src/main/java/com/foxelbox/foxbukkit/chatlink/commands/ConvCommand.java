@@ -21,7 +21,6 @@ import com.foxelbox.foxbukkit.chatlink.RedisHandler;
 import com.foxelbox.foxbukkit.chatlink.commands.system.ICommand;
 import com.foxelbox.foxbukkit.chatlink.json.ChatMessageIn;
 import com.foxelbox.foxbukkit.chatlink.json.ChatMessageOut;
-import com.foxelbox.foxbukkit.chatlink.json.MessageContents;
 import com.foxelbox.foxbukkit.chatlink.json.MessageTarget;
 import com.foxelbox.foxbukkit.chatlink.util.CommandException;
 import com.foxelbox.foxbukkit.chatlink.util.PlayerHelper;
@@ -58,14 +57,14 @@ public class ConvCommand extends ICommand {
         ChatMessageOut message = new ChatMessageOut(messageIn);
 
         if(isEmote) {
-            message.contents = new MessageContents("\u00a7e[CONV] \u00a7f* " + formattedName + "\u00a77 " + messageText,
+            message.setContents(
                     CONV_EMOTE_FORMAT,
                     new String[]{
                             message.from.name, formattedName, messageText
                     }
             );
         } else {
-            message.contents = new MessageContents("\u00a7e[CONV] \u00a7f" + formattedName + "\u00a7f: " + messageText,
+            message.setContents(
                     CONV_FORMAT,
                     new String[]{
                             message.from.name, formattedName, messageText
@@ -86,10 +85,10 @@ public class ConvCommand extends ICommand {
         if(args.length > 0) {
             Player target = PlayerHelper.matchPlayerSingle(args[0]);
             conversationMap.put(messageIn.from.uuid, target.getUniqueId());
-            message.contents = new MessageContents("\u00a75[FBCL] \u00a7fStarted conversation with " + target.getName());
+            message.contents = "\u00a75[FBCL] \u00a7fStarted conversation with " + target.getName();
         } else {
             conversationMap.remove(messageIn.from.uuid);
-            message.contents = new MessageContents("\u00a75[FBCL] \u00a7fClosed conversation");
+            message.contents = "\u00a75[FBCL] \u00a7fClosed conversation";
         }
         return message;
     }

@@ -19,7 +19,6 @@ package com.foxelbox.foxbukkit.chatlink.permissions.commands;
 import com.foxelbox.foxbukkit.chatlink.commands.system.ICommand;
 import com.foxelbox.foxbukkit.chatlink.json.ChatMessageIn;
 import com.foxelbox.foxbukkit.chatlink.json.ChatMessageOut;
-import com.foxelbox.foxbukkit.chatlink.json.MessageContents;
 import com.foxelbox.foxbukkit.chatlink.permissions.FoxBukkitPermissionHandler;
 import com.foxelbox.foxbukkit.chatlink.util.CommandException;
 
@@ -32,7 +31,7 @@ public class ReloadPermissionsCommand extends ICommand {
     public ChatMessageOut run(ChatMessageIn messageIn, String formattedName, String argStr) throws CommandException {
         FoxBukkitPermissionHandler.instance.reload();
         ChatMessageOut message = makeReply(messageIn);
-        message.contents = new MessageContents("\u00a75[FBCL] \u00a7fPermissions system reloaded!");
+        message.contents = "\u00a75[FBCL] \u00a7fPermissions system reloaded!";
         return message;
     }
 }

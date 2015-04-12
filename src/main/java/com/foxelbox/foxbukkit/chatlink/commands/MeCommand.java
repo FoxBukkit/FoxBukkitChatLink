@@ -20,7 +20,6 @@ import com.foxelbox.foxbukkit.chatlink.RedisHandler;
 import com.foxelbox.foxbukkit.chatlink.commands.system.ICommand;
 import com.foxelbox.foxbukkit.chatlink.json.ChatMessageIn;
 import com.foxelbox.foxbukkit.chatlink.json.ChatMessageOut;
-import com.foxelbox.foxbukkit.chatlink.json.MessageContents;
 
 @ICommand.Names({"me", "emote"})
 @ICommand.Help("Well, it's /me, durp")
@@ -36,7 +35,7 @@ public class MeCommand extends ICommand {
 
         final ChatMessageOut message = new ChatMessageOut(messageIn);
 
-        message.contents = new MessageContents("\u00a7f* " + formattedName + "\u00a77 " + argStr,
+        message.setContents(
                 EMOTE_FORMAT,
                 new String[] {
                         messageIn.from.name, formattedName, argStr

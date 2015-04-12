@@ -21,7 +21,6 @@ import com.foxelbox.foxbukkit.chatlink.RedisHandler;
 import com.foxelbox.foxbukkit.chatlink.commands.system.ICommand;
 import com.foxelbox.foxbukkit.chatlink.json.ChatMessageIn;
 import com.foxelbox.foxbukkit.chatlink.json.ChatMessageOut;
-import com.foxelbox.foxbukkit.chatlink.json.MessageContents;
 import com.foxelbox.foxbukkit.chatlink.util.CommandException;
 import com.foxelbox.foxbukkit.chatlink.util.Utils;
 
@@ -50,7 +49,7 @@ public class MCLinkCommand extends ICommand {
 
                     final String link = new BufferedReader(new InputStreamReader(conn.getInputStream())).readLine();
 
-                    message.contents = new MessageContents("\u00a75[FBCL]\u00a7f Go here to complete: " + link);
+                    message.contents = "\u00a75[FBCL]\u00a7f Go here to complete: " + link;
 					message.finalize_context = true;
                     RedisHandler.sendMessage(message);
                 } catch(Exception e) {

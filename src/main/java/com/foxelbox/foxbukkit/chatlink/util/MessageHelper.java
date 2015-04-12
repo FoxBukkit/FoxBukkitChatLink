@@ -18,7 +18,6 @@ package com.foxelbox.foxbukkit.chatlink.util;
 
 import com.foxelbox.foxbukkit.chatlink.Player;
 import com.foxelbox.foxbukkit.chatlink.json.ChatMessageOut;
-import com.foxelbox.foxbukkit.chatlink.json.MessageContents;
 import com.foxelbox.foxbukkit.chatlink.json.MessageTarget;
 import com.foxelbox.foxbukkit.chatlink.json.UserInfo;
 import com.google.common.base.Predicate;
@@ -98,9 +97,9 @@ public class MessageHelper {
 			format = "<color name=\"" + color + "\">[FBCL]</color> " + format;
 		}
 
-        ChatMessageOut result = new ChatMessageOut("", new UserInfo(null, ""), "");
+        ChatMessageOut result = new ChatMessageOut("", new UserInfo(null, ""));
         result.to = new MessageTarget("all", new String[0]);
-        result.contents = new MessageContents(null, format, params);
+        result.setContents(format, params);
         return result;
 	}
 
@@ -117,9 +116,9 @@ public class MessageHelper {
 			format = "<color name=\"" + color + "\">[FBCL]</color> " + format;
 		}
 
-        ChatMessageOut result = new ChatMessageOut("", new UserInfo(null, ""), "");
+        ChatMessageOut result = new ChatMessageOut("", new UserInfo(null, ""));
         result.to = new MessageTarget("player", new String[] { commandSender.getUniqueId().toString() });
-        result.contents = new MessageContents(null, format, params);
+		result.setContents(format, params);
         return result;
 	}
 }

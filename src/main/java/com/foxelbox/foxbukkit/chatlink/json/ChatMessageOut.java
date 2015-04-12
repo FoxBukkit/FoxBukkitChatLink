@@ -16,20 +16,37 @@
  */
 package com.foxelbox.foxbukkit.chatlink.json;
 
+import com.foxelbox.foxbukkit.chatlink.util.Utils;
+
 import java.util.UUID;
 
 public class ChatMessageOut {
-    public ChatMessageOut(String server, UserInfo from, String plain) {
+    public ChatMessageOut(String server, UserInfo from) {
         this.server = server;
         this.from = from;
         this.to = new MessageTarget("all", null);
-        this.contents = new MessageContents(plain);
         this.context = UUID.randomUUID();
     }
 
+    private static String[] xmlEscapeArray(String[] in) {
+        final String[] out = new String[in.length];
+        for(int i = 0; i < in.length; i++)
+            out[i] = Utils.XMLEscape(in[i]);
+        return out;
+    }
+
+    public ChatMessageOut(ChatMessageIn messageIn, String formatXML, String[] formatXMLArgs) {
+        this(messageIn);
+        setContents(formatXML, formatXMLArgs);
+    }
+
     public ChatMessageOut(ChatMessageIn messageIn) {
-        this(messageIn.server, messageIn.from, messageIn.contents);
+        this(messageIn.server, messageIn.from);
         this.context = messageIn.context;
+    }
+
+    public void setContents(String formatXML, String[] formatXMLArgs) {
+        this.contents = String.format(formatXML, xmlEscapeArray(formatXMLArgs));
     }
 
     public String server;
@@ -44,5 +61,5 @@ public class ChatMessageOut {
 
     public int importance = 0;
 
-    public MessageContents contents;
+    public String contents;
 }

@@ -21,7 +21,6 @@ import com.foxelbox.foxbukkit.chatlink.RedisHandler;
 import com.foxelbox.foxbukkit.chatlink.commands.system.ICommand;
 import com.foxelbox.foxbukkit.chatlink.json.ChatMessageIn;
 import com.foxelbox.foxbukkit.chatlink.json.ChatMessageOut;
-import com.foxelbox.foxbukkit.chatlink.json.MessageContents;
 import com.foxelbox.foxbukkit.chatlink.util.CommandException;
 import com.foxelbox.foxbukkit.chatlink.util.PlayerHelper;
 
@@ -51,7 +50,7 @@ public class ListCommand extends ICommand {
                 }
                 listText = "\u00a7f" + listTextB.substring(4);
             }
-            message.contents = new MessageContents("\u00a75[FBCL] \u00a78[" + server + "] " + listText,
+            message.setContents(
                     LIST_FORMAT,
                     new String[]{
                             server, listText
