@@ -20,7 +20,6 @@ import com.foxelbox.foxbukkit.chatlink.RedisHandler;
 import com.foxelbox.foxbukkit.chatlink.commands.system.ICommand;
 import com.foxelbox.foxbukkit.chatlink.json.ChatMessageIn;
 import com.foxelbox.foxbukkit.chatlink.json.ChatMessageOut;
-import com.foxelbox.foxbukkit.chatlink.json.MessageContents;
 import com.foxelbox.foxbukkit.chatlink.util.CommandException;
 
 @ICommand.Names({"staffnotice"})
@@ -33,7 +32,7 @@ public class StaffNoticeCommand extends ICommand {
     @Override
     public ChatMessageOut run(ChatMessageIn messageIn, String formattedName, String argStr) throws CommandException {
         final ChatMessageOut message = new ChatMessageOut(messageIn);
-        message.contents = new MessageContents("\u00a74[#!STAFF] \u00a7f" + formattedName + "\u00a7f: " + argStr,
+        message.setContents(
                 OPCHAT_FORMAT,
                 new String[] {
                         messageIn.from.name, formattedName, argStr
