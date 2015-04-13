@@ -49,6 +49,10 @@ public class ChatMessageOut {
         this.contents = String.format(formatXML, xmlEscapeArray(formatXMLArgs));
     }
 
+    public void setContentsPlain(String plain) {
+        this.contents = Utils.XMLEscape(plain);
+    }
+
     public String server;
     public UserInfo from;
     public MessageTarget to;

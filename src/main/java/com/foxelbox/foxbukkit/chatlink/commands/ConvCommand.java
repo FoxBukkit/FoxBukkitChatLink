@@ -85,10 +85,10 @@ public class ConvCommand extends ICommand {
         if(args.length > 0) {
             Player target = PlayerHelper.matchPlayerSingle(args[0]);
             conversationMap.put(messageIn.from.uuid, target.getUniqueId());
-            message.contents = "\u00a75[FBCL] \u00a7fStarted conversation with " + target.getName();
+            message.setContentsPlain("\u00a75[FBCL] \u00a7fStarted conversation with " + target.getName());
         } else {
             conversationMap.remove(messageIn.from.uuid);
-            message.contents = "\u00a75[FBCL] \u00a7fClosed conversation";
+            message.setContentsPlain("\u00a75[FBCL] \u00a7fClosed conversation");
         }
         return message;
     }

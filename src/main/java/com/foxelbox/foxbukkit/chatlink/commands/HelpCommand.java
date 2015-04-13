@@ -46,16 +46,16 @@ public class HelpCommand extends ICommand {
             }
 
             for (String line : val.getHelp().split("\n")) {
-                message.contents = "\u00a75[FBCL]\u00a7f " + line;
+                message.setContentsPlain("\u00a75[FBCL]\u00a7f " + line);
                 RedisHandler.sendMessage(message);
             }
-            message.contents = "\u00a75[FBCL]\u00a7f Usage: /" + args[0] + " " + val.getUsage();
+            message.setContentsPlain("\u00a75[FBCL]\u00a7f Usage: /" + args[0] + " " + val.getUsage());
             return message;
         }
         else {
             String ret = "Available commands: /";
             for (String key : new PriorityQueue<>(commands.keySet())) {
-                if (key == "\u00a7")
+                if (key.equals("\u00a7"))
                     continue;
 
                 ICommand val = commands.get(key);
@@ -65,7 +65,7 @@ public class HelpCommand extends ICommand {
                 ret += key + ", /";
             }
             ret = ret.substring(0,ret.length() - 3);
-            message.contents = "\u00a75[FBCL]\u00a7f " + ret;
+            message.setContentsPlain("\u00a75[FBCL]\u00a7f " + ret);
             return message;
         }
     }

@@ -20,6 +20,7 @@ import com.foxelbox.foxbukkit.chatlink.Player;
 import com.foxelbox.foxbukkit.chatlink.json.ChatMessageIn;
 import com.foxelbox.foxbukkit.chatlink.json.ChatMessageOut;
 import com.foxelbox.foxbukkit.chatlink.util.CommandException;
+import com.foxelbox.foxbukkit.chatlink.util.Utils;
 import gnu.trove.map.TCharObjectMap;
 import gnu.trove.map.hash.TCharObjectHashMap;
 import gnu.trove.set.TCharSet;
@@ -199,7 +200,7 @@ public abstract class ICommand {
 
     public static ChatMessageOut makeError(ChatMessageIn messageIn, String error) {
         ChatMessageOut message = makeReply(messageIn);
-        message.contents = "<color name=\"dark_red\">[FBCL] " + error + "</color>";
+        message.contents = "<color name=\"dark_red\">[FBCL] " + Utils.XMLEscape(error) + "</color>";
         return message;
     }
 

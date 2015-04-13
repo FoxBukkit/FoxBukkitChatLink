@@ -31,7 +31,7 @@ public class ReloadPermissionsCommand extends ICommand {
     public ChatMessageOut run(ChatMessageIn messageIn, String formattedName, String argStr) throws CommandException {
         FoxBukkitPermissionHandler.instance.reload();
         ChatMessageOut message = makeReply(messageIn);
-        message.contents = "\u00a75[FBCL] \u00a7fPermissions system reloaded!";
+        message.setContentsPlain("\u00a75[FBCL] \u00a7fPermissions system reloaded!");
         return message;
     }
 }
