@@ -163,12 +163,12 @@ public class ChatMessageOut {
 
         if(lastPos < in.length()) {
             out.append(in.substring(lastPos));
-            while(!openTags.empty()) {
-                String tag = openTags.pop();
-                out.append("</");
-                out.append(tag);
-                out.append('>');
-            }
+        }
+        while(!openTags.empty()) {
+            String tag = openTags.pop();
+            out.append("</");
+            out.append(tag);
+            out.append('>');
         }
 
         return FIX_REDUNDANT_TAGS.matcher(out.toString()).replaceAll("$2");
