@@ -83,9 +83,9 @@ public class ChatMessageOut {
         int lastPos = 0; char currentColor = 'f';
 
         Set<String> openTagsSet = new HashSet<>();
-        Queue<String> openTags = new LinkedBlockingQueue<>();
+        Stack<String> openTags = new Stack<>();
         openTagsSet.add("color");
-        openTags.add("color");
+        openTags.push("color");
 
         while(true) {
             int pos = in.indexOf(COLOR_CHAR, lastPos);
@@ -105,8 +105,8 @@ public class ChatMessageOut {
                 if(newColor == 'r') {
                     newColor = 'f';
                 }
-                String tag;
-                while((tag = openTags.poll()) != null) {
+                while(!openTags.empty()) {
+                    String tag = openTags.pop();
                     out.append("</");
                     out.append(tag);
                     out.append('>');
@@ -115,35 +115,35 @@ public class ChatMessageOut {
                 out.append("<color name=\"");
                 out.append(colorNames.get(newColor));
                 out.append("\">");
-                openTags.add("color");
+                openTags.push("color");
                 openTagsSet.add("color");
                 currentColor = newColor;
             } else {
                 switch (newColor) {
                     case 'l':
                         if(!openTagsSet.contains("b")) {
-                            openTags.add("b");
+                            openTags.push("b");
                             openTagsSet.add("b");
                             out.append("<b>");
                         }
                         break;
                     case 'm':
                         if(!openTagsSet.contains("s")) {
-                            openTags.add("s");
+                            openTags.push("s");
                             openTagsSet.add("s");
                             out.append("<s>");
                         }
                         break;
                     case 'n':
                         if(!openTagsSet.contains("u")) {
-                            openTags.add("u");
+                            openTags.push("u");
                             openTagsSet.add("u");
                             out.append("<u>");
                         }
                         break;
                     case 'o':
                         if(!openTagsSet.contains("i")) {
-                            openTags.add("i");
+                            openTags.push("i");
                             openTagsSet.add("i");
                             out.append("<i>");
                         }
@@ -156,8 +156,8 @@ public class ChatMessageOut {
 
         if(lastPos < in.length() - 1) {
             out.append(in.substring(lastPos));
-            String tag;
-            while((tag = openTags.poll()) != null) {
+            while(!openTags.empty()) {
+                String tag = openTags.pop();
                 out.append("</");
                 out.append(tag);
                 out.append('>');
