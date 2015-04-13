@@ -161,7 +161,7 @@ public class ChatMessageOut {
             }
         }
 
-        if(lastPos < in.length() - 1) {
+        if(lastPos < in.length()) {
             out.append(in.substring(lastPos));
             while(!openTags.empty()) {
                 String tag = openTags.pop();
