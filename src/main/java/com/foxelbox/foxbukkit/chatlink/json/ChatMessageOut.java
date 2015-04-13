@@ -78,6 +78,7 @@ public class ChatMessageOut {
     }
 
     public static String convertLegacyColors(String in) {
+        System.out.println(in);
         StringBuilder out = new StringBuilder("<color name=\"white\">");
 
         int lastPos = 0; char currentColor = 'f';
