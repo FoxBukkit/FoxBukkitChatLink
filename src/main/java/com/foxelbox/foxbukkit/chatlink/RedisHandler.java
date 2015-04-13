@@ -31,7 +31,6 @@ public class RedisHandler extends AbstractRedisHandler {
         super(Main.redisManager, RedisHandlerType.BOTH, "foxbukkit:from_server");
     }
 
-    private static final Pattern REMOVE_COLOR_CODE = Pattern.compile("\u00a7.");
     private static final Pattern REMOVE_DISALLOWED_CHARS = Pattern.compile("[\u00a7\r\n\t]");
 
 	public static final String PLAYER_FORMAT = "<span onClick=\"suggest_command('/pm %1$s ')\">%2$s</span>";

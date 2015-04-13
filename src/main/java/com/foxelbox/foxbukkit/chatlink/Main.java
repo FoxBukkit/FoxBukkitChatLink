@@ -20,6 +20,7 @@ import com.foxelbox.dependencies.config.Configuration;
 import com.foxelbox.dependencies.redis.RedisManager;
 import com.foxelbox.dependencies.threading.SimpleThreadCreator;
 import com.foxelbox.foxbukkit.chatlink.commands.system.CommandSystem;
+import com.foxelbox.foxbukkit.chatlink.json.ChatMessageOut;
 import com.foxelbox.foxbukkit.chatlink.permissions.FoxBukkitPermissionHandler;
 
 import java.io.File;

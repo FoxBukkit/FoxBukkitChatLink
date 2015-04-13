@@ -18,7 +18,9 @@ package com.foxelbox.foxbukkit.chatlink.json;
 
 import com.foxelbox.foxbukkit.chatlink.util.Utils;
 
-import java.util.UUID;
+import java.util.*;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.regex.Pattern;
 
 public class ChatMessageOut {
     public ChatMessageOut(String server, UserInfo from) {
@@ -31,7 +33,7 @@ public class ChatMessageOut {
     private static String[] xmlEscapeArray(String[] in) {
         final String[] out = new String[in.length];
         for(int i = 0; i < in.length; i++)
-            out[i] = Utils.XMLEscape(in[i]);
+            out[i] = convertLegacyColors(Utils.XMLEscape(in[i]));
         return out;
     }
 
@@ -50,7 +52,119 @@ public class ChatMessageOut {
     }
 
     public void setContentsPlain(String plain) {
-        this.contents = Utils.XMLEscape(plain);
+        this.contents = convertLegacyColors(Utils.XMLEscape(plain));
+    }
+
+    private static final char COLOR_CHAR = '\u00a7';
+    private static final Pattern FIX_REDUNDANT_TAGS = Pattern.compile("<([a-z]+)[^>]*>(\\s*)</\\1>", Pattern.CASE_INSENSITIVE);
+    private static final Map<Character, String> colorNames = new HashMap<>();
+    static {
+        colorNames.put('0', "black");
+        colorNames.put('1', "dark_blue");
+        colorNames.put('2', "dark_green");
+        colorNames.put('3', "dark_aqua");
+        colorNames.put('4', "dark_red");
+        colorNames.put('5', "dark_purple");
+        colorNames.put('6', "gold");
+        colorNames.put('7', "gray");
+        colorNames.put('8', "dark_gray");
+        colorNames.put('9', "blue");
+        colorNames.put('a', "green");
+        colorNames.put('b', "aqua");
+        colorNames.put('c', "red");
+        colorNames.put('d', "light_purple");
+        colorNames.put('e', "yellow");
+        colorNames.put('f', "white");
+    }
+
+    public static String convertLegacyColors(String in) {
+        StringBuilder out = new StringBuilder("<color name=\"white\">");
+
+        int lastPos = 0; char currentColor = 'f';
+
+        Set<String> openTagsSet = new HashSet<>();
+        Queue<String> openTags = new LinkedBlockingQueue<>();
+        openTagsSet.add("color");
+        openTags.add("color");
+
+        while(true) {
+            int pos = in.indexOf(COLOR_CHAR, lastPos);
+            if(pos < 0) {
+                break;
+            }
+            char newColor = in.charAt(pos + 1);
+            if(newColor == currentColor) {
+                continue;
+            }
+
+            if(pos > 0) {
+                out.append(in.substring(lastPos, pos));
+            }
+
+            if((newColor >= '0' && newColor <= '9') || (newColor >= 'a' && newColor <= 'f') || newColor == 'r') {
+                if(newColor == 'r') {
+                    newColor = 'f';
+                }
+                String tag;
+                while((tag = openTags.poll()) != null) {
+                    out.append("</");
+                    out.append(tag);
+                    out.append('>');
+                }
+                openTagsSet.clear();
+                out.append("<color name=\"");
+                out.append(colorNames.get(newColor));
+                out.append("\">");
+                openTags.add("color");
+                openTagsSet.add("color");
+                currentColor = newColor;
+            } else {
+                switch (newColor) {
+                    case 'l':
+                        if(!openTagsSet.contains("b")) {
+                            openTags.add("b");
+                            openTagsSet.add("b");
+                            out.append("<b>");
+                        }
+                        break;
+                    case 'm':
+                        if(!openTagsSet.contains("s")) {
+                            openTags.add("s");
+                            openTagsSet.add("s");
+                            out.append("<s>");
+                        }
+                        break;
+                    case 'n':
+                        if(!openTagsSet.contains("u")) {
+                            openTags.add("u");
+                            openTagsSet.add("u");
+                            out.append("<u>");
+                        }
+                        break;
+                    case 'o':
+                        if(!openTagsSet.contains("i")) {
+                            openTags.add("i");
+                            openTagsSet.add("i");
+                            out.append("<i>");
+                        }
+                        break;
+                }
+            }
+
+            lastPos = pos + 2;
+        }
+
+        if(lastPos < in.length() - 1) {
+            out.append(in.substring(lastPos));
+            String tag;
+            while((tag = openTags.poll()) != null) {
+                out.append("</");
+                out.append(tag);
+                out.append('>');
+            }
+        }
+
+        return FIX_REDUNDANT_TAGS.matcher(out.toString()).replaceAll("$2");
     }
 
     public String server;
