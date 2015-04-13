@@ -93,30 +93,36 @@ public class ChatMessageOut {
                 break;
             }
             char newColor = in.charAt(pos + 1);
-            if(newColor == currentColor) {
-                continue;
-            }
 
             if(pos > 0) {
                 out.append(in.substring(lastPos, pos));
             }
 
+            lastPos = pos + 2;
+
             if((newColor >= '0' && newColor <= '9') || (newColor >= 'a' && newColor <= 'f') || newColor == 'r') {
-                if(newColor == 'r') {
-                    newColor = 'f';
-                }
                 while(!openTags.empty()) {
                     String tag = openTags.pop();
+                    if(newColor == 'r' && tag.equals("color")) {
+                        continue;
+                    }
                     out.append("</");
                     out.append(tag);
                     out.append('>');
                 }
                 openTagsSet.clear();
+
+                openTagsSet.add("color");
+                openTags.push("color");
+
+                if(newColor == 'r' || currentColor == newColor) {
+                    continue;
+                }
+
                 out.append("<color name=\"");
                 out.append(colorNames.get(newColor));
                 out.append("\">");
-                openTags.push("color");
-                openTagsSet.add("color");
+
                 currentColor = newColor;
             } else {
                 switch (newColor) {
@@ -150,8 +156,6 @@ public class ChatMessageOut {
                         break;
                 }
             }
-
-            lastPos = pos + 2;
         }
 
         if(lastPos < in.length() - 1) {
