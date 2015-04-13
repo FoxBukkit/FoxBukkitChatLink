@@ -20,7 +20,7 @@ import com.foxelbox.foxbukkit.chatlink.json.ChatMessageOut;
 
 public class ChatConverterTestMain {
     public static void main(String[] args) {
-        System.out.println(ChatMessageOut.convertLegacyColors(
+        /*System.out.println(ChatMessageOut.convertLegacyColors(
                 "\u00a7nMinecraft Formatting\n" +
                 "\n" +
                 "\u00a7r\u00a700 \u00a711 \u00a722 \u00a733\n" +
@@ -34,6 +34,8 @@ public class ChatConverterTestMain {
                 "\u00a7rn \u00a7nMinecraft\n" +
                 "\u00a7ro \u00a7oMinecraft\n" +
                 "\u00a7rr \u00a7rMinecraft"
-        ));
+        ));*/
+
+        System.out.println(ChatMessageOut.convertLegacyColors("\u00a76Z\u00a75ido's \u00a75\u00a7dD\u00a7co\u00a76r\u00a7ei\u00a7ad\u00a7bi\u00a79a\u00a75n"));
     }
 }

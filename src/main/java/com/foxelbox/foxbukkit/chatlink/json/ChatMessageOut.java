@@ -78,7 +78,6 @@ public class ChatMessageOut {
     }
 
     public static String convertLegacyColors(String in) {
-        System.out.println(in);
         StringBuilder out = new StringBuilder("<color name=\"white\">");
 
         int lastPos = 0; char currentColor = 'f';
@@ -105,9 +104,12 @@ public class ChatMessageOut {
             lastPos = pos + 2;
 
             if((newColor >= '0' && newColor <= '9') || (newColor >= 'a' && newColor <= 'f') || newColor == 'r') {
+
+                boolean doesNotChangeColor = newColor == 'r' || currentColor == newColor;
+
                 while(!openTags.empty()) {
                     String tag = openTags.pop();
-                    if(newColor == 'r' && tag.equals("color")) {
+                    if(doesNotChangeColor && tag.equals("color")) {
                         continue;
                     }
                     out.append("</");
@@ -119,7 +121,7 @@ public class ChatMessageOut {
                 openTagsSet.add("color");
                 openTags.push("color");
 
-                if(newColor == 'r' || currentColor == newColor) {
+                if(doesNotChangeColor) {
                     continue;
                 }
 
@@ -171,7 +173,7 @@ public class ChatMessageOut {
             out.append(tag);
             out.append('>');
         }
-
+        
         return FIX_REDUNDANT_TAGS.matcher(out.toString()).replaceAll("$2");
     }
 
