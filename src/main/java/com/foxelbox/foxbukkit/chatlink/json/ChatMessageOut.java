@@ -90,6 +90,9 @@ public class ChatMessageOut {
         while(true) {
             int pos = in.indexOf(COLOR_CHAR, lastPos);
             if(pos < 0) {
+                if(lastPos == 0) {
+                    return in;
+                }
                 break;
             }
             char newColor = in.charAt(pos + 1);
