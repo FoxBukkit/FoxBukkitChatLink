@@ -19,7 +19,6 @@ package com.foxelbox.foxbukkit.chatlink.json;
 import com.foxelbox.foxbukkit.chatlink.util.Utils;
 
 import java.util.*;
-import java.util.concurrent.LinkedBlockingQueue;
 import java.util.regex.Pattern;
 
 public class ChatMessageOut {
@@ -173,7 +172,7 @@ public class ChatMessageOut {
             out.append(tag);
             out.append('>');
         }
-        
+
         return FIX_REDUNDANT_TAGS.matcher(out.toString()).replaceAll("$2");
     }
 

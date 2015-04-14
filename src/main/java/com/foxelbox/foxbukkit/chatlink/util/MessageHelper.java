@@ -72,7 +72,7 @@ public class MessageHelper {
             final String hoverText = String.format("<color name=\"%1$s\">%2$s</color>", color, commandSender.getName());
             onHover = " onHover=\"show_text('" + escape(hoverText) + "')\"";
 		}
-		return String.format(PLAYER_FORMAT, name, displayName, onHover);
+		return String.format(PLAYER_FORMAT, name, ChatMessageOut.convertLegacyColors(displayName), onHover);
 	}
 
 	public static String button(String command, String label, String color, boolean run) {
