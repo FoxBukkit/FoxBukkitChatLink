@@ -70,11 +70,11 @@ public class MessageHelper {
 				displayName = playerTag + " " + displayName;
 			}
 
-            /*final String color = commandSender.isOnline() ? ONLINE_COLOR : OFFLINE_COLOR;
+            final String color = commandSender.isOnline() ? ONLINE_COLOR : OFFLINE_COLOR;
             final String hoverText = String.format("<color name=\"%1$s\">%2$s</color>", color, commandSender.getName());
-            onHover = " onHover=\"show_text('" + escape(hoverText) + "')\"";*/
+            onHover = " onHover=\"show_text('" + escape(hoverText) + "')\"";
 
-			onHover = " onHover=\"show_entity('{id:\"" + commandSender.getUniqueId() + "\",name:\"" + name + "\"}')\"";
+			//onHover = " onHover=\"show_entity('{id:\"" + commandSender.getUniqueId() + "\",name:\"" + name + "\"}')\"";
 		}
 		return String.format(PLAYER_FORMAT, name, ChatMessageOut.convertLegacyColors(displayName), onHover);
 	}
