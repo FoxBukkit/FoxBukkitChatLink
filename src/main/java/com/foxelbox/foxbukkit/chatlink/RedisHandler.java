@@ -33,7 +33,7 @@ public class RedisHandler extends AbstractRedisHandler {
 
     private static final Pattern REMOVE_DISALLOWED_CHARS = Pattern.compile("[\u00a7\r\n\t]");
 
-	public static final String PLAYER_FORMAT = "<span onHover=\"show_entity('{id:\"%2$s\",name:\"%1$s\"}')\" onClick=\"suggest_command('/pm %1$s ')\">%3$s</span>";
+	public static final String PLAYER_FORMAT = "<span onHover=\"show_entity('{id:&quot;%2$s&quot;,name:&quot;%1$s&quot;}')\" onClick=\"suggest_command('/pm %1$s ')\">%3$s</span>";
     public static final String MESSAGE_FORMAT = PLAYER_FORMAT + "<color name=\"white\">: %4$s</color>";
     public static final String KICK_FORMAT = "<color name=\"dark_red\">[-]</color> " + PLAYER_FORMAT + " <color name=\"yellow\">was kicked (%4$s)!</color>";
     public static final String QUIT_FORMAT = "<color name=\"dark_red\">[-]</color> " + PLAYER_FORMAT + " <color name=\"yellow\">disconnected!</color>";
