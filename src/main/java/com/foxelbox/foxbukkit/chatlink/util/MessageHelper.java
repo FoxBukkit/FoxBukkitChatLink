@@ -64,13 +64,16 @@ public class MessageHelper {
 		else {
 			name = commandSender.getName();
 			displayName = PlayerHelper.getPlayerRankTag(uuid) + commandSender.getDisplayName();
-			final String playerTag = PlayerHelper.getPlayerTagRaw(uuid, false);
+			
+			/*final String playerTag = PlayerHelper.getPlayerTagRaw(uuid, false);
 			if (withTag && playerTag != null) {
 				displayName = playerTag + " " + displayName;
 			}
             final String color = commandSender.isOnline() ? ONLINE_COLOR : OFFLINE_COLOR;
             final String hoverText = String.format("<color name=\"%1$s\">%2$s</color>", color, commandSender.getName());
-            onHover = " onHover=\"show_text('" + escape(hoverText) + "')\"";
+            onHover = " onHover=\"show_text('" + escape(hoverText) + "')\"";*/
+
+			onHover = " onHover=\"show_entity('{id:\"" + commandSender.getUniqueId() + "\",name:\"" + name + "\"}')\"";
 		}
 		return String.format(PLAYER_FORMAT, name, ChatMessageOut.convertLegacyColors(displayName), onHover);
 	}
