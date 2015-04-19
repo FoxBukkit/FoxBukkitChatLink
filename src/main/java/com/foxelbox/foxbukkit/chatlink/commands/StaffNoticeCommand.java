@@ -35,7 +35,7 @@ public class StaffNoticeCommand extends ICommand {
         message.setContents(
                 OPCHAT_FORMAT,
                 new String[] {
-                        messageIn.from.name, formattedName, argStr
+                        messageIn.from.name, message.from.uuid.toString(), formattedName, argStr
                 });
         message.importance = 3;
         return message;

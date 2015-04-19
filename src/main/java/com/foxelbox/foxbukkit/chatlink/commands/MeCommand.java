@@ -21,12 +21,12 @@ import com.foxelbox.foxbukkit.chatlink.commands.system.ICommand;
 import com.foxelbox.foxbukkit.chatlink.json.ChatMessageIn;
 import com.foxelbox.foxbukkit.chatlink.json.ChatMessageOut;
 
-@ICommand.Names({"me", "emote"})
+@ICommand.Names("me")
 @ICommand.Help("Well, it's /me, durp")
 @ICommand.Usage("<stuff here>")
 @ICommand.Permission("foxbukkit.communication.emote")
 public class MeCommand extends ICommand {
-    public static final String EMOTE_FORMAT = "* " + RedisHandler.PLAYER_FORMAT + " <color name=\"gray\">%3$s</color>";
+    public static final String EMOTE_FORMAT = "* " + RedisHandler.PLAYER_FORMAT + " <color name=\"gray\">%4$s</color>";
 
     @Override
     public ChatMessageOut run(ChatMessageIn messageIn, String formattedName, String argStr) {
@@ -38,7 +38,7 @@ public class MeCommand extends ICommand {
         message.setContents(
                 EMOTE_FORMAT,
                 new String[] {
-                        messageIn.from.name, formattedName, argStr
+                        messageIn.from.name, messageIn.from.uuid.toString(), formattedName, argStr
                 });
         return message;
     }

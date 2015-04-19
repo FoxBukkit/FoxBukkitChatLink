@@ -35,7 +35,7 @@ public class OpChatCommand extends ICommand {
         message.setContents(
                 OPCHAT_FORMAT,
                 new String[] {
-                        messageIn.from.name, formattedName, argStr
+                        messageIn.from.name, message.from.uuid.toString(), formattedName, argStr
                 });
         message.to.type = "permission";
         message.importance = 3;

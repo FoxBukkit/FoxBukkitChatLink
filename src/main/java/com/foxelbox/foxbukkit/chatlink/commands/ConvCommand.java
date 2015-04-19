@@ -60,14 +60,14 @@ public class ConvCommand extends ICommand {
             message.setContents(
                     CONV_EMOTE_FORMAT,
                     new String[]{
-                            message.from.name, formattedName, messageText
+                            message.from.name, message.from.uuid.toString(), formattedName, messageText
                     }
             );
         } else {
             message.setContents(
                     CONV_FORMAT,
                     new String[]{
-                            message.from.name, formattedName, messageText
+                            message.from.name, message.from.uuid.toString(), formattedName, messageText
                     }
             );
         }

@@ -45,7 +45,7 @@ public class PMCommand extends ICommand {
         message.setContents(
                 PM_RECEIVE_FORMAT,
                 new String[] {
-                        messageIn.from.name, formattedName, messageText
+                        messageIn.from.name, message.from.uuid.toString(), formattedName, messageText
                 });
         message.to = new MessageTarget("player", new String[] { target.getUniqueId().toString() });
         message.importance = 4;
@@ -57,7 +57,7 @@ public class PMCommand extends ICommand {
         message.setContents(
                 PM_SEND_FORMAT,
                 new String[] {
-                        target.getName(), formattedName, messageText
+                        target.getName(), target.getUniqueId().toString(), formattedName, messageText
                 });
         message.importance = 4;
         return message;

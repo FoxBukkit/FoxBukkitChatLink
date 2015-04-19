@@ -33,9 +33,9 @@ public class RedisHandler extends AbstractRedisHandler {
 
     private static final Pattern REMOVE_DISALLOWED_CHARS = Pattern.compile("[\u00a7\r\n\t]");
 
-	public static final String PLAYER_FORMAT = "<span onClick=\"suggest_command('/pm %1$s ')\">%2$s</span>";
-    public static final String MESSAGE_FORMAT = PLAYER_FORMAT + "<color name=\"white\">: %3$s</color>";
-    public static final String KICK_FORMAT = "<color name=\"dark_red\">[-]</color> " + PLAYER_FORMAT + " <color name=\"yellow\">was kicked (%3$s)!</color>";
+	public static final String PLAYER_FORMAT = "<span onHover=\"show_entity('{id:\"%2$s\",name:\"%1$s\"}')\" onClick=\"suggest_command('/pm %1$s ')\">%3$s</span>";
+    public static final String MESSAGE_FORMAT = PLAYER_FORMAT + "<color name=\"white\">: %4$s</color>";
+    public static final String KICK_FORMAT = "<color name=\"dark_red\">[-]</color> " + PLAYER_FORMAT + " <color name=\"yellow\">was kicked (%4$s)!</color>";
     public static final String QUIT_FORMAT = "<color name=\"dark_red\">[-]</color> " + PLAYER_FORMAT + " <color name=\"yellow\">disconnected!</color>";
     public static final String JOIN_FORMAT = "<color name=\"dark_green\">[+]</color> " + PLAYER_FORMAT + " <color name=\"yellow\">joined!</color>";
 
@@ -88,7 +88,7 @@ public class RedisHandler extends AbstractRedisHandler {
                         return runFormatAndStore(messageIn,
                                 JOIN_FORMAT,
                                 new String[]{
-                                        plyN, formattedName
+                                        plyN, messageIn.from.uuid.toString(), formattedName
                                 }
                         );
 
@@ -96,7 +96,7 @@ public class RedisHandler extends AbstractRedisHandler {
                         return runFormatAndStore(messageIn,
                                 QUIT_FORMAT,
                                 new String[]{
-                                        plyN, formattedName
+                                        plyN, messageIn.from.uuid.toString(), formattedName
                                 }
                         );
                 }
@@ -106,7 +106,7 @@ public class RedisHandler extends AbstractRedisHandler {
                     return runFormatAndStore(messageIn,
                             KICK_FORMAT,
                             new String[]{
-                                    plyN, formattedName, param
+                                    plyN, messageIn.from.uuid.toString(), formattedName, param
                             }
                     );
                 }
@@ -145,7 +145,7 @@ public class RedisHandler extends AbstractRedisHandler {
                     return runFormatAndStore(messageIn,
                             MESSAGE_FORMAT,
                             new String[] {
-                                    plyN, formattedName, messageStr
+                                    plyN, messageIn.from.uuid.toString(), formattedName, messageStr
                             }
                     );
                 }
