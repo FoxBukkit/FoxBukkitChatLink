@@ -27,7 +27,7 @@ import com.foxelbox.foxbukkit.chatlink.util.CommandException;
 import java.util.Map;
 import java.util.PriorityQueue;
 
-@ICommand.Names({"help", "?", "h"})
+@ICommand.Names("fbhelp")
 @ICommand.Help("Prints a list of available commands or information about the specified command.")
 @ICommand.Usage("[<command>]")
 @ICommand.Permission("foxbukkit.help")
