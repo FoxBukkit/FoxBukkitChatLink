@@ -41,10 +41,9 @@ import com.foxelbox.foxbukkit.chatlink.util.Utils;
 @ICommand.Permission("foxbukkit.bans.ban")
 public class BanCommand extends ICommand {
 	@Override
-	public ChatMessageOut run(ChatMessageIn messageIn, String formattedName, String[] args) throws CommandException {
-		final Player commandSender = Player.getPlayerFromMessage(messageIn);
+	public ChatMessageOut run(Player sender, ChatMessageIn messageIn, String formattedName, String[] args) throws CommandException {
 		args = parseFlags(args);
-		executeBan(messageIn.server, commandSender, args[0], Utils.concatArray(" ", args, 1, null), booleanFlags.contains('r'), booleanFlags.contains('g'), stringFlags.get('t'));
+		executeBan(messageIn.server, sender, args[0], Utils.concatArray(" ", args, 1, null), booleanFlags.contains('r'), booleanFlags.contains('g'), stringFlags.get('t'));
 		return makeBlank(messageIn);
 	}
 

@@ -31,7 +31,7 @@ import com.foxelbox.foxbukkit.chatlink.util.*;
 @ICommand.Permission("foxbukkit.users.setnick")
 public class SetNickCommand extends ICommand {
     @Override
-    public ChatMessageOut run(ChatMessageIn messageIn, String formattedName, String[] args) throws CommandException {
+    public ChatMessageOut run(Player commandSender, ChatMessageIn messageIn, String formattedName, String[] args) throws CommandException {
 		final Player otherPly = PlayerHelper.matchPlayerSingle(args[0], false);
 
 		final String newNick = Utils.concatArray(" ", args, 1, "").replace('$', '\u00a7');

@@ -36,10 +36,8 @@ import com.foxelbox.foxbukkit.chatlink.util.Utils;
 @ICommand.Permission("foxbukkit.users.settag")
 public class SetTagCommand extends ICommand {
     @Override
-    public ChatMessageOut run(ChatMessageIn messageIn, String formattedName, String[] args) throws CommandException {
+    public ChatMessageOut run(Player commandSender, ChatMessageIn messageIn, String formattedName, String[] args) throws CommandException {
 		args = parseFlags(args);
-
-        final Player commandSender = Player.getPlayerFromMessage(messageIn);
 
 		final Player otherPly = PlayerHelper.matchPlayerSingle(args[0], false);
 

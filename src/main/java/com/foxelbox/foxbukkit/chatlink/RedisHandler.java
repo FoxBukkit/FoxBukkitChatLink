@@ -95,6 +95,8 @@ public class RedisHandler extends AbstractRedisHandler {
         final String plyN = messageIn.from.name;
         final String formattedName = PlayerHelper.getFullPlayerName(messageIn.from.uuid, plyN);
 
+        final Player sender = new Player(messageIn.from.uuid, messageIn.from.name);
+
         String messageStr = messageIn.contents;
 
         switch (messageIn.type) {
@@ -119,11 +121,10 @@ public class RedisHandler extends AbstractRedisHandler {
 
                 if (messageStr.startsWith("kick ")) {
                     final String param = messageStr.substring(5);
-                    Player ply = new Player(messageIn.from.uuid, messageIn.from.name);
                     if(param.startsWith("\u00a7r")) {
-                        ply.kick(param.substring(2));
+                        sender.kick(param.substring(2));
                     } else {
-                        ply.showKickMessage(param);
+                        sender.showKickMessage(param);
                     }
                 }
 
@@ -137,8 +138,9 @@ public class RedisHandler extends AbstractRedisHandler {
                         messageStr = "/staffnotice " + messageStr.substring(2);
                 }
 
-                if (messageStr.charAt(0) == '#')
+                if (messageStr.charAt(0) == '#') {
                     messageStr = "/opchat " + messageStr.substring(1);
+                }
 
                 if (messageStr.charAt(0) == '/') {
                     messageStr = messageStr.substring(1).trim();
@@ -152,11 +154,15 @@ public class RedisHandler extends AbstractRedisHandler {
                         argStr = "";
                         commandName = messageStr;
                     }
-                    return CommandSystem.instance.runCommand(messageIn, commandName, argStr);
-                }
-                else {
-                    if(ConvCommand.handleConvMessage(messageIn, formattedName, messageStr, false))
+                    return CommandSystem.instance.runCommand(sender, messageIn, commandName, argStr);
+                } else {
+                    if(sender.isMuted) {
                         return null;
+                    }
+
+                    if(ConvCommand.handleConvMessage(messageIn, formattedName, messageStr, false)) {
+                        return null;
+                    }
 
                     return runFormatAndStore(messageIn,
                             MESSAGE_FORMAT,

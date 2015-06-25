@@ -204,15 +204,16 @@ public abstract class ICommand {
         return message;
     }
 
-    public ChatMessageOut run(ChatMessageIn messageIn, String formattedName, String[] args) throws CommandException {
+    public ChatMessageOut run(Player sender, ChatMessageIn messageIn, String formattedName, String[] args) throws CommandException {
         throw new CommandException("Not implemented");
     }
 
-    public ChatMessageOut run(ChatMessageIn messageIn, String formattedName, String argStr) throws CommandException {
-        if(argStr != null && !argStr.isEmpty())
-            return run(messageIn, formattedName, argStr.split(" "));
-        else
-            return run(messageIn, formattedName, new String[0]);
+    public ChatMessageOut run(Player sender, ChatMessageIn messageIn, String formattedName, String argStr) throws CommandException {
+        if(argStr != null && !argStr.isEmpty()) {
+			return run(sender, messageIn, formattedName, argStr.split(" "));
+		} else {
+			return run(sender, messageIn, formattedName, new String[0]);
+		}
     }
 
 

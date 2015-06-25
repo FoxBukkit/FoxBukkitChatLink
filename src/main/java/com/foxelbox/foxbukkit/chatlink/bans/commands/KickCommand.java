@@ -32,9 +32,7 @@ import com.foxelbox.foxbukkit.chatlink.util.Utils;
 @ICommand.Permission("foxbukkit.bans.kick")
 public class KickCommand extends ICommand {
     @Override
-    public ChatMessageOut run(ChatMessageIn messageIn, String formattedName, String[] args) throws CommandException {
-        final Player commandSender = Player.getPlayerFromMessage(messageIn);
-
+    public ChatMessageOut run(Player commandSender, ChatMessageIn messageIn, String formattedName, String[] args) throws CommandException {
         final Player otherPly = PlayerHelper.matchPlayerSingle(args[0], false);
 
         if (commandSender.getLevel() <= otherPly.getLevel()) {

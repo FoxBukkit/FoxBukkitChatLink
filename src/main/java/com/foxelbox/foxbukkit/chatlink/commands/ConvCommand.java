@@ -80,7 +80,7 @@ public class ConvCommand extends ICommand {
     }
 
     @Override
-    public ChatMessageOut run(ChatMessageIn messageIn, String formattedName, String[] args) throws CommandException {
+    public ChatMessageOut run(Player sender, ChatMessageIn messageIn, String formattedName, String[] args) throws CommandException {
         ChatMessageOut message = makeReply(messageIn);
         if(args.length > 0) {
             Player target = PlayerHelper.matchPlayerSingle(args[0]);

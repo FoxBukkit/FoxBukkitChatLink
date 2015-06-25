@@ -17,6 +17,7 @@
 package com.foxelbox.foxbukkit.chatlink.commands;
 
 import com.foxelbox.foxbukkit.chatlink.Main;
+import com.foxelbox.foxbukkit.chatlink.Player;
 import com.foxelbox.foxbukkit.chatlink.RedisHandler;
 import com.foxelbox.foxbukkit.chatlink.commands.system.ICommand;
 import com.foxelbox.foxbukkit.chatlink.json.ChatMessageIn;
@@ -35,7 +36,7 @@ import java.net.URLConnection;
 @ICommand.Permission("foxbukkit.mclink")
 public class MCLinkCommand extends ICommand {
     @Override
-    public ChatMessageOut run(final ChatMessageIn messageIn, String formattedName, String argStr) throws CommandException {
+    public ChatMessageOut run(Player commandSender, final ChatMessageIn messageIn, String formattedName, String argStr) throws CommandException {
         final ChatMessageOut message = makeReply(messageIn);
         new Thread() {
             public void run() {

@@ -16,6 +16,7 @@
  */
 package com.foxelbox.foxbukkit.chatlink.commands;
 
+import com.foxelbox.foxbukkit.chatlink.Player;
 import com.foxelbox.foxbukkit.chatlink.RedisHandler;
 import com.foxelbox.foxbukkit.chatlink.commands.system.ICommand;
 import com.foxelbox.foxbukkit.chatlink.json.ChatMessageIn;
@@ -29,7 +30,7 @@ public class MeCommand extends ICommand {
     public static final String EMOTE_FORMAT = "* " + RedisHandler.PLAYER_FORMAT + " <color name=\"gray\">%4$s</color>";
 
     @Override
-    public ChatMessageOut run(ChatMessageIn messageIn, String formattedName, String argStr) {
+    public ChatMessageOut run(Player sender, ChatMessageIn messageIn, String formattedName, String argStr) {
         if(ConvCommand.handleConvMessage(messageIn, formattedName, argStr, true))
             return null;
 

@@ -36,7 +36,7 @@ public class PMCommand extends ICommand {
     private static final String PM_RECEIVE_FORMAT = "<color name=\"yellow\">[PM &lt;]</color> " + RedisHandler.MESSAGE_FORMAT;
 
     @Override
-    public ChatMessageOut run(ChatMessageIn messageIn, String formattedName, String[] args) throws CommandException {
+    public ChatMessageOut run(Player commandSender, ChatMessageIn messageIn, String formattedName, String[] args) throws CommandException {
         final String messageText = Utils.concatArray(" ", args, 1, "");
         final Player target = PlayerHelper.matchPlayerSingle(args[0]);
 

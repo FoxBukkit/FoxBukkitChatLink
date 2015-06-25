@@ -37,9 +37,7 @@ import java.util.UUID;
 @ICommand.Permission("foxbukkit.bans.lookup")
 public class LookupCommand extends ICommand {
 	@Override
-	public ChatMessageOut run(ChatMessageIn messageIn, String formattedName, String[] args) throws CommandException {
-		final Player commandSender = Player.getPlayerFromMessage(messageIn);
-
+	public ChatMessageOut run(final Player commandSender, ChatMessageIn messageIn, String formattedName, String[] args) throws CommandException {
 		final Player otherPly = PlayerHelper.matchPlayerSingle(args[0], false);
 
 		final String user = otherPly.getName();

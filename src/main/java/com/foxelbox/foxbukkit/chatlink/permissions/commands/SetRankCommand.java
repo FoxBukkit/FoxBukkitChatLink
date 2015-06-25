@@ -34,8 +34,7 @@ import java.util.UUID;
 @ICommand.Permission("foxbukkit.users.setrank")
 public class SetRankCommand extends ICommand {
 	@Override
-    public ChatMessageOut run(ChatMessageIn messageIn, String formattedName, String[] args) throws CommandException {
-        Player commandSender = Player.getPlayerFromMessage(messageIn);
+    public ChatMessageOut run(Player commandSender, ChatMessageIn messageIn, String formattedName, String[] args) throws CommandException {
         args = parseFlags(args);
 
 		String otherName = args[0];

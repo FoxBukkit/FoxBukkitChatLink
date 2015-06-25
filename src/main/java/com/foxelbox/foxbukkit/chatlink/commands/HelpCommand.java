@@ -33,10 +33,9 @@ import java.util.PriorityQueue;
 @ICommand.Permission("foxbukkit.help")
 public class HelpCommand extends ICommand {
     @Override
-    public ChatMessageOut run(ChatMessageIn messageIn, String formattedName, String[] args) throws CommandException {
+    public ChatMessageOut run(Player commandSender, ChatMessageIn messageIn, String formattedName, String[] args) throws CommandException {
         Map<String, ICommand> commands = CommandSystem.instance.getCommands();
 
-        final Player commandSender = Player.getPlayerFromMessage(messageIn);
         ChatMessageOut message = makeReply(messageIn);
 
         if(args.length > 0) {

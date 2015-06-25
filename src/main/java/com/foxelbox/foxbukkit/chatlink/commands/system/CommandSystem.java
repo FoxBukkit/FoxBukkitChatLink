@@ -76,7 +76,7 @@ public class CommandSystem {
 		return commands;
 	}
 
-	public ChatMessageOut runCommand(ChatMessageIn message, String cmd, String argStr) {
+	public ChatMessageOut runCommand(Player sender, ChatMessageIn message, String cmd, String argStr) {
 		if (commands.containsKey(cmd)) {
             final Player player = Player.getPlayerFromMessage(message);
 			final String playerName = player.getName();
@@ -90,7 +90,7 @@ public class CommandSystem {
 					String logmsg = "FBCL Command: " + playerName + ": "  + cmd + " " + argStr;
                     System.err.println(logmsg);
 				}
-				return icmd.run(message, PlayerHelper.getFullPlayerName(message.from.uuid, message.from.name), argStr.trim());
+				return icmd.run(sender, message, PlayerHelper.getFullPlayerName(message.from.uuid, message.from.name), argStr.trim());
 			}
 			catch (PermissionDeniedException e) {
 				String logmsg = "FBCL Command denied: " + playerName + ": "  + cmd + " " + argStr;

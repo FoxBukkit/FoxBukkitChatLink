@@ -35,14 +35,13 @@ public class ListCommand extends ICommand {
     private static final String LIST_FORMAT = "<color name=\"dark_purple\">[FBCL]</color> <color name=\"dark_gray\">[%1$s]</color> %2$s";
 
     @Override
-    public ChatMessageOut run(ChatMessageIn messageIn, String formattedName, String[] args) throws CommandException {
+    public ChatMessageOut run(Player commandSender, ChatMessageIn messageIn, String formattedName, String[] args) throws CommandException {
         if(args.length > 0) {
-            final Player ply = new Player(messageIn.from.uuid, messageIn.from.name);
             final Player target = PlayerHelper.matchPlayerSingle(args[0], false);
 
-            RedisHandler.sendSimpleMessage(ply, "Name: " + target.getName());
-            RedisHandler.sendSimpleMessage(ply, "Rank: " + PlayerHelper.getPlayerRank(target.getUniqueId()));
-            RedisHandler.sendSimpleMessage(ply, "NameTag: " + PlayerHelper.getFullPlayerName(target.getUniqueId(), target.getName()));
+            RedisHandler.sendSimpleMessage(commandSender, "Name: " + target.getName());
+            RedisHandler.sendSimpleMessage(commandSender, "Rank: " + PlayerHelper.getPlayerRank(target.getUniqueId()));
+            RedisHandler.sendSimpleMessage(commandSender, "NameTag: " + PlayerHelper.getFullPlayerName(target.getUniqueId(), target.getName()));
 
             return makeBlank(messageIn);
         }
