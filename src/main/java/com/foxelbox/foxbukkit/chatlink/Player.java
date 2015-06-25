@@ -16,6 +16,7 @@
  */
 package com.foxelbox.foxbukkit.chatlink;
 
+import com.foxelbox.dependencies.redis.RedisManager;
 import com.foxelbox.foxbukkit.chatlink.json.ChatMessageIn;
 import com.foxelbox.foxbukkit.chatlink.json.ChatMessageOut;
 import com.foxelbox.foxbukkit.chatlink.json.UserInfo;
@@ -75,10 +76,18 @@ public class Player {
     public void kick(String reason) {
         ChatMessageOut messageOut = new ChatMessageOut(null, new UserInfo(uuid, name));
         messageOut.contents = "\u00a7r" + reason;
-        messageOut.server = null;
         messageOut.type = "kick";
         messageOut.to.type = "player";
         messageOut.to.filter = new String[] { uuid.toString() };
+        RedisHandler.sendMessage(messageOut);
+        showKickMessage(reason);
+    }
+
+    public void showKickMessage(String reason) {
+        ChatMessageOut messageOut = new ChatMessageOut(null, new UserInfo(uuid, name));
+        messageOut.setContents(RedisHandler.KICK_FORMAT, new String[] {
+                name, uuid.toString(), PlayerHelper.getFullPlayerName(uuid, name), reason
+        });
         RedisHandler.sendMessage(messageOut);
     }
 

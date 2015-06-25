@@ -103,15 +103,12 @@ public class RedisHandler extends AbstractRedisHandler {
 
                 if (messageStr.startsWith("kick ")) {
                     final String param = messageStr.substring(5);
+                    Player ply = new Player(messageIn.from.uuid, messageIn.from.name);
                     if(param.startsWith("\u00a7r")) {
-                        new Player(messageIn.from.uuid, messageIn.from.name).kick(messageIn.contents.substring(2));
+                        ply.kick(param.substring(2));
+                    } else {
+                        ply.showKickMessage(param);
                     }
-                    return runFormatAndStore(messageIn,
-                            KICK_FORMAT,
-                            new String[]{
-                                    plyN, messageIn.from.uuid.toString(), formattedName, param
-                            }
-                    );
                 }
 
                 break;
