@@ -45,7 +45,7 @@ public class BanCommand extends ICommand {
 		final Player commandSender = Player.getPlayerFromMessage(messageIn);
 		args = parseFlags(args);
 		executeBan(messageIn.server, commandSender, args[0], Utils.concatArray(" ", args, 1, null), booleanFlags.contains('r'), booleanFlags.contains('g'), stringFlags.get('t'));
-		return null;
+		return makeBlank(messageIn);
 	}
 
 	public static void executeBan(String server, Player commandSender, String plyName, String reason, boolean rollback, boolean global, final String duration) throws CommandException {

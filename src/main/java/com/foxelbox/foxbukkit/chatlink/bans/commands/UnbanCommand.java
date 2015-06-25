@@ -32,6 +32,6 @@ public class UnbanCommand extends ICommand {
 	public ChatMessageOut run(ChatMessageIn messageIn, String formattedName, String[] args) throws CommandException {
 		final Player commandSender = Player.getPlayerFromMessage(messageIn);
 		Bans.instance.unban(commandSender, args[0]);
-        return null;
+		return makeBlank(messageIn);
 	}
 }

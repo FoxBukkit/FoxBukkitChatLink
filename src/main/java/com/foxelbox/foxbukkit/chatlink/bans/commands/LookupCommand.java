@@ -70,6 +70,6 @@ public class LookupCommand extends ICommand {
 			}
 		}.start();
 
-		return null;
+		return makeBlank(messageIn);
 	}
 }
