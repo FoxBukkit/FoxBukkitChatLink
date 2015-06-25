@@ -18,6 +18,7 @@ package com.foxelbox.foxbukkit.chatlink;
 
 import com.foxelbox.foxbukkit.chatlink.json.ChatMessageIn;
 import com.foxelbox.foxbukkit.chatlink.json.ChatMessageOut;
+import com.foxelbox.foxbukkit.chatlink.json.UserInfo;
 import com.foxelbox.foxbukkit.chatlink.permissions.FoxBukkitPermissionHandler;
 import com.foxelbox.foxbukkit.chatlink.util.PlayerHelper;
 
@@ -69,6 +70,16 @@ public class Player {
             final String nick = PlayerHelper.getPlayerNick(uuid);
             this.displayName = (nick != null) ? nick : name;
         }
+    }
+
+    public void kick(String reason) {
+        ChatMessageOut messageOut = new ChatMessageOut(null, new UserInfo(uuid, name));
+        messageOut.contents = "\u00a7r" + reason;
+        messageOut.server = null;
+        messageOut.type = "kick";
+        messageOut.to.type = "player";
+        messageOut.to.filter = new String[] { uuid.toString() };
+        RedisHandler.sendMessage(messageOut);
     }
 
     public boolean hasPermission(String permission) {

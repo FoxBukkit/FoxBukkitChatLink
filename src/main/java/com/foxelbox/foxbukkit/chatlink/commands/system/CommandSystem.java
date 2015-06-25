@@ -40,6 +40,7 @@ public class CommandSystem {
 		commands.clear();
 		scanCommands("com.foxelbox.foxbukkit.chatlink.commands");
 		scanCommands("com.foxelbox.foxbukkit.chatlink.permissions.commands");
+		scanCommands("com.foxelbox.foxbukkit.chatlink.bans.commands");
         Main.redisManager.del("chatLinkCommands");
         final Set<String> commandsKeySet = commands.keySet();
         Main.redisManager.lpush("chatLinkCommands", commandsKeySet.toArray(new String[commandsKeySet.size()]));
