@@ -23,6 +23,7 @@ import com.foxelbox.foxbukkit.chatlink.json.ChatMessageIn;
 import com.foxelbox.foxbukkit.chatlink.json.ChatMessageOut;
 import com.foxelbox.foxbukkit.chatlink.util.CommandException;
 import com.foxelbox.foxbukkit.chatlink.util.PlayerHelper;
+import com.foxelbox.foxbukkit.chatlink.util.Utils;
 
 import java.util.List;
 
@@ -35,6 +36,17 @@ public class ListCommand extends ICommand {
 
     @Override
     public ChatMessageOut run(ChatMessageIn messageIn, String formattedName, String[] args) throws CommandException {
+        if(args.length > 0) {
+            final Player ply = new Player(messageIn.from.uuid, messageIn.from.name);
+            final Player target = PlayerHelper.matchPlayerSingle(args[0], false);
+
+            RedisHandler.sendSimpleMessage(ply, "Name: " + target.getName());
+            RedisHandler.sendSimpleMessage(ply, "Rank: " + PlayerHelper.getPlayerRank(target.getUniqueId()));
+            RedisHandler.sendSimpleMessage(ply, "NameTag: " + PlayerHelper.getFullPlayerName(target.getUniqueId(), target.getName()));
+
+            return makeBlank(messageIn);
+        }
+
         ChatMessageOut message = makeReply(messageIn);
         for(String server : PlayerHelper.getAllServers()) {
             StringBuilder listTextB = new StringBuilder();
