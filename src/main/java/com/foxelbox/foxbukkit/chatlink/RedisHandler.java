@@ -78,7 +78,7 @@ public class RedisHandler extends AbstractRedisHandler {
 
     public static void sendSimpleMessage(Player to, String msg) {
         ChatMessageOut chatMessageOut = new ChatMessageOut(null, null);
-        chatMessageOut.contents = ChatMessageOut.convertLegacyColors(Utils.XMLEscape(msg));
+        chatMessageOut.contents = ChatMessageOut.convertLegacyColors("\u00a75[FBCL]\u00a7f " + Utils.XMLEscape(msg));
         chatMessageOut.finalize_context = true;
         chatMessageOut.to.type = "player";
         chatMessageOut.to.filter = new String[] { to.getUniqueId().toString() };
