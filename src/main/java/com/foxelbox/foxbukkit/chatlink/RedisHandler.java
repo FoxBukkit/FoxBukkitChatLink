@@ -80,16 +80,15 @@ public class RedisHandler extends AbstractRedisHandler {
         ChatMessageOut chatMessageOut = new ChatMessageOut(null, null);
         chatMessageOut.contents = ChatMessageOut.convertLegacyColors("\u00a75[FBCL]\u00a7f " + Utils.XMLEscape(msg));
         chatMessageOut.finalize_context = true;
-        chatMessageOut.to.type = "player";
-        chatMessageOut.to.filter = new String[] { to.getUniqueId().toString() };
+        if(to != null) {
+            chatMessageOut.to.type = "player";
+            chatMessageOut.to.filter = new String[]{to.getUniqueId().toString()};
+        }
         sendMessage(chatMessageOut);
     }
 
     public static void sendSimpleMessage(String msg) {
-        ChatMessageOut chatMessageOut = new ChatMessageOut(null, null);
-        chatMessageOut.contents = ChatMessageOut.convertLegacyColors("\u00a75[FBCL]\u00a7f " + Utils.XMLEscape(msg));
-        chatMessageOut.finalize_context = true;
-        sendMessage(chatMessageOut);
+        sendSimpleMessage(null, msg);
     }
 
 	private static ChatMessageOut formatMessage(ChatMessageIn messageIn) {
