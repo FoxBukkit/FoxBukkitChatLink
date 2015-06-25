@@ -103,6 +103,15 @@ public class RedisHandler extends AbstractRedisHandler {
 
                 if (messageStr.startsWith("kick ")) {
                     final String param = messageStr.substring(5);
+                    if(param.startsWith("\u00a7r")) {
+                        ChatMessageOut messageOut = new ChatMessageOut(messageIn);
+                        messageOut.contents = param;
+                        messageOut.server = null;
+                        messageOut.type = "kick";
+                        messageOut.to.type = "player";
+                        messageOut.to.filter = new String[] { messageIn.from.uuid.toString() };
+                        sendMessage(messageOut);
+                    }
                     return runFormatAndStore(messageIn,
                             KICK_FORMAT,
                             new String[]{
