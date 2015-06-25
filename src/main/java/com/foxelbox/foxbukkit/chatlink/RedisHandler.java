@@ -22,6 +22,7 @@ import com.foxelbox.foxbukkit.chatlink.commands.system.CommandSystem;
 import com.foxelbox.foxbukkit.chatlink.json.ChatMessageIn;
 import com.foxelbox.foxbukkit.chatlink.json.ChatMessageOut;
 import com.foxelbox.foxbukkit.chatlink.util.PlayerHelper;
+import com.foxelbox.foxbukkit.chatlink.util.Utils;
 import com.google.gson.Gson;
 
 import java.util.regex.Pattern;
@@ -73,6 +74,22 @@ public class RedisHandler extends AbstractRedisHandler {
 
     private static ChatMessageOut runFormatAndStore(ChatMessageIn messageIn, String format, String[] formatArgs) {
         return new ChatMessageOut(messageIn, format, formatArgs);
+    }
+
+    public static void sendSimpleMessage(Player to, String msg) {
+        ChatMessageOut chatMessageOut = new ChatMessageOut(null, null);
+        chatMessageOut.contents = ChatMessageOut.convertLegacyColors(Utils.XMLEscape(msg));
+        chatMessageOut.finalize_context = true;
+        chatMessageOut.to.type = "player";
+        chatMessageOut.to.filter = new String[] { to.getUniqueId().toString() };
+        sendMessage(chatMessageOut);
+    }
+
+    public static void sendSimpleMessage(String msg) {
+        ChatMessageOut chatMessageOut = new ChatMessageOut(null, null);
+        chatMessageOut.contents = ChatMessageOut.convertLegacyColors("\u00a75[FBCL]\u00a7f " + Utils.XMLEscape(msg));
+        chatMessageOut.finalize_context = true;
+        sendMessage(chatMessageOut);
     }
 
 	private static ChatMessageOut formatMessage(ChatMessageIn messageIn) {

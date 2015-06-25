@@ -1,22 +1,7 @@
-/**
- * This file is part of FoxBukkitChatLink.
- *
- * FoxBukkitChatLink is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * FoxBukkitChatLink is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with FoxBukkitChatLink.  If not, see <http://www.gnu.org/licenses/>.
- */
 package com.foxelbox.foxbukkit.chatlink.bans.commands;
 
 import com.foxelbox.foxbukkit.chatlink.Player;
+import com.foxelbox.foxbukkit.chatlink.RedisHandler;
 import com.foxelbox.foxbukkit.chatlink.commands.system.ICommand;
 import com.foxelbox.foxbukkit.chatlink.json.ChatMessageIn;
 import com.foxelbox.foxbukkit.chatlink.json.ChatMessageOut;
@@ -41,9 +26,7 @@ public class KickCommand extends ICommand {
         }
 
         otherPly.kick("\u00a7r[" + messageIn.from.name + "] " + Utils.concatArray(" ", args, 1, ""));
-
-        ChatMessageOut message = new ChatMessageOut(messageIn);
-        message.setContentsPlain("\u00a75[FBCL]\u00a7f " + messageIn.from.name + " kicked " + otherPly.getName());
-        return message;
+        RedisHandler.sendSimpleMessage(messageIn.from.name + " kicked " + otherPly.getName());
+        return null;
     }
 }
