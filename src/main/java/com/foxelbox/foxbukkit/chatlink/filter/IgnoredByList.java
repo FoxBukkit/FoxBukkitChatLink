@@ -21,38 +21,38 @@ import com.foxelbox.foxbukkit.chatlink.util.Utils;
 
 import java.util.*;
 
-public class IgnoreList {
-    private static Map<String, String> ignoreList = Main.redisManager.createCachedRedisMap("ignoreList");
+public class IgnoredByList {
+    private static Map<String, String> ignoredByList = Main.redisManager.createCachedRedisMap("ignoredByList");
 
-    private IgnoreList() {
+    private IgnoredByList() {
 
     }
 
-    private static String[] getList(UUID uuid) {
-        String list = ignoreList.get(uuid.toString());
+    private static String[] getList(UUID ignoredPerson) {
+        String list = ignoredByList.get(ignoredPerson.toString());
         if(list == null) {
             return new String[0];
         }
         return list.split(",");
     }
 
-    public static void add(UUID uuid, UUID other) {
-        String[] old = getList(uuid);
+    public static void add(UUID ignoredPerson, UUID ignoringPerson) {
+        String[] old = getList(ignoredPerson);
         Set<String> newList = new HashSet<>();
         newList.addAll(Arrays.asList(old));
-        newList.add(other.toString());
-        setList(uuid, newList);
+        newList.add(ignoringPerson.toString());
+        setList(ignoredPerson, newList);
     }
 
-    public static void remove(UUID uuid, UUID other) {
-        String[] old = getList(uuid);
+    public static void remove(UUID ignoredPerson, UUID ignoringPerson) {
+        String[] old = getList(ignoredPerson);
         Set<String> newList = new HashSet<>();
         newList.addAll(Arrays.asList(old));
-        newList.remove(other.toString());
-        setList(uuid, newList);
+        newList.remove(ignoringPerson.toString());
+        setList(ignoredPerson, newList);
     }
 
-    private static void setList(UUID uuid, Collection<String> newList) {
-        ignoreList.put(uuid.toString(), Utils.concat(",", newList, 0, ""));
+    private static void setList(UUID ignoredPerson, Collection<String> newList) {
+        ignoredByList.put(ignoredPerson.toString(), Utils.concat(",", newList, 0, ""));
     }
 }

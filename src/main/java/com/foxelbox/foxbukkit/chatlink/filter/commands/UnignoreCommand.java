@@ -18,7 +18,7 @@ package com.foxelbox.foxbukkit.chatlink.filter.commands;
 
 import com.foxelbox.foxbukkit.chatlink.Player;
 import com.foxelbox.foxbukkit.chatlink.commands.system.ICommand;
-import com.foxelbox.foxbukkit.chatlink.filter.IgnoreList;
+import com.foxelbox.foxbukkit.chatlink.filter.IgnoredByList;
 import com.foxelbox.foxbukkit.chatlink.json.ChatMessageIn;
 import com.foxelbox.foxbukkit.chatlink.json.ChatMessageOut;
 import com.foxelbox.foxbukkit.chatlink.util.CommandException;
@@ -32,7 +32,7 @@ public class UnignoreCommand extends ICommand {
     @Override
     public ChatMessageOut run(Player sender, ChatMessageIn messageIn, String formattedName, String[] args) throws CommandException {
         final Player target = PlayerHelper.matchPlayerSingle(args[0], false);
-        IgnoreList.remove(sender.getUniqueId(), target.getUniqueId());
+        IgnoredByList.remove(target.getUniqueId(), sender.getUniqueId());
         ChatMessageOut reply = makeReply(messageIn);
         reply.setContentsPlain("\u00a75[FBCL]\u00a7f Ignored " + target.getName());
         return reply;
