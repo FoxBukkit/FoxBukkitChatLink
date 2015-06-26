@@ -24,8 +24,8 @@ import com.foxelbox.foxbukkit.chatlink.util.CommandException;
 import com.foxelbox.foxbukkit.chatlink.util.PlayerHelper;
 
 @ICommand.Names("mute")
-@ICommand.Help("Mutes target")
-@ICommand.Usage("")
+@ICommand.Help("Mutes target globally")
+@ICommand.Usage("<target>")
 @ICommand.Permission("foxbukkit.filter.mute")
 public class MuteCommand extends ICommand {
     @Override

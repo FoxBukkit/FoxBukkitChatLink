@@ -18,22 +18,23 @@ package com.foxelbox.foxbukkit.chatlink.filter.commands;
 
 import com.foxelbox.foxbukkit.chatlink.Player;
 import com.foxelbox.foxbukkit.chatlink.commands.system.ICommand;
+import com.foxelbox.foxbukkit.chatlink.filter.IgnoreList;
 import com.foxelbox.foxbukkit.chatlink.json.ChatMessageIn;
 import com.foxelbox.foxbukkit.chatlink.json.ChatMessageOut;
 import com.foxelbox.foxbukkit.chatlink.util.CommandException;
 import com.foxelbox.foxbukkit.chatlink.util.PlayerHelper;
 
-@ICommand.Names("unmute")
-@ICommand.Help("Unmutes target globally")
+@ICommand.Names("ignore")
+@ICommand.Help("Ignores target")
 @ICommand.Usage("<target>")
-@ICommand.Permission("foxbukkit.filter.mute")
-public class UnmuteCommand extends ICommand {
+@ICommand.Permission("foxbukkit.filter.ignore")
+public class IgnoreCommand extends ICommand {
     @Override
     public ChatMessageOut run(Player sender, ChatMessageIn messageIn, String formattedName, String[] args) throws CommandException {
         final Player target = PlayerHelper.matchPlayerSingle(args[0], false);
-        target.isMuted = false;
+        IgnoreList.add(sender.getUniqueId(), target.getUniqueId());
         ChatMessageOut reply = makeReply(messageIn);
-        reply.setContentsPlain("\u00a75[FBCL]\u00a7f Unmuted " + target.getName());
+        reply.setContentsPlain("\u00a75[FBCL]\u00a7f Ignored " + target.getName());
         return reply;
     }
 }
