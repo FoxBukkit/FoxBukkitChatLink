@@ -53,6 +53,10 @@ public class IgnoredByList {
     }
 
     private static void setList(UUID ignoredPerson, Collection<String> newList) {
-        ignoredByList.put(ignoredPerson.toString(), Utils.concat(",", newList, 0, ""));
+        if(newList.isEmpty()) {
+            ignoredByList.remove(ignoredPerson.toString());
+        } else {
+            ignoredByList.put(ignoredPerson.toString(), Utils.concat(",", newList, 0, ""));
+        }
     }
 }
