@@ -21,42 +21,42 @@ import com.foxelbox.foxbukkit.chatlink.util.Utils;
 
 import java.util.*;
 
-public class IgnoredByList {
-    private static Map<String, String> ignoredByList = Main.redisManager.createCachedRedisMap("ignoredByList");
+public class UUIDToUUIDsRedisMap {
+    private final Map<String, String> redisMap;
 
-    private IgnoredByList() {
-
+    public UUIDToUUIDsRedisMap(String name) {
+        redisMap = Main.redisManager.createCachedRedisMap(name);
     }
 
-    private static String[] getList(UUID ignoredPerson) {
-        String list = ignoredByList.get(ignoredPerson.toString());
+    private String[] getList(UUID ignoredPerson) {
+        String list = redisMap.get(ignoredPerson.toString());
         if(list == null) {
             return new String[0];
         }
         return list.split(",");
     }
 
-    public static void add(UUID ignoredPerson, UUID ignoringPerson) {
-        String[] old = getList(ignoredPerson);
+    public void add(UUID key, UUID value) {
+        String[] old = getList(key);
         Set<String> newList = new HashSet<>();
         newList.addAll(Arrays.asList(old));
-        newList.add(ignoringPerson.toString());
-        setList(ignoredPerson, newList);
+        newList.add(value.toString());
+        setList(key, newList);
     }
 
-    public static void remove(UUID ignoredPerson, UUID ignoringPerson) {
-        String[] old = getList(ignoredPerson);
+    public void remove(UUID key, UUID value) {
+        String[] old = getList(key);
         Set<String> newList = new HashSet<>();
         newList.addAll(Arrays.asList(old));
-        newList.remove(ignoringPerson.toString());
-        setList(ignoredPerson, newList);
+        newList.remove(value.toString());
+        setList(key, newList);
     }
 
-    private static void setList(UUID ignoredPerson, Collection<String> newList) {
+    private void setList(UUID key, Collection<String> newList) {
         if(newList.isEmpty()) {
-            ignoredByList.remove(ignoredPerson.toString());
+            redisMap.remove(key.toString());
         } else {
-            ignoredByList.put(ignoredPerson.toString(), Utils.concat(",", newList, 0, ""));
+            redisMap.put(key.toString(), Utils.concat(",", newList, 0, ""));
         }
     }
 }
