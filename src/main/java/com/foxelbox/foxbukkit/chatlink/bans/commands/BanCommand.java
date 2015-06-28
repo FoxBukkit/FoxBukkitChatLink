@@ -98,6 +98,6 @@ public class BanCommand extends ICommand {
 			asPlayer(commandSender).chat("/lb rollback player "+otherply.getName());
 		}*/
 
-		otherply.kick("\u00a7r[" + commandSender.getName() + "] " + reason);
+		otherply.kick("[" + commandSender.getName() + "] " + reason);
 	}
 }
