@@ -77,7 +77,7 @@ public class Player {
 
     public void kick(String reason) {
         ChatMessageOut messageOut = new ChatMessageOut(null, new UserInfo(uuid, name));
-        messageOut.contents = "\u00a7r" + reason;
+        messageOut.contents = "\u00a7r[Kicked] " + reason;
         messageOut.type = "kick";
         messageOut.to.type = "player";
         messageOut.to.filter = new String[] { uuid.toString() };
