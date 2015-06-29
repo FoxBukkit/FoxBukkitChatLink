@@ -76,13 +76,17 @@ public class Player {
     }
 
     public void kick(String reason) {
+        kick(reason, false);
+    }
+
+    public void kick(String reason, boolean force) {
         ChatMessageOut messageOut = new ChatMessageOut(null, new UserInfo(uuid, name));
         messageOut.contents = "[Kicked] " + reason;
         messageOut.type = "kick";
         messageOut.to.type = "player";
         messageOut.to.filter = new String[] { uuid.toString() };
         RedisHandler.sendMessage(messageOut);
-        showKickMessage(reason);
+        showKickMessage(reason, force);
     }
 
     public void chat(String message) {
@@ -94,8 +98,8 @@ public class Player {
         RedisHandler.sendMessage(messageOut);
     }
 
-    public void showKickMessage(String reason) {
-        if (isOnline()) {
+    public void showKickMessage(String reason, boolean force) {
+        if (isOnline() || force) {
             ChatMessageOut messageOut = new ChatMessageOut(null, new UserInfo(uuid, name));
             messageOut.setContents(RedisHandler.KICK_FORMAT, new String[]{
                     name, uuid.toString(), PlayerHelper.getFullPlayerName(uuid, name), reason
