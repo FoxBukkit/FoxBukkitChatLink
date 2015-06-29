@@ -55,10 +55,6 @@ public class BanCommand extends ICommand {
 		if (PlayerHelper.getPlayerLevel(commandSender.getUniqueId()) <= PlayerHelper.getPlayerLevel(otherply.getUniqueId()))
 			throw new PermissionDeniedException();
 
-		if (rollback) {
-			commandSender.chat("/lb writelogfile player "+otherply.getName());
-		}
-
 		if (reason == null) {
 			reason = "Kickbanned by " + commandSender.getName();
 		}
@@ -95,7 +91,7 @@ public class BanCommand extends ICommand {
 		}
 
 		if (rollback) {
-			commandSender.chat("/lb rollback player "+otherply.getName());
+			commandSender.chat("/lb writelogfile player " + otherply.getName() + "\n/lb rollback player " + otherply.getName());
 		}
 
 		otherply.kick("[" + commandSender.getName() + "] " + reason);
