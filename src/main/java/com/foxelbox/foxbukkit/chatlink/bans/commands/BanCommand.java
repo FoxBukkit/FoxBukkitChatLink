@@ -90,6 +90,8 @@ public class BanCommand extends ICommand {
 			Bans.instance.ban(commandSender, otherply, reason, type);
 		}
 
+		commandSender.chat("/co " + otherply.getName());
+
 		if (rollback) {
 			commandSender.chat("/lb writelogfile player " + otherply.getName() + "\n/lb rollback player " + otherply.getName());
 		}
