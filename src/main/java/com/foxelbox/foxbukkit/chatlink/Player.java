@@ -85,6 +85,15 @@ public class Player {
         showKickMessage(reason);
     }
 
+    public void chat(String message) {
+        ChatMessageOut messageOut = new ChatMessageOut(null, new UserInfo(uuid, name));
+        messageOut.contents = message;
+        messageOut.type = "inject";
+        messageOut.to.type = "player";
+        messageOut.to.filter = new String[] { uuid.toString() };
+        RedisHandler.sendMessage(messageOut);
+    }
+
     public void showKickMessage(String reason) {
         ChatMessageOut messageOut = new ChatMessageOut(null, new UserInfo(uuid, name));
         messageOut.setContents(RedisHandler.KICK_FORMAT, new String[] {
