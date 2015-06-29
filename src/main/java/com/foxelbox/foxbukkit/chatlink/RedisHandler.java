@@ -121,7 +121,7 @@ public class RedisHandler extends AbstractRedisHandler {
 
                 if (messageStr.startsWith("kick ")) {
                     final String param = messageStr.substring(5);
-                    if(param.startsWith("\u00a7r")) {
+                    if(param.startsWith("[Kicked]")) {
                         sender.kick(param.substring(2));
                     } else {
                         sender.showKickMessage(param);

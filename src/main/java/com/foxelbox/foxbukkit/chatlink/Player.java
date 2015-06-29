@@ -95,11 +95,13 @@ public class Player {
     }
 
     public void showKickMessage(String reason) {
-        ChatMessageOut messageOut = new ChatMessageOut(null, new UserInfo(uuid, name));
-        messageOut.setContents(RedisHandler.KICK_FORMAT, new String[] {
-                name, uuid.toString(), PlayerHelper.getFullPlayerName(uuid, name), reason
-        });
-        RedisHandler.sendMessage(messageOut);
+        if (isOnline()) {
+            ChatMessageOut messageOut = new ChatMessageOut(null, new UserInfo(uuid, name));
+            messageOut.setContents(RedisHandler.KICK_FORMAT, new String[]{
+                    name, uuid.toString(), PlayerHelper.getFullPlayerName(uuid, name), reason
+            });
+            RedisHandler.sendMessage(messageOut);
+        }
     }
 
     public boolean hasPermission(String permission) {
