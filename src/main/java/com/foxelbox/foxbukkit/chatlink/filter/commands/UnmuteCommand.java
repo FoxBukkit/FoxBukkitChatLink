@@ -20,6 +20,7 @@ import com.foxelbox.foxbukkit.chatlink.Player;
 import com.foxelbox.foxbukkit.chatlink.commands.system.ICommand;
 import com.foxelbox.foxbukkit.chatlink.json.ChatMessageIn;
 import com.foxelbox.foxbukkit.chatlink.json.ChatMessageOut;
+import com.foxelbox.foxbukkit.chatlink.json.MessageTarget;
 import com.foxelbox.foxbukkit.chatlink.util.CommandException;
 import com.foxelbox.foxbukkit.chatlink.util.PlayerHelper;
 
@@ -33,7 +34,8 @@ public class UnmuteCommand extends ICommand {
         final Player target = PlayerHelper.matchPlayerSingle(args[0], false);
         target.isMuted = false;
         ChatMessageOut reply = makeReply(messageIn);
-        reply.setContentsPlain("\u00a75[FBCL]\u00a7f Unmuted " + target.getName());
+        reply.to = new MessageTarget("all", null);
+        reply.setContentsPlain("\u00a75[FBCL]\u00a7f " + sender.getName() + " unmuted " + target.getName());
         return reply;
     }
 }
