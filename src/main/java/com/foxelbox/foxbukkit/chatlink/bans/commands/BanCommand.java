@@ -48,8 +48,6 @@ public class BanCommand extends ICommand {
 	}
 
 	public static void executeBan(String server, Player commandSender, String plyName, String reason, boolean rollback, boolean global, final String duration) throws CommandException {
-		if (!commandSender.hasPermission("foxbukkit.users.ban")) throw new PermissionDeniedException();
-
 		final Player otherply = PlayerHelper.matchPlayerSingle(plyName, false);
 
 		if (PlayerHelper.getPlayerLevel(commandSender.getUniqueId()) <= PlayerHelper.getPlayerLevel(otherply.getUniqueId()))
