@@ -19,6 +19,7 @@ package com.foxelbox.foxbukkit.chatlink.commands;
 import com.foxelbox.foxbukkit.chatlink.Player;
 import com.foxelbox.foxbukkit.chatlink.RedisHandler;
 import com.foxelbox.foxbukkit.chatlink.commands.system.ICommand;
+import com.foxelbox.foxbukkit.chatlink.filter.MuteList;
 import com.foxelbox.foxbukkit.chatlink.json.ChatMessageIn;
 import com.foxelbox.foxbukkit.chatlink.json.ChatMessageOut;
 import com.foxelbox.foxbukkit.chatlink.json.MessageTarget;
@@ -37,6 +38,10 @@ public class PMCommand extends ICommand {
 
     @Override
     public ChatMessageOut run(Player commandSender, ChatMessageIn messageIn, String formattedName, String[] args) throws CommandException {
+        if(MuteList.isMuted(commandSender)) {
+            return null;
+        }
+
         final String messageText = Utils.concatArray(" ", args, 1, "");
         final Player target = PlayerHelper.matchPlayerSingle(args[0]);
 

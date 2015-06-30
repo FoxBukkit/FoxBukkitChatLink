@@ -19,6 +19,7 @@ package com.foxelbox.foxbukkit.chatlink;
 import com.foxelbox.dependencies.redis.AbstractRedisHandler;
 import com.foxelbox.foxbukkit.chatlink.commands.ConvCommand;
 import com.foxelbox.foxbukkit.chatlink.commands.system.CommandSystem;
+import com.foxelbox.foxbukkit.chatlink.filter.MuteList;
 import com.foxelbox.foxbukkit.chatlink.json.ChatMessageIn;
 import com.foxelbox.foxbukkit.chatlink.json.ChatMessageOut;
 import com.foxelbox.foxbukkit.chatlink.util.PlayerHelper;
@@ -156,7 +157,7 @@ public class RedisHandler extends AbstractRedisHandler {
                     }
                     return CommandSystem.instance.runCommand(sender, messageIn, commandName, argStr);
                 } else {
-                    if(sender.isMuted) {
+                    if(MuteList.isMuted(sender)) {
                         return null;
                     }
 

@@ -19,6 +19,7 @@ package com.foxelbox.foxbukkit.chatlink.commands;
 import com.foxelbox.foxbukkit.chatlink.Player;
 import com.foxelbox.foxbukkit.chatlink.RedisHandler;
 import com.foxelbox.foxbukkit.chatlink.commands.system.ICommand;
+import com.foxelbox.foxbukkit.chatlink.filter.MuteList;
 import com.foxelbox.foxbukkit.chatlink.json.ChatMessageIn;
 import com.foxelbox.foxbukkit.chatlink.json.ChatMessageOut;
 import com.foxelbox.foxbukkit.chatlink.util.CommandException;
@@ -32,7 +33,7 @@ public class OpChatCommand extends ICommand {
 
     @Override
     public ChatMessageOut run(Player sender, ChatMessageIn messageIn, String formattedName, String argStr) throws CommandException {
-        if(sender.isMuted) {
+        if(MuteList.isMuted(sender)) {
             return null;
         }
 

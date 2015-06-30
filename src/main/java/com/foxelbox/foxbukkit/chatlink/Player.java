@@ -30,8 +30,6 @@ public class Player {
     private final String name;
     private String displayName;
 
-    public boolean isMuted;
-
     public static final UUID CONSOLE_UUID = UUID.nameUUIDFromBytes("COMMANDSENDER:CONSOLE".getBytes());
 
     public static Player getPlayerFromMessage(ChatMessageOut message) {

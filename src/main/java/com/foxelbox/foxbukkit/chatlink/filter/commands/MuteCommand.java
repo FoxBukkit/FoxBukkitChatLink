@@ -18,6 +18,7 @@ package com.foxelbox.foxbukkit.chatlink.filter.commands;
 
 import com.foxelbox.foxbukkit.chatlink.Player;
 import com.foxelbox.foxbukkit.chatlink.commands.system.ICommand;
+import com.foxelbox.foxbukkit.chatlink.filter.MuteList;
 import com.foxelbox.foxbukkit.chatlink.json.ChatMessageIn;
 import com.foxelbox.foxbukkit.chatlink.json.ChatMessageOut;
 import com.foxelbox.foxbukkit.chatlink.json.MessageTarget;
@@ -32,7 +33,7 @@ public class MuteCommand extends ICommand {
     @Override
     public ChatMessageOut run(Player sender, ChatMessageIn messageIn, String formattedName, String[] args) throws CommandException {
         final Player target = PlayerHelper.matchPlayerSingle(args[0], false);
-        target.isMuted = true;
+        MuteList.setMuteState(target, true);
         ChatMessageOut reply = makeReply(messageIn);
         reply.to = new MessageTarget("all", null);
         reply.setContentsPlain("\u00a75[FBCL]\u00a7f " + sender.getName() + " muted " + target.getName());
