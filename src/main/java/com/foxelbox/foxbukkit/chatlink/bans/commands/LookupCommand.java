@@ -37,7 +37,7 @@ import java.util.UUID;
 @ICommand.Permission("foxbukkit.bans.lookup")
 public class LookupCommand extends ICommand {
 	@Override
-	public ChatMessageOut run(final Player commandSender, ChatMessageIn messageIn, String formattedName, String[] args) throws CommandException {
+	public ChatMessageOut run(final Player commandSender, final ChatMessageIn messageIn, String formattedName, String[] args) throws CommandException {
 		final Player otherPly = PlayerHelper.matchPlayerSingle(args[0], false);
 
 		final String user = otherPly.getName();
@@ -54,20 +54,28 @@ public class LookupCommand extends ICommand {
 						fishBansStr.append(String.format(" %1$d ban(s) on %2$s,", fishBanEntry.getValue(), fishBanEntry.getKey()));
 				fishBansStr.deleteCharAt(fishBansStr.length() - 1);
 
+				ChatMessageOut messageOut = makeReply(messageIn);
+
 				if (ban != null) {
-					RedisHandler.sendSimpleMessage(commandSender, String.format("Player %1$s IS banned by %2$s for the reason of \"%3$s\"", user, ban.getAdmin().name, ban.getReason()));
+					messageOut.setContentsPlain(String.format("Player %1$s IS banned by %2$s for the reason of \"%3$s\"", user, ban.getAdmin().name, ban.getReason()));
 				} else {
-					RedisHandler.sendSimpleMessage(commandSender, String.format("Player %1$s is NOT banned", user));
+					messageOut.setContentsPlain(String.format("Player %1$s is NOT banned", user));
 				}
+				RedisHandler.sendMessage(messageOut);
+
 				if (altList != null) {
-					RedisHandler.sendSimpleMessage(commandSender, altList);
+					messageOut.setContentsPlain(altList);
 				} else {
-					RedisHandler.sendSimpleMessage(commandSender, String.format("No possible alts of %1$s found", user));
+					messageOut.setContentsPlain(String.format("No possible alts of %1$s found", user));
 				}
-				RedisHandler.sendSimpleMessage(commandSender, fishBansStr.toString());
+				RedisHandler.sendMessage(messageOut);
+
+				messageOut.setContentsPlain(fishBansStr.toString());
+				messageOut.finalize_context = true;
+				RedisHandler.sendMessage(messageOut);
 			}
 		}.start();
 
-		return makeBlank(messageIn);
+		return null;
 	}
 }

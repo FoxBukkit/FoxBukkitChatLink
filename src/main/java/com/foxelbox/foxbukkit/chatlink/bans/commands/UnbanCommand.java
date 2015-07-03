@@ -30,7 +30,7 @@ import com.foxelbox.foxbukkit.chatlink.util.CommandException;
 public class UnbanCommand extends ICommand {
 	@Override
 	public ChatMessageOut run(Player commandSender, ChatMessageIn messageIn, String formattedName, String[] args) throws CommandException {
-		Bans.instance.unban(commandSender, args[0]);
+		Bans.instance.unban(messageIn, commandSender, args[0]);
 		return makeBlank(messageIn);
 	}
 }

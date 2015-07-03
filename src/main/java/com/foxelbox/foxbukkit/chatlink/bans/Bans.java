@@ -34,6 +34,9 @@ package com.foxelbox.foxbukkit.chatlink.bans;
 
 import com.foxelbox.foxbukkit.chatlink.Player;
 import com.foxelbox.foxbukkit.chatlink.RedisHandler;
+import com.foxelbox.foxbukkit.chatlink.commands.system.ICommand;
+import com.foxelbox.foxbukkit.chatlink.json.ChatMessageIn;
+import com.foxelbox.foxbukkit.chatlink.json.ChatMessageOut;
 import com.foxelbox.foxbukkit.chatlink.util.PlayerHelper;
 
 import java.util.UUID;
@@ -60,36 +63,41 @@ public class Bans {
 		}
 	}
 
-	public void unban(final Player from, final String ply) {
+	public void unban(final ChatMessageIn refMessage, final Player from, final String ply) {
 		new Thread() {
 			public void run() {
 				Ban ban = BanResolver.getBan(ply, null, false);
+				ChatMessageOut reply = ICommand.makeReply(refMessage);
 				if(ban != null) {
 					BanResolver.deleteBan(ban);
-					RedisHandler.sendSimpleMessage(from.getName() + " unbanned " + ply + "!");
+					reply.to.type = "all";
+					reply.to.filter = null;
+					reply.setContentsPlain(from.getName() + " unbanned " + ply + "!");
 				} else {
-					RedisHandler.sendSimpleMessage(from, "Player with the name " + ply + " was not banned!");
+					reply.setContentsPlain("Player with the name " + ply + " was not banned!");
 				}
+				reply.finalize_context = true;
+				RedisHandler.sendMessage(reply);
 			}
 		}.start();
 	}
 
-	public void ban(final Player from, final Player ply, final String reason, final BanType type) {
+	public void ban(final ChatMessageIn refMessage, final Player from, final Player ply, final String reason, final BanType type) {
 		if (type == BanType.TEMPORARY) return;
-		ban(from, ply, reason, type, 0, "");
+		ban(refMessage, from, ply, reason, type, 0, "");
 	}
 
-    public void ban(final Player from, final Player ply, final String reason, final BanType type, final long duration, final String measure) {
+    public void ban(final ChatMessageIn refMessage, final Player from, final Player ply, final String reason, final BanType type, final long duration, final String measure) {
         if (type == BanType.TEMPORARY) return;
-        ban(from, ply.getName(), ply.getUniqueId(), reason, type, duration, measure);
+        ban(refMessage, from, ply.getName(), ply.getUniqueId(), reason, type, duration, measure);
     }
 
-	public void ban(final Player from, final String plyName, final UUID plyUUID, final String reason, final BanType type) {
+	public void ban(final ChatMessageIn refMessage, final Player from, final String plyName, final UUID plyUUID, final String reason, final BanType type) {
 		if (type == BanType.TEMPORARY) return;
-		ban(from, plyName, plyUUID, reason, type, 0, "");
+		ban(refMessage, from, plyName, plyUUID, reason, type, 0, "");
 	}
 
-	public void ban(final Player from, final String _plyName, final UUID plyUUID, final String reason, final BanType type, final long duration, final String measure) {
+	public void ban(final ChatMessageIn refMessage, final Player from, final String _plyName, final UUID plyUUID, final String reason, final BanType type, final long duration, final String measure) {
 		if (type == null) return;
 		if (type == BanType.TEMPORARY) return;
 
@@ -107,7 +115,12 @@ public class Bans {
 				newBan.setReason(reason);
 				newBan.setType(type.getName());
 				BanResolver.addBan(newBan);
-				RedisHandler.sendSimpleMessage(from.getName() + " banned " + plyName + " [Reason: " + reason + "]!");
+				ChatMessageOut messageOut = ICommand.makeReply(refMessage);
+				messageOut.to.type = "all";
+				messageOut.to.filter = null;
+				messageOut.finalize_context = true;
+				messageOut.setContentsPlain(from.getName() + " banned " + plyName + " [Reason: " + reason + "]!");
+				RedisHandler.sendMessage(messageOut);
 			}
 		}.start();
 	}

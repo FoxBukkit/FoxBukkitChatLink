@@ -39,11 +39,17 @@ public class ListCommand extends ICommand {
         if(args.length > 0) {
             final Player target = PlayerHelper.matchPlayerSingle(args[0], false);
 
-            RedisHandler.sendSimpleMessage(commandSender, "Name: " + target.getName());
-            RedisHandler.sendSimpleMessage(commandSender, "Rank: " + PlayerHelper.getPlayerRank(target.getUniqueId()));
-            RedisHandler.sendSimpleMessage(commandSender, "NameTag: " + PlayerHelper.getFullPlayerName(target.getUniqueId(), target.getName()));
+            ChatMessageOut reply = makeReply(messageIn);
 
-            return makeBlank(messageIn);
+            reply.setContentsPlain("Name: " + target.getName());
+            RedisHandler.sendMessage(reply);
+
+            reply.setContentsPlain("Rank: " + PlayerHelper.getPlayerRank(target.getUniqueId()));
+            RedisHandler.sendMessage(reply);
+
+            reply.setContentsPlain("NameTag: " + PlayerHelper.getFullPlayerName(target.getUniqueId(), target.getName()));
+
+            return reply;
         }
 
         ChatMessageOut message = makeReply(messageIn);

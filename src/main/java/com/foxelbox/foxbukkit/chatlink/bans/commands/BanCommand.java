@@ -43,11 +43,11 @@ public class BanCommand extends ICommand {
 	@Override
 	public ChatMessageOut run(Player sender, ChatMessageIn messageIn, String formattedName, String[] args) throws CommandException {
 		args = parseFlags(args);
-		executeBan(messageIn.server, sender, args[0], Utils.concatArray(" ", args, 1, null), booleanFlags.contains('r'), booleanFlags.contains('g'), stringFlags.get('t'));
-		return makeBlank(messageIn);
+		executeBan(messageIn, sender, args[0], Utils.concatArray(" ", args, 1, null), booleanFlags.contains('r'), booleanFlags.contains('g'), stringFlags.get('t'));
+		return null;
 	}
 
-	public static void executeBan(String server, Player commandSender, String plyName, String reason, boolean rollback, boolean global, final String duration) throws CommandException {
+	public static void executeBan(ChatMessageIn messageIn, Player commandSender, String plyName, String reason, boolean rollback, boolean global, final String duration) throws CommandException {
 		final Player otherply = PlayerHelper.matchPlayerSingle(plyName, false);
 
 		if (commandSender.getLevel() <= otherply.getLevel()) {
@@ -77,7 +77,7 @@ public class BanCommand extends ICommand {
 				throw new CommandException("Malformed ban duration");
 			}
 
-			Bans.instance.ban(commandSender, otherply, reason, type, durationValue, measure);
+			Bans.instance.ban(messageIn, commandSender, otherply, reason, type, durationValue, measure);
 		}
 		else {
 			if (global) {
@@ -86,7 +86,7 @@ public class BanCommand extends ICommand {
 				type = Bans.BanType.LOCAL;
 			}
 
-			Bans.instance.ban(commandSender, otherply, reason, type);
+			Bans.instance.ban(messageIn, commandSender, otherply, reason, type);
 		}
 
 		commandSender.chat("/co " + otherply.getName() + " force");

@@ -40,7 +40,11 @@ public class KickCommand extends ICommand {
         }
 
         otherPly.kick("[" + messageIn.from.name + "] " + Utils.concatArray(" ", args, 1, ""));
-        RedisHandler.sendSimpleMessage(messageIn.from.name + " kicked " + otherPly.getName());
-        return makeBlank(messageIn);
+
+        ChatMessageOut reply = makeReply(messageIn);
+        reply.to.type = "all";
+        reply.to.filter = null;
+        reply.setContentsPlain(messageIn.from.name + " kicked " + otherPly.getName());
+        return reply;
     }
 }
