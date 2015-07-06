@@ -16,7 +16,6 @@
  */
 package com.foxelbox.foxbukkit.chatlink;
 
-import com.foxelbox.dependencies.redis.RedisManager;
 import com.foxelbox.foxbukkit.chatlink.json.ChatMessageIn;
 import com.foxelbox.foxbukkit.chatlink.json.ChatMessageOut;
 import com.foxelbox.foxbukkit.chatlink.json.UserInfo;

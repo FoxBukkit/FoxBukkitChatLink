@@ -16,7 +16,7 @@
  */
 package com.foxelbox.foxbukkit.chatlink.filter;
 
-import java.util.*;
+import java.util.UUID;
 
 public class IgnoreList {
     private static UUIDToUUIDsRedisMap ignoredByList = new UUIDToUUIDsRedisMap("ignoredByList");

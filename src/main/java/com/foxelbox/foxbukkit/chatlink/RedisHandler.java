@@ -23,7 +23,6 @@ import com.foxelbox.foxbukkit.chatlink.filter.MuteList;
 import com.foxelbox.foxbukkit.chatlink.json.ChatMessageIn;
 import com.foxelbox.foxbukkit.chatlink.json.ChatMessageOut;
 import com.foxelbox.foxbukkit.chatlink.util.PlayerHelper;
-import com.foxelbox.foxbukkit.chatlink.util.Utils;
 import com.google.gson.Gson;
 
 import java.util.regex.Pattern;

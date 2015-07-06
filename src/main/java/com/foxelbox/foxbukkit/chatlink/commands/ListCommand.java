@@ -25,10 +25,7 @@ import com.foxelbox.foxbukkit.chatlink.json.ChatMessageIn;
 import com.foxelbox.foxbukkit.chatlink.json.ChatMessageOut;
 import com.foxelbox.foxbukkit.chatlink.util.CommandException;
 import com.foxelbox.foxbukkit.chatlink.util.PlayerHelper;
-import com.foxelbox.foxbukkit.chatlink.util.Utils;
-import jdk.management.resource.ResourceId;
 
-import java.net.InetAddress;
 import java.text.SimpleDateFormat;
 import java.util.List;
 
