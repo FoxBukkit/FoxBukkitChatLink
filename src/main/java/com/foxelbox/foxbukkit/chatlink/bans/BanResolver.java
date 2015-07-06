@@ -69,6 +69,7 @@ public class BanResolver {
 			if(server != null) {
 				query.append(" AND server = ?");
 			}
+			query.append(" ORDER BY time DESC LIMIT 1");
 			PreparedStatement preparedStatement = connection.prepareStatement(query.toString());
 			preparedStatement.setInt(1, userID);
 			int i = 1;
