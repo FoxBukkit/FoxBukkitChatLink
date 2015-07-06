@@ -58,18 +58,21 @@ public class ListCommand extends ICommand {
                 new Thread() {
                     public void run() {
                         ChatMessageOut reply = makeReply(messageIn);
-                        LogEntry logEntry = BanResolver.getLatestEntry(target.getName(), target.getUniqueId(), "logout", messageIn.server);
-                        if(logEntry == null) {
-                            reply.setContentsPlain("\u00a75[FBCL]\u00a7f Last logout data not present");
-                            reply.finalize_context = true;
-                            RedisHandler.sendMessage(reply);
-                            return;
-                        }
+                        LogEntry logEntryLogout = BanResolver.getLatestEntry(target.getName(), target.getUniqueId(), "logout", messageIn.server);
+                        LogEntry logEntry = BanResolver.getLatestEntry(target.getName(), target.getUniqueId(), null, messageIn.server);
 
-                        reply.setContentsPlain("\u00a75[FBCL]\u00a7f Last logout: " + DATE_FORMAT.format(logEntry.getTime()));
+                        if(logEntryLogout == null) {
+                            reply.setContentsPlain("\u00a75[FBCL]\u00a7f Last logout data not present");
+                        } else {
+                            reply.setContentsPlain("\u00a75[FBCL]\u00a7f Last logout: " + DATE_FORMAT.format(logEntryLogout.getTime()));
+                        }
                         RedisHandler.sendMessage(reply);
 
-                        reply.setContentsPlain("\u00a75[FBCL]\u00a7f Last IP: " + logEntry.getIp().getHostAddress());
+                        if(logEntry == null) {
+                            reply.setContentsPlain("\u00a75[FBCL]\u00a7f IP data not present");
+                        } else {
+                            reply.setContentsPlain("\u00a75[FBCL]\u00a7f Last IP: " + logEntry.getIp().getHostAddress());
+                        }
                         reply.finalize_context = true;
                         RedisHandler.sendMessage(reply);
                     }
