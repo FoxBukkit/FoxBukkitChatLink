@@ -58,7 +58,7 @@ public class ListCommand extends ICommand {
                 new Thread() {
                     public void run() {
                         ChatMessageOut reply = makeReply(messageIn);
-                        LogEntry logEntry = BanResolver.getLatestEntry(commandSender.getName(), commandSender.getUniqueId(), "logout", messageIn.server);
+                        LogEntry logEntry = BanResolver.getLatestEntry(target.getName(), target.getUniqueId(), "logout", messageIn.server);
                         if(logEntry == null) {
                             reply.setContentsPlain("Last logout data not present");
                             reply.finalize_context = true;
