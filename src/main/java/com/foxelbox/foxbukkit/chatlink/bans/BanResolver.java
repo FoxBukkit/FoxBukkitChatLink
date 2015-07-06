@@ -121,11 +121,12 @@ public class BanResolver {
 		deleteBan(ban);
 		try {
 			Connection connection = DatabaseConnectionPool.instance.getConnection();
-			PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO bans (reason, admin, player, type, time) VALUES (?, ?, ?, ?, NOW())");
+			PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO bans (reason, admin, player, type, time) VALUES (?, ?, ?, ?, ?)");
 			preparedStatement.setString(1, ban.getReason());
 			preparedStatement.setInt(2, ban.getAdminID());
 			preparedStatement.setInt(3, ban.getPlayerID());
 			preparedStatement.setString(4, ban.getType());
+			preparedStatement.setDate(5, ban.getTime());
 			preparedStatement.execute();
 			preparedStatement.close();
 			connection.close();
