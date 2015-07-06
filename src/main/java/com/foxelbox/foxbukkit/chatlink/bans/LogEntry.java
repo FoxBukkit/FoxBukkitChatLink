@@ -17,7 +17,6 @@
 package com.foxelbox.foxbukkit.chatlink.bans;
 
 import java.net.InetAddress;
-import java.sql.Time;
 import java.sql.Timestamp;
 
 public class LogEntry {

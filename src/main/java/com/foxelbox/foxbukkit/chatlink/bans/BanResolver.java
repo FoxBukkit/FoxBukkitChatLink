@@ -164,7 +164,7 @@ public class BanResolver {
 			preparedStatement.setInt(2, ban.getAdminID());
 			preparedStatement.setInt(3, ban.getPlayerID());
 			preparedStatement.setString(4, ban.getType());
-			preparedStatement.setDate(5, ban.getTime());
+			preparedStatement.setTimestamp(5, ban.getTime());
 			preparedStatement.execute();
 			preparedStatement.close();
 			connection.close();
@@ -215,7 +215,7 @@ public class BanResolver {
 			ResultSet resultSet = preparedStatement.executeQuery();
 			Ban ret = null;
 			if(resultSet.next()) {
-				ret = new Ban(resultSet.getString("reason"), resultSet.getInt("admin"), resultSet.getInt("player"), resultSet.getString("type"), resultSet.getDate("time"));
+				ret = new Ban(resultSet.getString("reason"), resultSet.getInt("admin"), resultSet.getInt("player"), resultSet.getString("type"), resultSet.getTimestamp("time"));
 				playerBans.put(userID, new SoftReference<>(ret));
 			}
 			preparedStatement.close();

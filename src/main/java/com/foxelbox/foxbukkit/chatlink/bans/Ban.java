@@ -32,7 +32,7 @@
  */
 package com.foxelbox.foxbukkit.chatlink.bans;
 
-import java.sql.Date;
+import java.sql.Timestamp;
 import java.util.UUID;
 
 public class Ban {
@@ -40,11 +40,11 @@ public class Ban {
 	private int admin;
 	private int player;
 	private String type;
-	private Date time;
+	private Timestamp time;
 
 	protected final long retrievalTime;
 
-	protected Ban(String reason, int admin, int player, String type, Date time) {
+	protected Ban(String reason, int admin, int player, String type, Timestamp time) {
 		this.reason = reason;
 		this.admin = admin;
 		this.player = player;
@@ -107,10 +107,10 @@ public class Ban {
 	}
 
 	public void refreshTime() {
-		this.time = new Date(new java.util.Date().getTime());
+		this.time = new Timestamp(new java.util.Date().getTime());
 	}
 
-	public Date getTime() {
+	public Timestamp getTime() {
 		return time;
 	}
 }
