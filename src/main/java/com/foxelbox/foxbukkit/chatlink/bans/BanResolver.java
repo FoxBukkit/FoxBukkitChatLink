@@ -35,7 +35,6 @@ package com.foxelbox.foxbukkit.chatlink.bans;
 import com.foxelbox.foxbukkit.chatlink.database.DatabaseConnectionPool;
 
 import java.lang.ref.SoftReference;
-import java.net.InetAddress;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -88,25 +87,6 @@ public class BanResolver {
 			return String.format("Possible alts of %1$s: %2$s", user, sb);
 	}
 
-	public static void addIPForPlayer(String username, UUID uuid, InetAddress address) {
-		if(address.isAnyLocalAddress() || address.isLoopbackAddress() || address.isLinkLocalAddress() || address.isSiteLocalAddress())
-			return;
-
-		int userID = getUserID(username, uuid, true);
-
-		try {
-			Connection connection = DatabaseConnectionPool.instance.getConnection();
-			PreparedStatement preparedStatement = connection.prepareStatement("REPLACE INTO player_ips (player, ip, time) VALUES (?, ?, UNIX_TIMESTAMP())");
-			preparedStatement.setInt(1, userID);
-			preparedStatement.setBytes(2, address.getAddress());
-			preparedStatement.execute();
-			preparedStatement.close();
-			connection.close();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-
 	public static Collection<BanPlayer> getPossibleAltsForPlayer(String username, UUID uuid) {
 		int userID = getUserID(username, uuid);
 		if(userID < 1)
@@ -141,17 +121,16 @@ public class BanResolver {
 		deleteBan(ban);
 		try {
 			Connection connection = DatabaseConnectionPool.instance.getConnection();
-			PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO bans (reason, admin, player, type, time) VALUES (?, ?, ?, ?, ?)");
+			PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO bans (reason, admin, player, type, time) VALUES (?, ?, ?, ?, NOW())");
 			preparedStatement.setString(1, ban.getReason());
 			preparedStatement.setInt(2, ban.getAdminID());
-			preparedStatement.setInt(3, ban.getUserID());
+			preparedStatement.setInt(3, ban.getPlayerID());
 			preparedStatement.setString(4, ban.getType());
-			preparedStatement.setInt(5, ban.getTime());
 			preparedStatement.execute();
 			preparedStatement.close();
 			connection.close();
 
-			playerBans.put(ban.getUserID(), new SoftReference<>(ban));
+			playerBans.put(ban.getPlayerID(), new SoftReference<>(ban));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -161,12 +140,12 @@ public class BanResolver {
 		try {
 			Connection connection = DatabaseConnectionPool.instance.getConnection();
 			PreparedStatement preparedStatement = connection.prepareStatement("DELETE FROM bans WHERE player = ?");
-			preparedStatement.setInt(1, ban.getUserID());
+			preparedStatement.setInt(1, ban.getPlayerID());
 			preparedStatement.execute();
 			preparedStatement.close();
 			connection.close();
 
-			playerBans.remove(ban.getUserID());
+			playerBans.remove(ban.getPlayerID());
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
@@ -197,7 +176,7 @@ public class BanResolver {
 			ResultSet resultSet = preparedStatement.executeQuery();
 			Ban ret = null;
 			if(resultSet.next()) {
-				ret = new Ban(resultSet.getString("reason"), resultSet.getInt("admin"), resultSet.getInt("player"), resultSet.getString("type"), resultSet.getInt("time"));
+				ret = new Ban(resultSet.getString("reason"), resultSet.getInt("admin"), resultSet.getInt("player"), resultSet.getString("type"), resultSet.getDate("time"));
 				playerBans.put(userID, new SoftReference<>(ret));
 			}
 			preparedStatement.close();
@@ -205,7 +184,7 @@ public class BanResolver {
 			return ret;
 		} catch(Exception e) {
 			e.printStackTrace();
-			return new Ban("Database failure", 0, 0, "invalid", 0);
+			return new Ban("Database failure", 0, 0, "invalid", null);
 		}
 	}
 

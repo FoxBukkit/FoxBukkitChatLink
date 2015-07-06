@@ -110,7 +110,7 @@ public class Bans {
 		new Thread() {
 			public void run() {
 				Ban newBan = new Ban();
-				newBan.setUser(plyName, plyUUID);
+				newBan.setPlayer(plyName, plyUUID);
 				newBan.setAdmin(from.getName(), from.getUniqueId());
 				newBan.setReason(reason);
 				newBan.setType(type.getName());

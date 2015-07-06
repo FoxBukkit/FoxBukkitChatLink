@@ -32,21 +32,22 @@
  */
 package com.foxelbox.foxbukkit.chatlink.bans;
 
+import java.sql.Date;
 import java.util.UUID;
 
 public class Ban {
 	private String reason;
 	private int admin;
-	private int user;
+	private int player;
 	private String type;
-	private int time;
+	private Date time;
 
 	protected final long retrievalTime;
 
-	protected Ban(String reason, int admin, int user, String type, int time) {
+	protected Ban(String reason, int admin, int player, String type, Date time) {
 		this.reason = reason;
 		this.admin = admin;
-		this.user = user;
+		this.player = player;
 		this.type = type;
 		this.time = time;
 		this.retrievalTime = System.currentTimeMillis();
@@ -69,28 +70,28 @@ public class Ban {
 		return admin;
 	}
 
-	public int getUserID() {
-		return user;
+	public int getPlayerID() {
+		return player;
 	}
 
 	public BanPlayer getAdmin() {
 		return BanResolver.getUserByID(admin);
 	}
 
-	public BanPlayer getUser() {
-		return BanResolver.getUserByID(user);
+	public BanPlayer getPlayer() {
+		return BanResolver.getUserByID(player);
 	}
 
-	public void setUser(String username, UUID uuid) {
-		this.user = BanResolver.getUserID(username, uuid, true);
+	public void setPlayer(String username, UUID uuid) {
+		this.player = BanResolver.getUserID(username, uuid, true);
 	}
 
 	public void setAdmin(String adminname, UUID uuid) {
 		this.admin = BanResolver.getUserID(adminname, uuid, true);
 	}
 
-	public void setUser(int user) {
-		this.user = user;
+	public void setPlayer(int player) {
+		this.player = player;
 	}
 
 	public void setAdmin(int admin) {
@@ -105,9 +106,11 @@ public class Ban {
 		this.type = type;
 	}
 
-	public void refreshTime() { this.time = (int)(System.currentTimeMillis() / 1000); }
+	public void refreshTime() {
+		this.time = new Date(new java.util.Date().getTime());
+	}
 
-	public int getTime() {
+	public Date getTime() {
 		return time;
 	}
 }
