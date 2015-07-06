@@ -81,7 +81,7 @@ public class BanResolver {
 			ResultSet resultSet = preparedStatement.executeQuery();
 			LogEntry ret = null;
 			if(resultSet.next()) {
-				ret = new LogEntry(resultSet.getString("action"), resultSet.getTime("time"), InetAddress.getByAddress(resultSet.getBytes("ip")), resultSet.getInt("player"), resultSet.getString("server"));
+				ret = new LogEntry(resultSet.getString("action"), resultSet.getTimestamp("time"), InetAddress.getByAddress(resultSet.getBytes("ip")), resultSet.getInt("player"), resultSet.getString("server"));
 			}
 			preparedStatement.close();
 			connection.close();
