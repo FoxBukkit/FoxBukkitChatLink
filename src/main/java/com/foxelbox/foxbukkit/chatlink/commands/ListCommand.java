@@ -18,13 +18,18 @@ package com.foxelbox.foxbukkit.chatlink.commands;
 
 import com.foxelbox.foxbukkit.chatlink.Player;
 import com.foxelbox.foxbukkit.chatlink.RedisHandler;
+import com.foxelbox.foxbukkit.chatlink.bans.BanResolver;
+import com.foxelbox.foxbukkit.chatlink.bans.LogEntry;
 import com.foxelbox.foxbukkit.chatlink.commands.system.ICommand;
 import com.foxelbox.foxbukkit.chatlink.json.ChatMessageIn;
 import com.foxelbox.foxbukkit.chatlink.json.ChatMessageOut;
 import com.foxelbox.foxbukkit.chatlink.util.CommandException;
 import com.foxelbox.foxbukkit.chatlink.util.PlayerHelper;
 import com.foxelbox.foxbukkit.chatlink.util.Utils;
+import jdk.management.resource.ResourceId;
 
+import java.net.InetAddress;
+import java.text.SimpleDateFormat;
 import java.util.List;
 
 @ICommand.Names({ "who", "list" })
@@ -34,8 +39,10 @@ import java.util.List;
 public class ListCommand extends ICommand {
     private static final String LIST_FORMAT = "<color name=\"dark_purple\">[FBCL]</color> <color name=\"dark_gray\">[%1$s]</color> %2$s";
 
+    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss");
+
     @Override
-    public ChatMessageOut run(Player commandSender, ChatMessageIn messageIn, String formattedName, String[] args) throws CommandException {
+    public ChatMessageOut run(final Player commandSender, final ChatMessageIn messageIn, String formattedName, String[] args) throws CommandException {
         if(args.length > 0) {
             final Player target = PlayerHelper.matchPlayerSingle(args[0], false);
 
@@ -48,6 +55,30 @@ public class ListCommand extends ICommand {
             RedisHandler.sendMessage(reply);
 
             reply.setContentsPlain("NameTag: " + PlayerHelper.getFullPlayerName(target.getUniqueId(), target.getName()));
+
+            if(commandSender.hasPermission("foxbukkit.who.logdetails")) {
+                RedisHandler.sendMessage(reply);
+                new Thread() {
+                    public void run() {
+                        ChatMessageOut reply = makeReply(messageIn);
+                        LogEntry logEntry = BanResolver.getLatestEntry(commandSender.getName(), commandSender.getUniqueId(), "logout", messageIn.server);
+                        if(logEntry == null) {
+                            reply.setContentsPlain("Last logout data not present");
+                            reply.finalize_context = true;
+                            RedisHandler.sendMessage(reply);
+                            return;
+                        }
+
+                        reply.setContentsPlain("Last logout: " + DATE_FORMAT.format(logEntry.getTime()));
+                        RedisHandler.sendMessage(reply);
+
+                        reply.setContentsPlain("Last IP: " + logEntry.getIp().getHostAddress());
+                        reply.finalize_context = true;
+                        RedisHandler.sendMessage(reply);
+                    }
+                }.start();
+                return null;
+            }
 
             return reply;
         }

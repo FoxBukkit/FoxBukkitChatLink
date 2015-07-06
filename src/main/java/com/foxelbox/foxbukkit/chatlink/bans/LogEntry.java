@@ -16,13 +16,23 @@
  */
 package com.foxelbox.foxbukkit.chatlink.bans;
 
+import java.net.InetAddress;
 import java.sql.Date;
 
 public class LogEntry {
     private String action;
     private Date time;
-    private char[] ip;
+    private InetAddress ip;
     private int player;
+    private String server;
+
+    protected LogEntry(String action, Date time, InetAddress ip, int player, String server) {
+        this.action = action;
+        this.time = time;
+        this.ip = ip;
+        this.player = player;
+        this.server = server;
+    }
 
     public BanPlayer getPlayer() {
         return BanResolver.getUserByID(player);
@@ -36,7 +46,11 @@ public class LogEntry {
         return time;
     }
 
-    public char[] getIp() {
+    public InetAddress getIp() {
         return ip;
+    }
+
+    public String getServer() {
+        return server;
     }
 }

@@ -35,6 +35,7 @@ package com.foxelbox.foxbukkit.chatlink.bans;
 import com.foxelbox.foxbukkit.chatlink.database.DatabaseConnectionPool;
 
 import java.lang.ref.SoftReference;
+import java.net.InetAddress;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -52,6 +53,43 @@ public class BanResolver {
 
 	public static Ban getBan(String username, UUID uuid) {
 		return getBan(username, uuid, true);
+	}
+
+	public static LogEntry getLatestEntry(String username, UUID uuid, String action, String server) {
+		int userID = getUserID(username, uuid);
+		if(userID < 1)
+			return null;
+
+		try {
+			Connection connection = DatabaseConnectionPool.instance.getConnection();
+			StringBuilder query = new StringBuilder("SELECT * FROM player_logs WHERE player = ?");
+			if(action != null) {
+				query.append(" AND action = ?");
+			}
+			if(server != null) {
+				query.append(" AND server = ?");
+			}
+			PreparedStatement preparedStatement = connection.prepareStatement(query.toString());
+			preparedStatement.setInt(1, userID);
+			int i = 1;
+			if(action != null) {
+				preparedStatement.setString(++i, action);
+			}
+			if(server != null) {
+				preparedStatement.setString(++i, server);
+			}
+			ResultSet resultSet = preparedStatement.executeQuery();
+			LogEntry ret = null;
+			if(resultSet.next()) {
+				ret = new LogEntry(resultSet.getString("action"), resultSet.getDate("time"), InetAddress.getByAddress(resultSet.getBytes("ip")), resultSet.getInt("player"), resultSet.getString("server"));
+			}
+			preparedStatement.close();
+			connection.close();
+			return ret;
+		} catch(Exception e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 
 	public static String makePossibleAltString(String user, UUID uuid) {
