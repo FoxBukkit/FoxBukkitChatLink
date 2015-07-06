@@ -45,13 +45,13 @@ public class ListCommand extends ICommand {
 
             ChatMessageOut reply = makeReply(messageIn);
 
-            reply.setContentsPlain("Name: " + target.getName());
+            reply.setContentsPlain("\u00a75[FBCL]\u00a7f Name: " + target.getName());
             RedisHandler.sendMessage(reply);
 
-            reply.setContentsPlain("Rank: " + PlayerHelper.getPlayerRank(target.getUniqueId()));
+            reply.setContentsPlain("\u00a75[FBCL]\u00a7f Rank: " + PlayerHelper.getPlayerRank(target.getUniqueId()));
             RedisHandler.sendMessage(reply);
 
-            reply.setContentsPlain("NameTag: " + PlayerHelper.getFullPlayerName(target.getUniqueId(), target.getName()));
+            reply.setContentsPlain("\u00a75[FBCL]\u00a7f NameTag: " + PlayerHelper.getFullPlayerName(target.getUniqueId(), target.getName()));
 
             if(commandSender.hasPermission("foxbukkit.who.logdetails")) {
                 RedisHandler.sendMessage(reply);
@@ -60,16 +60,16 @@ public class ListCommand extends ICommand {
                         ChatMessageOut reply = makeReply(messageIn);
                         LogEntry logEntry = BanResolver.getLatestEntry(target.getName(), target.getUniqueId(), "logout", messageIn.server);
                         if(logEntry == null) {
-                            reply.setContentsPlain("Last logout data not present");
+                            reply.setContentsPlain("\u00a75[FBCL]\u00a7f Last logout data not present");
                             reply.finalize_context = true;
                             RedisHandler.sendMessage(reply);
                             return;
                         }
 
-                        reply.setContentsPlain("Last logout: " + DATE_FORMAT.format(logEntry.getTime()));
+                        reply.setContentsPlain("\u00a75[FBCL]\u00a7f Last logout: " + DATE_FORMAT.format(logEntry.getTime()));
                         RedisHandler.sendMessage(reply);
 
-                        reply.setContentsPlain("Last IP: " + logEntry.getIp().getHostAddress());
+                        reply.setContentsPlain("\u00a75[FBCL]\u00a7f Last IP: " + logEntry.getIp().getHostAddress());
                         reply.finalize_context = true;
                         RedisHandler.sendMessage(reply);
                     }
