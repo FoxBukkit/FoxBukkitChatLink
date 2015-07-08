@@ -16,6 +16,9 @@
  */
 package com.foxelbox.foxbukkit.chatlink.json;
 
+import com.foxelbox.dependencies.redis.RedisManager;
+import com.foxelbox.foxbukkit.chatlink.Main;
+import com.foxelbox.foxbukkit.chatlink.RedisHandler;
 import com.foxelbox.foxbukkit.chatlink.util.Utils;
 
 import java.util.*;
@@ -181,6 +184,7 @@ public class ChatMessageOut {
     public MessageTarget to;
 
     public long timestamp = System.currentTimeMillis() / 1000;
+    public long id = Main.redisManager.incrBy("lastMessageID", 1);
 
     public UUID context;
     public boolean finalize_context = false;
