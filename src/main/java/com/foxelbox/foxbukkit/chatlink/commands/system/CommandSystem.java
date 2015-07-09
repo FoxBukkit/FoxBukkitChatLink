@@ -44,7 +44,7 @@ public class CommandSystem {
 		scanCommands("com.foxelbox.foxbukkit.chatlink.filter.commands");
         Main.redisManager.del("chatLinkCommands");
         final Set<String> commandsKeySet = commands.keySet();
-        Main.redisManager.lpush("chatLinkCommands", commandsKeySet.toArray(new String[commandsKeySet.size()]));
+        Main.redisManager.sadd("chatLinkCommands", commandsKeySet.toArray(new String[commandsKeySet.size()]));
     }
 
 	public void scanCommands(String packageName) {

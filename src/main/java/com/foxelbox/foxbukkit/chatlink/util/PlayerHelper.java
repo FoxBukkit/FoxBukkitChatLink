@@ -20,10 +20,7 @@ import com.foxelbox.foxbukkit.chatlink.Main;
 import com.foxelbox.foxbukkit.chatlink.Player;
 import com.foxelbox.foxbukkit.chatlink.permissions.FoxBukkitPermissionHandler;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -135,7 +132,7 @@ public class PlayerHelper {
     }
 
     public static List<Player> getOnlinePlayersOnServer(String name) {
-        final List<String> onlineUUIDs = Main.redisManager.lrange("playersOnline:" + name, 0, -1);
+        final Set<String> onlineUUIDs = Main.redisManager.smembers("playersOnline:" + name);
         final List<Player> onlinePlayers = new ArrayList<>();
         if(onlineUUIDs == null)
             return onlinePlayers;
@@ -144,8 +141,8 @@ public class PlayerHelper {
         return onlinePlayers;
     }
 
-    public static List<String> getAllServers() {
-        return Main.redisManager.lrange("activeServers", 0, -1);
+    public static Set<String> getAllServers() {
+        return Main.redisManager.smembers("activeServers");
     }
 
     public static List<Player> getOnlinePlayersOnAllServers() {
