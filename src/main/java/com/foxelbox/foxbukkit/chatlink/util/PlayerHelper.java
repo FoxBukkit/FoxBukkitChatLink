@@ -142,7 +142,7 @@ public class PlayerHelper {
     }
 
     public static Set<String> getAllServers() {
-        return Main.redisManager.smembers("activeServers");
+        return Main.redisManager.zrange("activeServers", 0, -1);
     }
 
     public static List<Player> getOnlinePlayersOnAllServers() {
