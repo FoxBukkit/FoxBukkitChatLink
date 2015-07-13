@@ -57,7 +57,8 @@ public class SlackHandler implements SlackMessagePostedListener {
 			return;
 		}
 
-		if(!event.getChannel().getName().equalsIgnoreCase("#minecraft") && !event.getChannel().getName().equalsIgnoreCase("#minecraft-ops"))
+		final String channelName = event.getChannel().getName();
+		if(!channelName.equalsIgnoreCase("#minecraft") && !channelName.equalsIgnoreCase("#minecraft-ops"))
 			return;
 
 		Player minecraftPlayer = lookupMinecraftAssociation(event.getSender().getUserName());
@@ -73,7 +74,9 @@ public class SlackHandler implements SlackMessagePostedListener {
 		messageIn.from = new UserInfo(minecraftPlayer.getUniqueId(), minecraftPlayer.getName());
 
 		messageIn.contents = event.getMessageContent();
-		if(messageIn.contents.charAt(0) == '.')
+		if(channelName.equalsIgnoreCase("#minecraft-ops"))
+			messageIn.contents = "#" + messageIn.contents;
+		else if(messageIn.contents.charAt(0) == '.')
 			messageIn.contents = "/" + messageIn.contents.substring(1);
 
 		RedisHandler.incomingMessage(messageIn);
