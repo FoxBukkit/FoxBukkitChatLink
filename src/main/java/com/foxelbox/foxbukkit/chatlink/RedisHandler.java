@@ -123,7 +123,7 @@ public class RedisHandler extends AbstractRedisHandler {
 			params.put("channel", channel);
 			params.put("username", username);
 			params.put("icon_url", "https://minotar.net/avatar/" + URLEncoder.encode(message.from.name, "UTF-8") + "/48.png");
-			params.put("text", message.contents);
+			params.put("text", cleanText);
 
 			final byte[] encodedParams = encodeURLParams(params);
 
