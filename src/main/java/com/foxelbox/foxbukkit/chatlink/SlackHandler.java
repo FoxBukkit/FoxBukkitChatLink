@@ -111,7 +111,7 @@ public class SlackHandler implements SlackMessagePostedListener {
 					return;
 			}
 
-			final String cleanText = message.contents.replaceAll("<[^>]+>", "").replaceAll("&apos;", "'"); // Remove all of the HTML tags and fix &apos;
+			final String cleanText = message.contents.replaceAll("<[^>]+>", "").replaceAll("&apos;", "'").replaceAll("&quot;", "\""); // Remove all of the HTML tags and fix &apos; and &quot;
 
 			session.sendMessage(session.findChannelByName(channel), cleanText, null, slackChatConfiguration);
 		} catch(Exception e) {
