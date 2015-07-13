@@ -96,12 +96,31 @@ public class RedisHandler extends AbstractRedisHandler {
 			username = "(no username)";
 		}
 
+		String channel;
+		switch(message.to.type) {
+			case "all":
+				channel = "minecraft";
+				break;
+			case "permission":
+				if(message.to.filter.length == 1 && message.to.filter[0] == "foxbukkit.opchat") {
+					// op chat
+					channel = "minecraft-ops";
+					break;
+				}
+				return;
+			default:
+				return;
+		}
+
+		// TODO: Do something better than this simple replace.
+		String cleanText = message.contents.replace("<[^>]+>", ""); // Remove all of the HTML tags
+
 		try {
 			final URL slackPostURL = new URL("https://slack.com/api/chat.postMessage");
 
 			final Map<String, Object> params = new LinkedHashMap<>();
 			params.put("token", Main.configuration.getValue("slack-token", ""));
-			params.put("channel", "temp-chatlink");
+			params.put("channel", channel);
 			params.put("username", username);
 			params.put("icon_url", "https://minotar.net/avatar/" + URLEncoder.encode(message.from.name, "UTF-8") + "/48.png");
 			params.put("text", message.contents);
