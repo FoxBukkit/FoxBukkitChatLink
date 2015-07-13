@@ -84,10 +84,6 @@ public class RedisHandler extends AbstractRedisHandler {
 	}
 
 	private static void publishToSlack(ChatMessageOut message) {
-		if(!message.to.type.equalsIgnoreCase("all")) { // HOTFIX: Ignore all messages not intended for everyone
-			return;
-		}
-
 		if(!message.type.equalsIgnoreCase("text")) { // We ignore non-text messages
 			return;
 		}
@@ -105,12 +101,6 @@ public class RedisHandler extends AbstractRedisHandler {
 				channel = "#minecraft";
 				break;
 			case "permission":
-				System.out.print("Got permission filter: ");
-				for(String perm : message.to.filter) {
-					System.out.print(perm + ", ");
-				}
-				System.out.print("\n");
-
 				if(message.to.filter.length == 1 && message.to.filter[0].equals("foxbukkit.opchat")) {
 					// op chat
 					channel = "#minecraft-ops";
