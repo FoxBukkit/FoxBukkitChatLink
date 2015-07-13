@@ -28,39 +28,27 @@ import com.google.gson.Gson;
 import java.util.regex.Pattern;
 
 public class RedisHandler extends AbstractRedisHandler {
-	public RedisHandler() {
-		super(Main.redisManager, RedisHandlerType.BOTH, "foxbukkit:from_server");
-	}
-
-	private static final Pattern REMOVE_DISALLOWED_CHARS = Pattern.compile("[\u00a7\r\n\t]");
-
 	public static final String PLAYER_FORMAT = "<span onHover=\"show_text('%1$s')\" onClick=\"suggest_command('/pm %1$s ')\">%3$s</span>";
 	public static final String MESSAGE_FORMAT = PLAYER_FORMAT + "<color name=\"white\">: %4$s</color>";
 	public static final String KICK_FORMAT = "<color name=\"dark_red\">[-]</color> " + PLAYER_FORMAT + " <color name=\"yellow\">was kicked (%4$s)!</color>";
 	public static final String QUIT_FORMAT = "<color name=\"dark_red\">[-]</color> " + PLAYER_FORMAT + " <color name=\"yellow\">disconnected!</color>";
 	public static final String JOIN_FORMAT = "<color name=\"dark_green\">[+]</color> " + PLAYER_FORMAT + " <color name=\"yellow\">joined!</color>";
-
+	private static final Pattern REMOVE_DISALLOWED_CHARS = Pattern.compile("[\u00a7\r\n\t]");
 	private static final Gson gson = new Gson();
 
-	@Override
-	public void onMessage(final String c_message) {
-		try {
-			final ChatMessageIn chatMessageIn;
-			synchronized(gson) {
-				chatMessageIn = gson.fromJson(c_message, ChatMessageIn.class);
-			}
+	public RedisHandler() {
+		super(Main.redisManager, RedisHandlerType.BOTH, "foxbukkit:from_server");
+	}
 
-			ChatMessageOut message = formatMessage(chatMessageIn);
+	public static void incomingMessage(final ChatMessageIn chatMessageIn) {
+		final ChatMessageOut message = formatMessage(chatMessageIn);
 
-			if(message == null)
-				return;
+		if(message == null)
+			return;
 
-			message.finalize_context = true;
+		message.finalize_context = true;
 
-			sendMessage(message);
-		} catch(Exception e) {
-			e.printStackTrace();
-		}
+		sendMessage(message);
 	}
 
 	public static void sendMessage(ChatMessageOut message) {
@@ -145,5 +133,19 @@ public class RedisHandler extends AbstractRedisHandler {
 		}
 
 		throw new RuntimeException("Unprocessable message: " + messageIn.type + " => " + messageStr);
+	}
+
+	@Override
+	public void onMessage(final String c_message) {
+		try {
+			final ChatMessageIn chatMessageIn;
+			synchronized(gson) {
+				chatMessageIn = gson.fromJson(c_message, ChatMessageIn.class);
+			}
+
+			incomingMessage(chatMessageIn);
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
 	}
 }

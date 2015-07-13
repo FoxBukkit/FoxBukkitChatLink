@@ -21,6 +21,7 @@ import com.foxelbox.dependencies.redis.RedisManager;
 import com.foxelbox.dependencies.threading.SimpleThreadCreator;
 import com.foxelbox.foxbukkit.chatlink.commands.system.CommandSystem;
 import com.foxelbox.foxbukkit.chatlink.permissions.FoxBukkitPermissionHandler;
+import com.sun.javaws.exceptions.InvalidArgumentException;
 
 import java.io.File;
 
@@ -31,14 +32,14 @@ public class Main {
 
 	public static SlackHandler slackHandler;
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws InvalidArgumentException {
 		configuration = new Configuration(getDataFolder());
 		redisManager = new RedisManager(new SimpleThreadCreator(), configuration);
 
 		CommandSystem.instance.scanCommands();
 		FoxBukkitPermissionHandler.instance.load();
 
-		new SlackHandler();
+		slackHandler = new SlackHandler(configuration);
 
 		new RedisHandler();
 

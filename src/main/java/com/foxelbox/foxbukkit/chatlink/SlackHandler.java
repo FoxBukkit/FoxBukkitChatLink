@@ -16,10 +16,163 @@
  */
 package com.foxelbox.foxbukkit.chatlink;
 
+import com.foxelbox.dependencies.config.Configuration;
+import com.foxelbox.foxbukkit.chatlink.json.ChatMessageIn;
 import com.foxelbox.foxbukkit.chatlink.json.ChatMessageOut;
+import com.foxelbox.foxbukkit.chatlink.json.UserInfo;
+import com.foxelbox.foxbukkit.chatlink.util.CommandException;
+import com.ullink.slack.simpleslackapi.SlackSession;
+import com.ullink.slack.simpleslackapi.SlackUser;
+import com.ullink.slack.simpleslackapi.events.SlackMessagePosted;
+import com.ullink.slack.simpleslackapi.impl.SlackChatConfiguration;
+import com.ullink.slack.simpleslackapi.impl.SlackSessionFactory;
+import com.ullink.slack.simpleslackapi.listeners.SlackMessagePostedListener;
 
-public class SlackHandler {
+import java.net.URLEncoder;
+import java.util.Map;
+import java.util.UUID;
+
+public class SlackHandler implements SlackMessagePostedListener {
+	private static Map<String, String> slackToMinecraftLinks = Main.redisManager.createCachedRedisMap("slacklinks:slack-to-mc");
+	private static Map<String, String> minecraftToSlackLinks = Main.redisManager.createCachedRedisMap("slacklinks:mc-to-slack");
+	private static Map<String, String> pendingSlackLinks = Main.redisManager.createCachedRedisMap("slacklinks:pending"); // TODO: Entries in this should expire
+	private SlackSession session;
+
+	public SlackHandler(Configuration configuration) throws IllegalArgumentException {
+		String slackToken = configuration.getValue("slack-token", "");
+		if(slackToken == "")
+			throw new IllegalArgumentException("configuration: slack-token undefined");
+		session = SlackSessionFactory.createWebSocketSlackSession(slackToken);
+
+		session.addMessagePostedListener(this);
+	}
+
+	@Override
+	public void onEvent(SlackMessagePosted event, SlackSession session) {
+		if(event.getChannel().isDirect()) {
+			handleDirectMessage(event, session);
+			return;
+		}
+
+		if(!event.getChannel().getName().equalsIgnoreCase("#minecraft") && !event.getChannel().getName().equalsIgnoreCase("#minecraft-ops"))
+			return;
+
+		Player minecraftPlayer = lookupMinecraftAssociation(event.getSender().getUserName());
+		if(minecraftPlayer == null)
+			return;
+
+		ChatMessageIn messageIn = new ChatMessageIn();
+
+		messageIn.type = "text";
+		messageIn.server = "Chat";
+		messageIn.context = UUID.randomUUID();
+		messageIn.timestamp = Math.round(new Double(event.getTimeStamp()));
+		messageIn.from = new UserInfo(minecraftPlayer.getUniqueId(), minecraftPlayer.getName());
+
+		messageIn.contents = event.getMessageContent();
+		if(messageIn.contents.charAt(0) == '.')
+			messageIn.contents = "/" + messageIn.contents.substring(1);
+
+		RedisHandler.incomingMessage(messageIn);
+	}
+
 	public void sendMessage(ChatMessageOut message) {
+		if(!message.type.equalsIgnoreCase("text")) { // We ignore non-text messages
+			return;
+		}
+
+		try {
+			SlackChatConfiguration slackChatConfiguration = SlackChatConfiguration.getConfiguration();
+
+			if(message.from != null && message.from.name.length() > 0) {
+				slackChatConfiguration.withName(message.from.name);
+				slackChatConfiguration.withIcon("https://minotar.net/avatar/" + URLEncoder.encode(message.from.name, "UTF-8") + "/48.png");
+			} else {
+				slackChatConfiguration.asUser();
+			}
+
+			String channel;
+			switch(message.to.type) {
+				case "all":
+					channel = "#minecraft";
+					break;
+				case "permission":
+					if(message.to.filter.length == 1 && message.to.filter[0].equals("foxbukkit.opchat")) {
+						// op chat
+						channel = "#minecraft-ops";
+						break;
+					}
+					return;
+				default:
+					// We presently can't handle PMs.
+					return;
+			}
+
+			final String cleanText = message.contents.replaceAll("<[^>]+>", "").replaceAll("&apos;", "'"); // Remove all of the HTML tags and fix &apos;
+
+			session.sendMessage(session.findChannelByName(channel), cleanText, null, slackChatConfiguration);
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	public void beginLink(String username, UserInfo minecraftUser) throws CommandException {
+		SlackUser slackUser = session.findUserByUserName(username);
+		if(slackUser == null)
+			throw new CommandException("The given Slack user does not exist.");
+
+		pendingSlackLinks.put(slackUser.getUserName(), minecraftUser.uuid.toString());
+
+		session.sendMessageOverWebSocket(session.findChannelById(slackUser.getId()), minecraftUser.name + " has requested that you link your Slack account to your Minecraft account.\nIf this is you, please respond with `link " + minecraftUser.name + "`.\nIf this is not you, it is safe to ignore this message.", null);
+	}
+
+	private Player lookupMinecraftAssociation(String username) {
+		final UUID minecraftID;
+		try {
+			minecraftID = UUID.fromString(slackToMinecraftLinks.get(username));
+		} catch(IllegalArgumentException e) {
+			return null;
+		}
+
+		return new Player(minecraftID);
+	}
+
+	private void setMinecraftAssociation(String slackUsername, UUID minecraftID) {
+		String oldSlackUsername = minecraftToSlackLinks.get(minecraftID.toString());
+		if(!oldSlackUsername.equals("")) {
+			slackToMinecraftLinks.remove(oldSlackUsername);
+		}
+
+		minecraftToSlackLinks.put(minecraftID.toString(), slackUsername);
+		slackToMinecraftLinks.put(slackUsername, minecraftID.toString());
+	}
+
+	private void handleDirectMessage(SlackMessagePosted event, SlackSession session) {
+		if(!event.getMessageContent().toLowerCase().startsWith("link "))
+			return; // We only care about account linking in DMs
+
+		String requestedMinecraftName = event.getMessageContent().substring(5).trim();
+		if(requestedMinecraftName.equals("")) { // The name that they gave us was empty.
+			session.sendMessageOverWebSocket(event.getChannel(), "You must provide a Minecraft name for the `link` command.\nFor example: `link MinecraftName`", null);
+			return;
+		}
+
+		final UUID minecraftID;
+		try {
+			minecraftID = UUID.fromString(pendingSlackLinks.get(event.getSender().getUserName()));
+		} catch(IllegalArgumentException e) {
+			session.sendMessageOverWebSocket(event.getChannel(), "You have no pending link with that Minecraft account.", null);
+			return;
+		}
+
+		final Player minecraftPlayer = new Player(minecraftID);
+		if(!minecraftPlayer.getName().equalsIgnoreCase(requestedMinecraftName)) {
+			session.sendMessageOverWebSocket(event.getChannel(), "You have no pending link with that Minecraft account.", null);
+			return;
+		}
+
+		pendingSlackLinks.remove(event.getSender().getUserName());
+		setMinecraftAssociation(event.getSender().getUserName(), minecraftPlayer.getUniqueId());
 	}
 
 	/*private static void publishToSlack(ChatMessageOut message) {
