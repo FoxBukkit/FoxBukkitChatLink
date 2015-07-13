@@ -113,7 +113,7 @@ public class RedisHandler extends AbstractRedisHandler {
 		}
 
 		// TODO: Do something better than this simple replace.
-		String cleanText = message.contents.replace("<[^>]+>", ""); // Remove all of the HTML tags
+		String cleanText = message.contents.replaceAll("<[^>]+>", ""); // Remove all of the HTML tags
 
 		try {
 			final URL slackPostURL = new URL("https://slack.com/api/chat.postMessage");
