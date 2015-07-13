@@ -81,7 +81,7 @@ public class RedisHandler extends AbstractRedisHandler {
 	}
 
 	private static void publishToSlack(ChatMessageOut message) {
-		if(message.type != "all") {
+		if(!message.type.equalsIgnoreCase("all")) { // HOTFIX: Ignore all messages not intended for everyone
 			return;
 		}
 
