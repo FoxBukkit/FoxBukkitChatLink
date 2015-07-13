@@ -90,7 +90,7 @@ public class RedisHandler extends AbstractRedisHandler {
 		}
 
 		String username;
-		if(message.from.name.length() > 0) {
+		if(message.from != null && message.from.name.length() > 0) {
 			username = message.from.name;
 		} else {
 			username = "(no username)";
