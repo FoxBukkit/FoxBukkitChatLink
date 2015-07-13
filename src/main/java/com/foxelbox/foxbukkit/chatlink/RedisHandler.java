@@ -26,7 +26,10 @@ import com.foxelbox.foxbukkit.chatlink.json.SlackResponse;
 import com.foxelbox.foxbukkit.chatlink.util.PlayerHelper;
 import com.google.gson.Gson;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
+import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
@@ -102,7 +105,13 @@ public class RedisHandler extends AbstractRedisHandler {
 				channel = "#minecraft";
 				break;
 			case "permission":
-				if(message.to.filter.length == 1 && message.to.filter[0] == "foxbukkit.opchat") {
+				System.out.print("Got permission filter: ");
+				for(String perm : message.to.filter) {
+					System.out.print(perm + ", ");
+				}
+				System.out.print("\n");
+
+				if(message.to.filter.length == 1 && message.to.filter[0].equals("foxbukkit.opchat")) {
 					// op chat
 					channel = "#minecraft-ops";
 					break;
