@@ -22,19 +22,9 @@ import com.foxelbox.foxbukkit.chatlink.commands.system.CommandSystem;
 import com.foxelbox.foxbukkit.chatlink.filter.MuteList;
 import com.foxelbox.foxbukkit.chatlink.json.ChatMessageIn;
 import com.foxelbox.foxbukkit.chatlink.json.ChatMessageOut;
-import com.foxelbox.foxbukkit.chatlink.json.SlackResponse;
 import com.foxelbox.foxbukkit.chatlink.util.PlayerHelper;
 import com.google.gson.Gson;
 
-import java.io.BufferedReader;
-import java.io.DataOutputStream;
-import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.net.URLEncoder;
-import java.util.LinkedHashMap;
-import java.util.Map;
 import java.util.regex.Pattern;
 
 public class RedisHandler extends AbstractRedisHandler {
@@ -80,10 +70,10 @@ public class RedisHandler extends AbstractRedisHandler {
 		}
 		Main.redisManager.publish("foxbukkit:to_server", outMsg);
 
-		publishToSlack(message);
+		//publishToSlack(message);
 	}
 
-	private static void publishToSlack(ChatMessageOut message) {
+	/*private static void publishToSlack(ChatMessageOut message) {
 		if(!message.type.equalsIgnoreCase("text")) { // We ignore non-text messages
 			return;
 		}
@@ -176,7 +166,7 @@ public class RedisHandler extends AbstractRedisHandler {
 			e.printStackTrace();
 			return null;
 		}
-	}
+	}*/
 
 	private static ChatMessageOut runFormatAndStore(ChatMessageIn messageIn, String format, String[] formatArgs) {
 		return new ChatMessageOut(messageIn, format, formatArgs);
