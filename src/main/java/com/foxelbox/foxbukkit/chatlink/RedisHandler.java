@@ -94,6 +94,7 @@ public class RedisHandler extends AbstractRedisHandler {
 			final byte[] encodedParams = encodeURLParams(params);
 
 			final HttpURLConnection connection = (HttpURLConnection) slackPostURL.openConnection();
+			connection.setDoOutput(true);
 			connection.setRequestMethod("POST");
 			connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
 			connection.setRequestProperty("Content-Length", Integer.toString(encodedParams.length));
@@ -103,7 +104,6 @@ public class RedisHandler extends AbstractRedisHandler {
 				wr.flush();
 				wr.close();
 			}
-
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
