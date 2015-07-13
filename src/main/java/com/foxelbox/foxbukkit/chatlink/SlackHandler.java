@@ -94,12 +94,12 @@ public class SlackHandler implements SlackMessagePostedListener {
 			String channel;
 			switch(message.to.type) {
 				case "all":
-					channel = "#minecraft";
+					channel = "minecraft";
 					break;
 				case "permission":
 					if(message.to.filter.length == 1 && message.to.filter[0].equals("foxbukkit.opchat")) {
 						// op chat
-						channel = "#minecraft-ops";
+						channel = "minecraft-ops";
 						break;
 					}
 					return;
