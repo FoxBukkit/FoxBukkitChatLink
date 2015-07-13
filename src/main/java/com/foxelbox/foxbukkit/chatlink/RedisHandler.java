@@ -82,9 +82,9 @@ public class RedisHandler extends AbstractRedisHandler {
 
 	private static void publishToSlack(ChatMessageOut message) {
 		if(message.type != "all") {
-			return
+			return;
 		}
-		
+
 		try {
 			final URL slackPostURL = new URL("https://slack.com/api/chat.postMessage");
 
