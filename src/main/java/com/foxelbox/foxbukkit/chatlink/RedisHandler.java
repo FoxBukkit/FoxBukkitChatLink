@@ -122,7 +122,14 @@ public class RedisHandler extends AbstractRedisHandler {
 			params.put("token", Main.configuration.getValue("slack-token", ""));
 			params.put("channel", channel);
 			params.put("username", username);
-			params.put("icon_url", "https://minotar.net/avatar/" + URLEncoder.encode(message.from.name, "UTF-8") + "/48.png");
+			if(message.from != null && message.from.name.length() > 0) {
+				// Only set the avatar URL if there's a name attached to this message.
+				params.put("icon_url", "https://minotar.net/avatar/" + URLEncoder.encode(message.from.name, "UTF-8") + "/48.png");
+			}
+
+			params.put("parse", "none"); // Slack shouldn't do any modification to our text.
+			params.put("link_names", "false"); // Slack shouldn't try to link names.
+			params.put("unfurl_media", "false"); // Please don't unfurl media from untrusted users.
 			params.put("text", cleanText);
 
 			final byte[] encodedParams = encodeURLParams(params);
