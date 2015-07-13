@@ -25,16 +25,20 @@ import com.foxelbox.foxbukkit.chatlink.permissions.FoxBukkitPermissionHandler;
 import java.io.File;
 
 public class Main {
-    public static Configuration configuration;
+	public static Configuration configuration;
 
-    public static RedisManager redisManager;
+	public static RedisManager redisManager;
+
+	public static SlackHandler slackHandler;
 
 	public static void main(String[] args) {
-        configuration = new Configuration(getDataFolder());
-        redisManager = new RedisManager(new SimpleThreadCreator(), configuration);
+		configuration = new Configuration(getDataFolder());
+		redisManager = new RedisManager(new SimpleThreadCreator(), configuration);
 
-        CommandSystem.instance.scanCommands();
-        FoxBukkitPermissionHandler.instance.load();
+		CommandSystem.instance.scanCommands();
+		FoxBukkitPermissionHandler.instance.load();
+
+		new SlackHandler();
 
 		new RedisHandler();
 
@@ -45,13 +49,13 @@ public class Main {
 					return;
 				}
 				Thread.sleep(5000);
-			} catch (Exception e) {
+			} catch(Exception e) {
 				e.printStackTrace();
 			}
 		}
 	}
 
-    public static File getDataFolder() {
-        return new File(".");
-    }
+	public static File getDataFolder() {
+		return new File(".");
+	}
 }
