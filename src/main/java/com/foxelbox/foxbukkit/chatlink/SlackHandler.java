@@ -28,6 +28,7 @@ import com.ullink.slack.simpleslackapi.impl.SlackChatConfiguration;
 import com.ullink.slack.simpleslackapi.impl.SlackSessionFactory;
 import com.ullink.slack.simpleslackapi.listeners.SlackMessagePostedListener;
 
+import java.io.IOException;
 import java.net.URLEncoder;
 import java.util.Map;
 import java.util.UUID;
@@ -38,13 +39,15 @@ public class SlackHandler implements SlackMessagePostedListener {
 	private static Map<String, String> pendingSlackLinks = Main.redisManager.createCachedRedisMap("slacklinks:pending"); // TODO: Entries in this should expire
 	private SlackSession session;
 
-	public SlackHandler(Configuration configuration) throws IllegalArgumentException {
+	public SlackHandler(Configuration configuration) throws IllegalArgumentException, IOException {
 		String slackToken = configuration.getValue("slack-token", "");
 		if(slackToken == "")
 			throw new IllegalArgumentException("configuration: slack-token undefined");
 		session = SlackSessionFactory.createWebSocketSlackSession(slackToken);
 
 		session.addMessagePostedListener(this);
+
+		session.connect();
 	}
 
 	@Override
@@ -91,7 +94,7 @@ public class SlackHandler implements SlackMessagePostedListener {
 				slackChatConfiguration.asUser();
 			}
 
-			String channel;
+			final String channel;
 			switch(message.to.type) {
 				case "all":
 					channel = "minecraft";

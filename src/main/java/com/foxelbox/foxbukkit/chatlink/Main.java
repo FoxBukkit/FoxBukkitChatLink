@@ -23,6 +23,7 @@ import com.foxelbox.foxbukkit.chatlink.commands.system.CommandSystem;
 import com.foxelbox.foxbukkit.chatlink.permissions.FoxBukkitPermissionHandler;
 
 import java.io.File;
+import java.io.IOException;
 
 public class Main {
 	public static Configuration configuration;
@@ -31,7 +32,7 @@ public class Main {
 
 	public static SlackHandler slackHandler;
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException {
 		configuration = new Configuration(getDataFolder());
 		redisManager = new RedisManager(new SimpleThreadCreator(), configuration);
 
