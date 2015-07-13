@@ -81,8 +81,19 @@ public class RedisHandler extends AbstractRedisHandler {
 	}
 
 	private static void publishToSlack(ChatMessageOut message) {
-		if(!message.type.equalsIgnoreCase("all")) { // HOTFIX: Ignore all messages not intended for everyone
+		if(!message.to.type.equalsIgnoreCase("all")) { // HOTFIX: Ignore all messages not intended for everyone
 			return;
+		}
+
+		if(!message.type.equalsIgnoreCase("text")) { // We ignore non-text messages
+			return;
+		}
+
+		String username;
+		if(message.from.name.length() > 0) {
+			username = message.from.name;
+		} else {
+			username = "(no username)";
 		}
 
 		try {
@@ -91,7 +102,7 @@ public class RedisHandler extends AbstractRedisHandler {
 			final Map<String, Object> params = new LinkedHashMap<>();
 			params.put("token", Main.configuration.getValue("slack-token", ""));
 			params.put("channel", "temp-chatlink");
-			params.put("username", message.from.name);
+			params.put("username", username);
 			params.put("icon_url", "https://minotar.net/avatar/" + URLEncoder.encode(message.from.name, "UTF-8") + "/48.png");
 			params.put("text", message.contents);
 
