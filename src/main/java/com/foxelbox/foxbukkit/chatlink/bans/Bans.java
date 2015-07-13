@@ -72,9 +72,9 @@ public class Bans {
 					BanResolver.deleteBan(ban);
 					reply.to.type = "all";
 					reply.to.filter = null;
-					reply.setContentsPlain(from.getName() + " unbanned " + ply + "!");
+					reply.setContentsPlain("\u00a75[FBCL]\u00a7f " + from.getName() + " unbanned " + ply + "!");
 				} else {
-					reply.setContentsPlain("Player with the name " + ply + " was not banned!");
+					reply.setContentsPlain("\u00a75[FBCL]\u00a7f Player with the name " + ply + " was not banned!");
 				}
 				reply.finalize_context = true;
 				RedisHandler.sendMessage(reply);
@@ -119,7 +119,7 @@ public class Bans {
 				messageOut.to.type = "all";
 				messageOut.to.filter = null;
 				messageOut.finalize_context = true;
-				messageOut.setContentsPlain(from.getName() + " banned " + plyName + " [Reason: " + reason + "]!");
+				messageOut.setContentsPlain("\u00a75[FBCL]\u00a7f " + from.getName() + " banned " + plyName + " [Reason: " + reason + "]!");
 				RedisHandler.sendMessage(messageOut);
 			}
 		}.start();
