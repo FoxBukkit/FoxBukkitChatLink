@@ -22,11 +22,11 @@ import com.foxelbox.foxbukkit.chatlink.commands.system.CommandSystem;
 import com.foxelbox.foxbukkit.chatlink.filter.MuteList;
 import com.foxelbox.foxbukkit.chatlink.json.ChatMessageIn;
 import com.foxelbox.foxbukkit.chatlink.json.ChatMessageOut;
+import com.foxelbox.foxbukkit.chatlink.json.SlackResponse;
 import com.foxelbox.foxbukkit.chatlink.util.PlayerHelper;
 import com.google.gson.Gson;
 
-import java.io.DataOutputStream;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
@@ -95,14 +95,24 @@ public class RedisHandler extends AbstractRedisHandler {
 
 			final HttpURLConnection connection = (HttpURLConnection) slackPostURL.openConnection();
 			connection.setDoOutput(true);
+			connection.setDoInput(true);
 			connection.setRequestMethod("POST");
 			connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
 			connection.setRequestProperty("Content-Length", Integer.toString(encodedParams.length));
 
 			try(final DataOutputStream wr = new DataOutputStream(connection.getOutputStream())) {
 				wr.write(encodedParams);
-				wr.flush();
-				wr.close();
+			}
+
+			SlackResponse slackResponse;
+			try(final BufferedReader inputStream = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
+				synchronized(gson) {
+					slackResponse = gson.fromJson(inputStream, SlackResponse.class);
+				}
+			}
+
+			if(!slackResponse.ok) {
+				throw new Exception("Error occurred while calling Slack API: " + slackResponse.error);
 			}
 		} catch(Exception e) {
 			e.printStackTrace();
