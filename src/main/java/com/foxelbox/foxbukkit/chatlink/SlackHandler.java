@@ -60,6 +60,7 @@ public class SlackHandler implements SlackMessagePostedListener {
 	final private static Map<String, String> pendingSlackLinks = Main.redisManager.createCachedRedisMap("slacklinks:pending"); // TODO: Entries in this should expire
 
 	final private Map<String, String> contextResponses = new HashMap<>();
+	final private Map<String, StringBuilder> contextBuffers = new HashMap<>();
 
 	final private SlackSession session;
 	final private String slackAuthToken;
@@ -121,8 +122,26 @@ public class SlackHandler implements SlackMessagePostedListener {
 
 	public void sendMessage(ChatMessageOut message) {
 		if(!message.type.equalsIgnoreCase("text")) { // We ignore non-text messages
-			if(message.finalizeContext)
+			if(message.finalizeContext) {
 				contextResponses.remove(message.context.toString());
+				contextBuffers.remove(message.context.toString());
+			}
+			return;
+		}
+
+		StringBuilder contextBuffer = contextBuffers.get(message.context.toString());
+		if(!message.finalizeContext) {
+			// Buffer this so that we can make fewer calls to Slack
+
+			if(contextBuffer == null) {
+				contextBuffer = new StringBuilder();
+				contextBuffers.put(message.context.toString(), contextBuffer);
+			}
+
+			if(contextBuffer.length() > 0)
+				contextBuffer.append('\n');
+
+			contextBuffer.append(cleanMessageContents(message));
 			return;
 		}
 
@@ -131,7 +150,15 @@ public class SlackHandler implements SlackMessagePostedListener {
 			if(sendTo == null)
 				return; // We shouldn't send this to Slack
 
-			final String cleanText = cleanMessageContents(message);
+			final String finalMessage;
+			if(contextBuffer == null)
+				finalMessage = cleanMessageContents(message);
+			else {
+				if(contextBuffer.length() > 0)
+					contextBuffer.append('\n');
+				contextBuffer.append(cleanMessageContents(message));
+				finalMessage = contextBuffer.toString();
+			}
 
 			final Player as;
 			if(message.from != null)
@@ -140,12 +167,12 @@ public class SlackHandler implements SlackMessagePostedListener {
 				as = null;
 
 			for(final SlackChannel channel : sendTo)
-				sendToSlack(channel, cleanText, as);
+				sendToSlack(channel, finalMessage, as);
 		} catch(Exception e) {
 			e.printStackTrace();
 		} finally {
-			if(message.finalizeContext)
-				contextResponses.remove(message.context.toString());
+			contextResponses.remove(message.context.toString());
+			contextBuffers.remove(message.context.toString());
 		}
 	}
 
