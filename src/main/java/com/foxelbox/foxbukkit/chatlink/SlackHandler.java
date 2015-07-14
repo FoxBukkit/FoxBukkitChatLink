@@ -164,7 +164,7 @@ public class SlackHandler implements SlackMessagePostedListener {
 
 	private void setMinecraftAssociation(String slackID, UUID minecraftID) {
 		String oldSlackID = minecraftToSlackLinks.get(minecraftID.toString());
-		if(!oldSlackID.equals("")) {
+		if(oldSlackID != null) {
 			slackToMinecraftLinks.remove(oldSlackID);
 		}
 
