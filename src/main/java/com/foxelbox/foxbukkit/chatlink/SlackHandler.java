@@ -185,6 +185,9 @@ public class SlackHandler implements SlackMessagePostedListener {
 		final UUID minecraftID;
 		try {
 			minecraftID = UUID.fromString(pendingSlackLinks.get(event.getSender().getId()));
+		} catch(NullPointerException e) {
+			sendToSlack(event.getChannel().getId(), "That account has not requested to be linked with your Slack account from Minecraft.");
+			return;
 		} catch(IllegalArgumentException e) {
 			sendToSlack(event.getChannel().getId(), "That account has not requested to be linked with your Slack account from Minecraft.");
 			return;
