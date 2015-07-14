@@ -21,10 +21,7 @@ import com.foxelbox.foxbukkit.chatlink.json.ChatMessageIn;
 import com.foxelbox.foxbukkit.chatlink.json.ChatMessageOut;
 import com.foxelbox.foxbukkit.chatlink.json.UserInfo;
 import com.foxelbox.foxbukkit.chatlink.util.CommandException;
-import com.ullink.slack.simpleslackapi.SlackChannel;
-import com.ullink.slack.simpleslackapi.SlackMessageHandle;
-import com.ullink.slack.simpleslackapi.SlackSession;
-import com.ullink.slack.simpleslackapi.SlackUser;
+import com.ullink.slack.simpleslackapi.*;
 import com.ullink.slack.simpleslackapi.events.SlackMessagePosted;
 import com.ullink.slack.simpleslackapi.events.SlackReplyEvent;
 import com.ullink.slack.simpleslackapi.impl.SlackChatConfiguration;
@@ -58,6 +55,11 @@ public class SlackHandler implements SlackMessagePostedListener {
 
 	@Override
 	public void onEvent(SlackMessagePosted event, SlackSession session) {
+		for(final SlackBot bot : session.getBots()) {
+			if(event.getSender().getId() == bot.getId())
+				return; // Ignore messages from bots (including our self)
+		}
+		
 		if(event.getChannel().isDirect()) {
 			handleDirectMessage(event, session);
 			return;
