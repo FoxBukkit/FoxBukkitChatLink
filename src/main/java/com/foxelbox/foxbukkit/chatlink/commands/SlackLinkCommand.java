@@ -47,6 +47,7 @@ public class SlackLinkCommand extends ICommand {
 				} catch(CommandException e) {
 					RedisHandler.sendMessage(makeError(messageIn, e.getMessage()));
 				} catch(Exception e) {
+					e.printStackTrace();
 					RedisHandler.sendMessage(makeError(messageIn, "Please try again later."));
 				}
 			}

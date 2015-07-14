@@ -22,9 +22,11 @@ import com.foxelbox.foxbukkit.chatlink.json.ChatMessageOut;
 import com.foxelbox.foxbukkit.chatlink.json.UserInfo;
 import com.foxelbox.foxbukkit.chatlink.util.CommandException;
 import com.ullink.slack.simpleslackapi.SlackChannel;
+import com.ullink.slack.simpleslackapi.SlackMessageHandle;
 import com.ullink.slack.simpleslackapi.SlackSession;
 import com.ullink.slack.simpleslackapi.SlackUser;
 import com.ullink.slack.simpleslackapi.events.SlackMessagePosted;
+import com.ullink.slack.simpleslackapi.events.SlackReplyEvent;
 import com.ullink.slack.simpleslackapi.impl.SlackChatConfiguration;
 import com.ullink.slack.simpleslackapi.impl.SlackSessionFactory;
 import com.ullink.slack.simpleslackapi.listeners.SlackMessagePostedListener;
@@ -131,7 +133,11 @@ public class SlackHandler implements SlackMessagePostedListener {
 
 		pendingSlackLinks.put(slackUser.getId(), minecraftUser.uuid.toString());
 
-		session.sendMessage(new SlackDMChannel(slackUser), minecraftUser.name + " has requested that you link your Slack account to your Minecraft account.\nIf this is you, please respond with `link " + minecraftUser.name + "`.\nIf this is not you, it is safe to ignore this message.", null);
+		SlackMessageHandle handle = session.sendMessage(new SlackDMChannel(slackUser), minecraftUser.name + " has requested that you link your Slack account to your Minecraft account.\nIf this is you, please respond with `link " + minecraftUser.name + "`.\nIf this is not you, it is safe to ignore this message.", null);
+		SlackReplyEvent slackReply = handle.getSlackReply();
+		if(!slackReply.isOk()) {
+			throw new IllegalStateException("Got non-ok reply from Slack: " + slackReply.toString());
+		}
 	}
 
 	private Player lookupMinecraftAssociation(String username) {
