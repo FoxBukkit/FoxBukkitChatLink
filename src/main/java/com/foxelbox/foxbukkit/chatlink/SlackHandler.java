@@ -134,7 +134,9 @@ public class SlackHandler implements SlackMessagePostedListener {
 	}
 
 	public void beginLink(String username, UserInfo minecraftUser) throws CommandException {
-		final SlackUser slackUser = session.findUserByUserName(username);
+		throw new CommandException("This command has been temporarily disabled.");
+
+		/*final SlackUser slackUser = session.findUserByUserName(username);
 		if(slackUser == null)
 			throw new CommandException("The given Slack user does not exist.");
 
@@ -145,7 +147,7 @@ public class SlackHandler implements SlackMessagePostedListener {
 		SlackReplyEvent slackReply = handle.getSlackReply();
 		if(!slackReply.isOk()) {
 			throw new IllegalStateException("Got non-ok reply from Slack: " + slackReply.toString());
-		}
+		}*/
 	}
 
 	private Player lookupMinecraftAssociation(String username) {
