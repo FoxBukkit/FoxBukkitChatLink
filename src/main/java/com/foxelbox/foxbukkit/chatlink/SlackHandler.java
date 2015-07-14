@@ -199,6 +199,7 @@ public class SlackHandler implements SlackMessagePostedListener {
 
 		pendingSlackLinks.remove(event.getSender().getId());
 		setMinecraftAssociation(event.getSender().getId(), minecraftPlayer.getUniqueId());
+		session.sendMessageOverWebSocket(event.getChannel(), "Successfully linked your Minecraft account.", null);
 	}
 
 	private class SlackDMChannel implements SlackChannel {
