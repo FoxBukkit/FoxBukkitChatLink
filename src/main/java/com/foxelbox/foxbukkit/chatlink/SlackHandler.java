@@ -196,7 +196,7 @@ public class SlackHandler implements SlackMessagePostedListener {
 	}
 
 	private String cleanMessageContents(ChatMessageOut message) {
-		String cleanText = StringEscapeUtils.unescapeHtml4(htmlTags.matcher(message.contents).replaceAll("")).replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;"); // Remove all of the HTML tags and fix &apos; and &quot;
+		String cleanText = StringEscapeUtils.unescapeHtml4(htmlTags.matcher(message.contents).replaceAll("")).replaceAll("&apos;", "'").replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;"); // Remove all of the HTML tags and fix &apos; and &quot;
 		if(message.server != null && !message.server.equals("Slack"))
 			cleanText = "[" + message.server + "] " + cleanText;
 
