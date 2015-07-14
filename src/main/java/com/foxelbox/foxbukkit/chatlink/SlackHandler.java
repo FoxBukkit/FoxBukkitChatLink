@@ -120,7 +120,7 @@ public class SlackHandler implements SlackMessagePostedListener {
 			}
 
 			String cleanText = message.contents.replaceAll("<[^>]+>", "").replaceAll("&apos;", "'").replaceAll("&quot;", "\""); // Remove all of the HTML tags and fix &apos; and &quot;
-			if(message.server != "Slack")
+			if(message.server != null && message.server != "Slack")
 				cleanText = "[" + message.server + "] " + cleanText;
 
 			sendToSlack(channel, cleanText, new Player(message.from.uuid));
