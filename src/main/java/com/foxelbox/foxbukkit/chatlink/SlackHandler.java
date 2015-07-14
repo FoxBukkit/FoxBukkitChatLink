@@ -36,6 +36,7 @@ import java.net.URLEncoder;
 import java.util.Collection;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 public class SlackHandler implements SlackMessagePostedListener {
 	private static Map<String, String> slackToMinecraftLinks = Main.redisManager.createCachedRedisMap("slacklinks:slack-to-mc");
@@ -121,6 +122,7 @@ public class SlackHandler implements SlackMessagePostedListener {
 			final String cleanText = message.contents.replaceAll("<[^>]+>", "").replaceAll("&apos;", "'").replaceAll("&quot;", "\""); // Remove all of the HTML tags and fix &apos; and &quot;
 
 			SlackMessageHandle handle = session.sendMessage(session.findChannelByName(channel), cleanText, null, slackChatConfiguration);
+			handle.waitForReply(10, TimeUnit.SECONDS);
 			SlackReplyEvent slackReply = handle.getSlackReply();
 			if(!slackReply.isOk()) {
 				throw new IllegalStateException("Got non-ok reply from Slack: " + slackReply.toString());
@@ -139,6 +141,7 @@ public class SlackHandler implements SlackMessagePostedListener {
 		pendingSlackLinks.put(slackUser.getId(), minecraftUser.uuid.toString());
 
 		SlackMessageHandle handle = session.sendMessageOverWebSocket(new SlackDMChannel(slackUser), minecraftUser.name + " has requested that you link your Slack account to your Minecraft account.\nIf this is you, please respond with `link " + minecraftUser.name + "`.\nIf this is not you, it is safe to ignore this message.", null);
+		handle.waitForReply(10, TimeUnit.SECONDS);
 		SlackReplyEvent slackReply = handle.getSlackReply();
 		if(!slackReply.isOk()) {
 			throw new IllegalStateException("Got non-ok reply from Slack: " + slackReply.toString());
