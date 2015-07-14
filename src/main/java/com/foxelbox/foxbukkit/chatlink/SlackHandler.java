@@ -21,6 +21,8 @@ import com.foxelbox.foxbukkit.chatlink.json.ChatMessageIn;
 import com.foxelbox.foxbukkit.chatlink.json.ChatMessageOut;
 import com.foxelbox.foxbukkit.chatlink.json.UserInfo;
 import com.foxelbox.foxbukkit.chatlink.util.CommandException;
+import com.foxelbox.foxbukkit.chatlink.util.SlackException;
+import com.google.common.io.CharStreams;
 import com.ullink.slack.simpleslackapi.SlackChannel;
 import com.ullink.slack.simpleslackapi.SlackMessageHandle;
 import com.ullink.slack.simpleslackapi.SlackSession;
@@ -30,26 +32,37 @@ import com.ullink.slack.simpleslackapi.events.SlackReplyEvent;
 import com.ullink.slack.simpleslackapi.impl.SlackChatConfiguration;
 import com.ullink.slack.simpleslackapi.impl.SlackSessionFactory;
 import com.ullink.slack.simpleslackapi.listeners.SlackMessagePostedListener;
+import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.message.BasicNameValuePair;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.util.Collection;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 public class SlackHandler implements SlackMessagePostedListener {
-	private static Map<String, String> slackToMinecraftLinks = Main.redisManager.createCachedRedisMap("slacklinks:slack-to-mc");
-	private static Map<String, String> minecraftToSlackLinks = Main.redisManager.createCachedRedisMap("slacklinks:mc-to-slack");
-	private static Map<String, String> pendingSlackLinks = Main.redisManager.createCachedRedisMap("slacklinks:pending"); // TODO: Entries in this should expire
-	private SlackSession session;
+	final private static Map<String, String> slackToMinecraftLinks = Main.redisManager.createCachedRedisMap("slacklinks:slack-to-mc");
+	final private static Map<String, String> minecraftToSlackLinks = Main.redisManager.createCachedRedisMap("slacklinks:mc-to-slack");
+	final private static Map<String, String> pendingSlackLinks = Main.redisManager.createCachedRedisMap("slacklinks:pending"); // TODO: Entries in this should expire
+
+	final private SlackSession session;
+	final private String slackAuthToken;
 
 	public SlackHandler(Configuration configuration) throws IllegalArgumentException, IOException {
-		String slackToken = configuration.getValue("slack-token", "");
-		if(slackToken == "")
+		slackAuthToken = configuration.getValue("slack-token", "");
+		if(slackAuthToken.equals(""))
 			throw new IllegalArgumentException("configuration: slack-token undefined");
-		session = SlackSessionFactory.createWebSocketSlackSession(slackToken);
+		session = SlackSessionFactory.createWebSocketSlackSession(slackAuthToken);
 
 		session.addMessagePostedListener(this);
 
@@ -135,8 +148,7 @@ public class SlackHandler implements SlackMessagePostedListener {
 			throw new CommandException("The given Slack user does not exist.");
 
 		pendingSlackLinks.put(slackUser.getId(), minecraftUser.uuid.toString());
-
-		sendToSlack(slackUser.getUserName(), minecraftUser.name + " has requested that you link your Slack account to your Minecraft account.\nIf this is you, please respond with `link " + minecraftUser.name + "`.\nIf this is not you, it is safe to ignore this message.");
+		sendToSlack(getDMID(slackUser), minecraftUser.name + " has requested that you link your Slack account to your Minecraft account.\nIf this is you, please respond with `link " + minecraftUser.name + "`.\nIf this is not you, it is safe to ignore this message.");
 	}
 
 	private Player lookupMinecraftAssociation(String username) {
@@ -217,6 +229,44 @@ public class SlackHandler implements SlackMessagePostedListener {
 
 	private void sendToSlack(String channelID, String message) throws IOException {
 		this.sendToSlack(channelID, message, null);
+	}
+
+	private String getDMID(SlackUser user) {
+		HttpClient client = HttpClientBuilder.create().build();
+		HttpPost request = new HttpPost("https://slack.com/api/im.open");
+		List<NameValuePair> nameValuePairList = new ArrayList<>();
+		nameValuePairList.add(new BasicNameValuePair("token", slackAuthToken));
+		nameValuePairList.add(new BasicNameValuePair("user", user.getId()));
+		try {
+			request.setEntity(new UrlEncodedFormEntity(nameValuePairList, "UTF-8"));
+			HttpResponse response = client.execute(request);
+			String jsonResponse = CharStreams.toString(new InputStreamReader(response.getEntity().getContent()));
+			JSONObject resultObject = parseObject(jsonResponse);
+
+			boolean ok = (boolean) resultObject.get("ok");
+			if(!ok) {
+				throw new SlackException((String) resultObject.get("error"));
+			}
+
+			JSONObject channelObject = (JSONObject) resultObject.get("channel");
+			String channelID = (String) channelObject.get("id");
+
+			return channelID;
+		} catch(IOException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	private JSONObject parseObject(String json) {
+		JSONParser parser = new JSONParser();
+		try {
+			JSONObject object = (JSONObject) parser.parse(json);
+			return object;
+		} catch(ParseException e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 
 	private class SlackRawChannel implements SlackChannel {
