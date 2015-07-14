@@ -261,11 +261,13 @@ public class BanResolver {
 		if(username != null && username.charAt(0) == '[')
 			uuid = UUID.nameUUIDFromBytes(("SPECIAL:" + username).getBytes());
 
-		if(uuid == null)
+		if(uuid == null) {
 			uuid = FishBansResolver.getUUID(username);
+		}
 
-		if(uuid != null && playerIDs.containsKey(uuid))
+		if(uuid != null && playerIDs.containsKey(uuid)) {
 			return playerIDs.get(uuid);
+		}
 
 		try {
 			Connection connection = DatabaseConnectionPool.instance.getConnection();
