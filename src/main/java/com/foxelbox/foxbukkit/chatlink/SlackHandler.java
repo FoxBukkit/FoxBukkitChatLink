@@ -92,32 +92,36 @@ public class SlackHandler implements SlackMessagePostedListener {
 			if(!channelName.equalsIgnoreCase("minecraft") && !channelName.equalsIgnoreCase("minecraft-ops"))
 				return;
 
-			Player minecraftPlayer = lookupMinecraftAssociation(event.getSender().getId());
-			if(minecraftPlayer == null)
-				return;
-
-			ChatMessageIn messageIn = new ChatMessageIn();
-
-			messageIn.type = "text";
-			messageIn.server = "Slack";
-
-			messageIn.context = UUID.randomUUID();
-			contextResponses.put(messageIn.context.toString(), event.getChannel().getId());
-
-			messageIn.timestamp = Math.round(new Double(event.getTimeStamp()));
-			messageIn.from = new UserInfo(minecraftPlayer.getUniqueId(), minecraftPlayer.getName());
-
-			messageIn.contents = StringEscapeUtils.unescapeHtml4(event.getMessageContent());
-
-			if(messageIn.contents.charAt(0) == '.')
-				messageIn.contents = "/" + messageIn.contents.substring(1);
-			else if(channelName.equalsIgnoreCase("minecraft-ops"))
-				messageIn.contents = "#" + messageIn.contents;
-
-			RedisHandler.incomingMessage(messageIn);
+			handleSlackMessage(event);
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
+	}
+
+	private void handleSlackMessage(SlackMessagePosted event) {
+		Player minecraftPlayer = lookupMinecraftAssociation(event.getSender().getId());
+		if(minecraftPlayer == null)
+			return;
+
+		ChatMessageIn messageIn = new ChatMessageIn();
+
+		messageIn.type = "text";
+		messageIn.server = "Slack";
+
+		messageIn.context = UUID.randomUUID();
+		contextResponses.put(messageIn.context.toString(), event.getChannel().getId());
+
+		messageIn.timestamp = Math.round(new Double(event.getTimeStamp()));
+		messageIn.from = new UserInfo(minecraftPlayer.getUniqueId(), minecraftPlayer.getName());
+
+		messageIn.contents = StringEscapeUtils.unescapeHtml4(event.getMessageContent());
+
+		if(messageIn.contents.charAt(0) == '.')
+			messageIn.contents = "/" + messageIn.contents.substring(1);
+		else if(event.getChannel().getName().equalsIgnoreCase("minecraft-ops"))
+			messageIn.contents = "#" + messageIn.contents;
+
+		RedisHandler.incomingMessage(messageIn);
 	}
 
 	public void sendMessage(ChatMessageOut message) {
@@ -230,9 +234,19 @@ public class SlackHandler implements SlackMessagePostedListener {
 	}
 
 	private void handleDirectMessage(SlackMessagePosted event) throws IOException {
-		if(!event.getMessageContent().toLowerCase().startsWith("link"))
-			return; // We only care about account linking in DMs
+		final String lowerCaseMessage = event.getMessageContent().toLowerCase();
+		if(lowerCaseMessage.startsWith("link")) {
+			handleLinkMessage(event);
+			return; // It's a linking request. Don't worry about anything else.
+		}
 
+		if(!lowerCaseMessage.startsWith("."))
+			return; // Is not a command. We only accept commands in direct messages.
+
+		handleSlackMessage(event);
+	}
+
+	private void handleLinkMessage(SlackMessagePosted event) throws IOException {
 		String requestedMinecraftName = event.getMessageContent().substring(4).trim();
 		if(requestedMinecraftName.equals("")) { // The name that they gave us was empty.
 			sendToSlack(event.getChannel(), "You must provide a Minecraft name for the `link` command.\nFor example: `link MinecraftName`");
