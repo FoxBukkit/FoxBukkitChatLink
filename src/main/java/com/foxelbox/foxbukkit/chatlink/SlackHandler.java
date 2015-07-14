@@ -98,7 +98,7 @@ public class SlackHandler implements SlackMessagePostedListener {
 			messageIn.from = new UserInfo(minecraftPlayer.getUniqueId(), minecraftPlayer.getName());
 
 			messageIn.contents = event.getMessageContent();
-			if(channelName.equalsIgnoreCase("#minecraft-ops"))
+			if(channelName.equalsIgnoreCase("minecraft-ops"))
 				messageIn.contents = "#" + messageIn.contents;
 			else if(messageIn.contents.charAt(0) == '.')
 				messageIn.contents = "/" + messageIn.contents.substring(1);
