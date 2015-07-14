@@ -59,7 +59,8 @@ public class SlackHandler implements SlackMessagePostedListener {
 	@Override
 	public void onEvent(SlackMessagePosted event, SlackSession session) {
 		try {
-			if(event.getSender().getId() == session.sessionPersona().getId())
+			final SlackUser sender = event.getSender();
+			if(sender == null || sender.getId() == sender.getId())
 				return; // Ignore our own messages.
 
 			if(event.getChannel().isDirect()) {
