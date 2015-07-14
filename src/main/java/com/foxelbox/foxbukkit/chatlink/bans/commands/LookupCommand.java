@@ -48,7 +48,7 @@ public class LookupCommand extends ICommand {
 				final String altList = BanResolver.makePossibleAltString(user, uuid);
 				final HashMap<String, Integer> fishBans = FishBansResolver.getBanCounts(user);
 
-				final StringBuilder fishBansStr = new StringBuilder(user + " has");
+				final StringBuilder fishBansStr = new StringBuilder("\u00a75[FBCL]\u00a7f ").append(user).append(" has");
 				for (Map.Entry<String, Integer> fishBanEntry : fishBans.entrySet())
 					if (fishBanEntry.getKey() != null && fishBanEntry.getValue() != null)
 						fishBansStr.append(String.format(" %1$d ban(s) on %2$s,", fishBanEntry.getValue(), fishBanEntry.getKey()));
@@ -57,16 +57,16 @@ public class LookupCommand extends ICommand {
 				ChatMessageOut messageOut = makeReply(messageIn);
 
 				if (ban != null) {
-					messageOut.setContentsPlain(String.format("Player %1$s IS banned by %2$s for the reason of \"%3$s\"", user, ban.getAdmin().name, ban.getReason()));
+					messageOut.setContentsPlain(String.format("\u00a75[FBCL]\u00a7f Player %1$s IS banned by %2$s for the reason of \"%3$s\"", user, ban.getAdmin().name, ban.getReason()));
 				} else {
-					messageOut.setContentsPlain(String.format("Player %1$s is NOT banned", user));
+					messageOut.setContentsPlain(String.format("\u00a75[FBCL]\u00a7f Player %1$s is NOT banned", user));
 				}
 				RedisHandler.sendMessage(messageOut);
 
 				if (altList != null) {
 					messageOut.setContentsPlain(altList);
 				} else {
-					messageOut.setContentsPlain(String.format("No possible alts of %1$s found", user));
+					messageOut.setContentsPlain(String.format("\u00a75[FBCL]\u00a7f No possible alts of %1$s found", user));
 				}
 				RedisHandler.sendMessage(messageOut);
 
