@@ -157,28 +157,6 @@ public class SlackHandler implements SlackMessagePostedListener {
 		return null;
 	}
 
-	private void sendPlayerMessage(ChatMessageOut message) throws IOException {
-		final String cleanText = cleanMessageContents(message);
-
-		final Player as;
-		if(message.from != null)
-			as = new Player(message.from.uuid);
-		else
-			as = null;
-
-		for(String toID : message.to.filter) {
-			String slackID = minecraftToSlackLinks.get(toID);
-			if(slackID == null) // No Slack account is associated with this ID
-				continue;
-
-			SlackUser user = session.findUserById(slackID);
-			if(user == null || user.isDeleted()) // This slack user no longer exists
-				continue;
-
-			sendToSlack(getDMID(user), cleanText, as);
-		}
-	}
-
 	private String cleanMessageContents(ChatMessageOut message) {
 		String cleanText = message.contents.replaceAll("<[^>]+>", "").replaceAll("&apos;", "'").replaceAll("&quot;", "\""); // Remove all of the HTML tags and fix &apos; and &quot;
 		if(message.server != null && message.server != "Slack")
@@ -193,7 +171,7 @@ public class SlackHandler implements SlackMessagePostedListener {
 			throw new CommandException("The given Slack user does not exist.");
 
 		pendingSlackLinks.put(slackUser.getId(), minecraftUser.uuid.toString());
-		sendToSlack(getDMID(slackUser), minecraftUser.name + " has requested that you link your Slack account to your Minecraft account.\nIf this is you, please respond with `link " + minecraftUser.name + "`.\nIf this is not you, it is safe to ignore this message.");
+		sendToSlack(getDMChannel(slackUser), minecraftUser.name + " has requested that you link your Slack account to your Minecraft account.\nIf this is you, please respond with `link " + minecraftUser.name + "`.\nIf this is not you, it is safe to ignore this message.");
 	}
 
 	private Player lookupMinecraftAssociation(String username) {
@@ -223,7 +201,7 @@ public class SlackHandler implements SlackMessagePostedListener {
 
 		String requestedMinecraftName = event.getMessageContent().substring(4).trim();
 		if(requestedMinecraftName.equals("")) { // The name that they gave us was empty.
-			sendToSlack(event.getChannel().getId(), "You must provide a Minecraft name for the `link` command.\nFor example: `link MinecraftName`");
+			sendToSlack(event.getChannel(), "You must provide a Minecraft name for the `link` command.\nFor example: `link MinecraftName`");
 			return;
 		}
 
@@ -231,26 +209,39 @@ public class SlackHandler implements SlackMessagePostedListener {
 		try {
 			minecraftID = UUID.fromString(pendingSlackLinks.get(event.getSender().getId()));
 		} catch(NullPointerException e) {
-			sendToSlack(event.getChannel().getId(), "That account has not requested to be linked with your Slack account from Minecraft.");
+			sendToSlack(event.getChannel(), "That account has not requested to be linked with your Slack account from Minecraft.");
 			return;
 		} catch(IllegalArgumentException e) {
-			sendToSlack(event.getChannel().getId(), "That account has not requested to be linked with your Slack account from Minecraft.");
+			sendToSlack(event.getChannel(), "That account has not requested to be linked with your Slack account from Minecraft.");
 			return;
 		}
 
 		final Player minecraftPlayer = new Player(minecraftID);
 		if(!minecraftPlayer.getName().equalsIgnoreCase(requestedMinecraftName)) {
-			sendToSlack(event.getChannel().getId(), "That account has not requested to be linked with your Slack account from Minecraft.");
+			sendToSlack(event.getChannel(), "That account has not requested to be linked with your Slack account from Minecraft.");
 			return;
 		}
 
 		pendingSlackLinks.remove(event.getSender().getId());
 		setMinecraftAssociation(event.getSender().getId(), minecraftPlayer.getUniqueId());
 
-		sendToSlack(event.getChannel().getId(), "Successfully linked your Minecraft account.");
+		sendToSlack(event.getChannel(), "Successfully linked your Minecraft account.");
 	}
 
 	private void sendToSlack(SlackChannel channel, String message, Player asPlayer) throws IOException {
+		if(asPlayer == null || asPlayer.getName().equals("")) {
+			final SlackMessageHandle handle = session.sendMessageOverWebSocket(channel, message, null);
+			handle.waitForReply(1, TimeUnit.SECONDS);
+			SlackReplyEvent slackReply = handle.getSlackReply();
+			if(slackReply == null) {
+				throw new IOException("Got no reply from Slack API after 1 second");
+			} else if(!slackReply.isOk()) {
+				throw new IOException("Got non-ok reply from Slack");
+			}
+
+			return;
+		}
+
 		SlackChatConfiguration slackChatConfiguration = SlackChatConfiguration.getConfiguration();
 
 		if(asPlayer != null && asPlayer.getName().length() > 0) {
@@ -265,7 +256,7 @@ public class SlackHandler implements SlackMessagePostedListener {
 			slackChatConfiguration.asUser();
 		}
 
-		SlackMessageHandle handle = session.sendMessage(new SlackRawChannel(channelID), message, null, slackChatConfiguration);
+		SlackMessageHandle handle = session.sendMessage(channel, message, null, slackChatConfiguration);
 		handle.waitForReply(1, TimeUnit.SECONDS);
 		SlackReplyEvent slackReply = handle.getSlackReply();
 		if(slackReply == null) {
@@ -279,7 +270,7 @@ public class SlackHandler implements SlackMessagePostedListener {
 		this.sendToSlack(channel, message, null);
 	}
 
-	private String getDMID(SlackUser user) {
+	private SlackChannel getDMChannel(SlackUser user) {
 		HttpClient client = HttpClientBuilder.create().build();
 		HttpPost request = new HttpPost("https://slack.com/api/im.open");
 		List<NameValuePair> nameValuePairList = new ArrayList<>();
@@ -299,7 +290,7 @@ public class SlackHandler implements SlackMessagePostedListener {
 			JSONObject channelObject = (JSONObject) resultObject.get("channel");
 			String channelID = (String) channelObject.get("id");
 
-			return channelID;
+			return session.findChannelById(channelID);
 		} catch(IOException e) {
 			e.printStackTrace();
 		}
@@ -314,62 +305,6 @@ public class SlackHandler implements SlackMessagePostedListener {
 		} catch(ParseException e) {
 			e.printStackTrace();
 			return null;
-		}
-	}
-
-	private class SlackRawChannel implements SlackChannel {
-		final private String id;
-		final private SlackChannel underlyingChannel;
-
-		public SlackRawChannel(String id) {
-			this.id = id;
-			this.underlyingChannel = session.findChannelById(id);
-		}
-
-		@Override
-		public String getId() {
-			return id;
-		}
-
-		@Override
-		public String getName() {
-			if(this.underlyingChannel == null)
-				return null;
-
-			return this.underlyingChannel.getName();
-		}
-
-		@Override
-		public Collection<SlackUser> getMembers() {
-			if(this.underlyingChannel == null)
-				return null;
-
-			return this.underlyingChannel.getMembers();
-		}
-
-		@Override
-		public String getTopic() {
-			if(this.underlyingChannel == null)
-				return null;
-
-			return this.underlyingChannel.getTopic();
-		}
-
-		@Override
-		public String getPurpose() {
-			if(this.underlyingChannel == null)
-				return null;
-
-			return this.underlyingChannel.getPurpose();
-		}
-
-		@Override
-		public boolean isDirect() {
-			if(this.underlyingChannel == null) {
-				return this.id.charAt(0) == '@' || this.id.charAt(0) == 'D';
-			}
-
-			return this.underlyingChannel.isDirect();
 		}
 	}
 }
