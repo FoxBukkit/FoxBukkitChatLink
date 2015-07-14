@@ -32,6 +32,7 @@ import com.ullink.slack.simpleslackapi.impl.SlackSessionFactory;
 import com.ullink.slack.simpleslackapi.listeners.SlackMessagePostedListener;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.Collection;
 import java.util.Map;
@@ -93,24 +94,15 @@ public class SlackHandler implements SlackMessagePostedListener {
 		}
 
 		try {
-			SlackChatConfiguration slackChatConfiguration = SlackChatConfiguration.getConfiguration();
-
-			if(message.from != null && message.from.name.length() > 0) {
-				slackChatConfiguration.withName(message.from.name);
-				slackChatConfiguration.withIcon("https://minotar.net/avatar/" + URLEncoder.encode(message.from.name, "UTF-8") + "/48.png");
-			} else {
-				slackChatConfiguration.asUser();
-			}
-
 			final String channel;
 			switch(message.to.type) {
 				case "all":
-					channel = "minecraft";
+					channel = "#minecraft";
 					break;
 				case "permission":
 					if(message.to.filter.length == 1 && message.to.filter[0].equals("foxbukkit.opchat")) {
 						// op chat
-						channel = "minecraft-ops";
+						channel = "#minecraft-ops";
 						break;
 					}
 					return;
@@ -121,33 +113,20 @@ public class SlackHandler implements SlackMessagePostedListener {
 
 			final String cleanText = message.contents.replaceAll("<[^>]+>", "").replaceAll("&apos;", "'").replaceAll("&quot;", "\""); // Remove all of the HTML tags and fix &apos; and &quot;
 
-			SlackMessageHandle handle = session.sendMessage(session.findChannelByName(channel), cleanText, null, slackChatConfiguration);
-			handle.waitForReply(10, TimeUnit.SECONDS);
-			SlackReplyEvent slackReply = handle.getSlackReply();
-			if(!slackReply.isOk()) {
-				throw new IllegalStateException("Got non-ok reply from Slack: " + slackReply.toString());
-			}
-
+			sendToSlack(channel, cleanText, new Player(message.from.uuid));
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
 	}
 
 	public void beginLink(String username, UserInfo minecraftUser) throws CommandException {
-		throw new CommandException("This command has been temporarily disabled.");
-
-		/*final SlackUser slackUser = session.findUserByUserName(username);
+		final SlackUser slackUser = session.findUserByUserName(username);
 		if(slackUser == null)
 			throw new CommandException("The given Slack user does not exist.");
 
 		pendingSlackLinks.put(slackUser.getId(), minecraftUser.uuid.toString());
 
-		SlackMessageHandle handle = session.sendMessageOverWebSocket(new SlackDMChannel(slackUser), minecraftUser.name + " has requested that you link your Slack account to your Minecraft account.\nIf this is you, please respond with `link " + minecraftUser.name + "`.\nIf this is not you, it is safe to ignore this message.", null);
-		handle.waitForReply(10, TimeUnit.SECONDS);
-		SlackReplyEvent slackReply = handle.getSlackReply();
-		if(!slackReply.isOk()) {
-			throw new IllegalStateException("Got non-ok reply from Slack: " + slackReply.toString());
-		}*/
+		sendToSlack("@" + slackUser.getUserName(), minecraftUser.name + " has requested that you link your Slack account to your Minecraft account.\nIf this is you, please respond with `link " + minecraftUser.name + "`.\nIf this is not you, it is safe to ignore this message.");
 	}
 
 	private Player lookupMinecraftAssociation(String username) {
@@ -172,14 +151,14 @@ public class SlackHandler implements SlackMessagePostedListener {
 	}
 
 	private void handleDirectMessage(SlackMessagePosted event, SlackSession session) {
-		if(!event.getMessageContent().toLowerCase().startsWith("link ")) {
-			session.sendMessageOverWebSocket(event.getChannel(), event.getMessageContent(), null);
+		if(!event.getMessageContent().toLowerCase().startsWith("link")) {
+			sendToSlack(event.getChannel().getId(), event.getMessageContent());
 			return; // We only care about account linking in DMs
 		}
 
-		String requestedMinecraftName = event.getMessageContent().substring(5).trim();
+		String requestedMinecraftName = event.getMessageContent().substring(4).trim();
 		if(requestedMinecraftName.equals("")) { // The name that they gave us was empty.
-			session.sendMessageOverWebSocket(event.getChannel(), "You must provide a Minecraft name for the `link` command.\nFor example: `link MinecraftName`", null);
+			sendToSlack(event.getChannel().getId(), "You must provide a Minecraft name for the `link` command.\nFor example: `link MinecraftName`");
 			return;
 		}
 
@@ -187,58 +166,102 @@ public class SlackHandler implements SlackMessagePostedListener {
 		try {
 			minecraftID = UUID.fromString(pendingSlackLinks.get(event.getSender().getId()));
 		} catch(IllegalArgumentException e) {
-			session.sendMessageOverWebSocket(event.getChannel(), "You have no pending link with that Minecraft account.", null);
+			sendToSlack(event.getChannel().getId(), "That account has not requested to be linked with your Slack account from Minecraft.");
 			return;
 		}
 
 		final Player minecraftPlayer = new Player(minecraftID);
 		if(!minecraftPlayer.getName().equalsIgnoreCase(requestedMinecraftName)) {
-			session.sendMessageOverWebSocket(event.getChannel(), "You have no pending link with that Minecraft account.", null);
+			sendToSlack(event.getChannel().getId(), "That account has not requested to be linked with your Slack account from Minecraft.");
 			return;
 		}
 
 		pendingSlackLinks.remove(event.getSender().getId());
 		setMinecraftAssociation(event.getSender().getId(), minecraftPlayer.getUniqueId());
-		session.sendMessageOverWebSocket(event.getChannel(), "Successfully linked your Minecraft account.", null);
+
+		sendToSlack(event.getChannel().getId(), "Successfully linked your Minecraft account.");
 	}
 
-	private class SlackDMChannel implements SlackChannel {
-		private SlackUser user;
+	private void sendToSlack(String channelID, String message, Player asPlayer) {
+		SlackChatConfiguration slackChatConfiguration = SlackChatConfiguration.getConfiguration();
 
-		public SlackDMChannel(SlackUser user) {
-			this.user = user;
+		if(asPlayer != null && asPlayer.getName().length() > 0) {
+			slackChatConfiguration.withName(asPlayer.getName());
+			try {
+				slackChatConfiguration.withIcon("https://minotar.net/avatar/" + URLEncoder.encode(asPlayer.getName(), "UTF-8") + "/48.png");
+			} catch(UnsupportedEncodingException e) {
+				// This should never happen.
+				e.printStackTrace();
+			}
+		} else {
+			slackChatConfiguration.asUser();
+		}
+
+		SlackMessageHandle handle = session.sendMessage(new SlackRawChannel(channelID), message, null, slackChatConfiguration);
+		handle.waitForReply(10, TimeUnit.SECONDS);
+		SlackReplyEvent slackReply = handle.getSlackReply();
+		if(!slackReply.isOk()) {
+			throw new IllegalStateException("Got non-ok reply from Slack");
+		}
+	}
+
+	private void sendToSlack(String channelID, String message) {
+		this.sendToSlack(channelID, message, null);
+	}
+
+	private class SlackRawChannel implements SlackChannel {
+		final private String id;
+		final private SlackChannel underlyingChannel;
+
+		public SlackRawChannel(String id) {
+			this.id = id;
+			this.underlyingChannel = session.findChannelById(id);
 		}
 
 		@Override
 		public String getId() {
-			final String id = "@" + user.getUserName();
-			System.out.println("getId: " + id);
 			return id;
 		}
 
 		@Override
 		public String getName() {
-			return user.getRealName();
+			if(this.underlyingChannel == null)
+				return null;
+
+			return this.underlyingChannel.getName();
 		}
 
 		@Override
 		public Collection<SlackUser> getMembers() {
-			return null;
+			if(this.underlyingChannel == null)
+				return null;
+
+			return this.underlyingChannel.getMembers();
 		}
 
 		@Override
 		public String getTopic() {
-			return null;
+			if(this.underlyingChannel == null)
+				return null;
+
+			return this.underlyingChannel.getTopic();
 		}
 
 		@Override
 		public String getPurpose() {
-			return null;
+			if(this.underlyingChannel == null)
+				return null;
+
+			return this.underlyingChannel.getPurpose();
 		}
 
 		@Override
 		public boolean isDirect() {
-			return true;
+			if(this.underlyingChannel == null) {
+				return this.id.charAt(0) == '@' || this.id.charAt(0) == 'D';
+			}
+
+			return this.underlyingChannel.isDirect();
 		}
 	}
 }
