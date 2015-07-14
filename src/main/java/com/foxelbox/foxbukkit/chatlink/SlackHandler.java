@@ -55,6 +55,8 @@ public class SlackHandler implements SlackMessagePostedListener {
 	final private static Map<String, String> minecraftToSlackLinks = Main.redisManager.createCachedRedisMap("slacklinks:mc-to-slack");
 	final private static Map<String, String> pendingSlackLinks = Main.redisManager.createCachedRedisMap("slacklinks:pending"); // TODO: Entries in this should expire
 
+	final private Map<String, String> contextResponses = new HashMap<>();
+
 	final private SlackSession session;
 	final private String slackAuthToken;
 
@@ -93,7 +95,10 @@ public class SlackHandler implements SlackMessagePostedListener {
 
 			messageIn.type = "text";
 			messageIn.server = "Slack";
+
 			messageIn.context = UUID.randomUUID();
+			contextResponses.put(messageIn.context.toString(), event.getChannel().getId());
+
 			messageIn.timestamp = Math.round(new Double(event.getTimeStamp()));
 			messageIn.from = new UserInfo(minecraftPlayer.getUniqueId(), minecraftPlayer.getName());
 
@@ -111,32 +116,13 @@ public class SlackHandler implements SlackMessagePostedListener {
 
 	public void sendMessage(ChatMessageOut message) {
 		if(!message.type.equalsIgnoreCase("text")) { // We ignore non-text messages
+			if(message.finalizeContext)
+				contextResponses.remove(message.context.toString());
 			return;
 		}
 
 		try {
-			final String channel;
-			switch(message.to.type) {
-				case "all":
-					if(message.server.equals("Slack"))
-						return; // Don't relay messages that were just sent.
-					channel = "#minecraft";
-					break;
-				case "permission":
-					if(message.to.filter.length == 1 && message.to.filter[0].equals("foxbukkit.opchat")) {
-						if(message.server.equals("Slack"))
-							return; // Don't relay messages that were just sent.
-						// op chat
-						channel = "#minecraft-ops";
-						break;
-					}
-					return;
-				case "player":
-					this.sendPlayerMessage(message);
-					return;
-				default:
-					return;
-			}
+			final Collection<SlackChannel> sendTo = determineResponseChannels(message);
 
 			final String cleanText = cleanMessageContents(message);
 
@@ -146,10 +132,29 @@ public class SlackHandler implements SlackMessagePostedListener {
 			else
 				as = null;
 
-			sendToSlack(channel, cleanText, as);
+			for(final SlackChannel channel : sendTo)
+				sendToSlack(channel, cleanText, as);
 		} catch(Exception e) {
 			e.printStackTrace();
+		} finally {
+			if(message.finalizeContext)
+				contextResponses.remove(message.context.toString());
 		}
+	}
+
+	private Collection<SlackChannel> determineResponseChannels(ChatMessageOut message) {
+		String responseChannel = contextResponses.get(message.context.toString());
+		if(responseChannel != null) {
+			return Arrays.asList(session.findChannelById(responseChannel));
+		}
+
+		if(message.to.type.equals("all"))
+			return Arrays.asList(session.findChannelByName("minecraft"));
+
+		if(message.to.type.equals("permission") && message.to.filter.length == 1 && message.to.filter[0].equals("foxbukkit.opchat"))
+			return Arrays.asList(session.findChannelByName("minecraft-ops"));
+
+		return null;
 	}
 
 	private void sendPlayerMessage(ChatMessageOut message) throws IOException {
@@ -245,7 +250,7 @@ public class SlackHandler implements SlackMessagePostedListener {
 		sendToSlack(event.getChannel().getId(), "Successfully linked your Minecraft account.");
 	}
 
-	private void sendToSlack(String channelID, String message, Player asPlayer) throws IOException {
+	private void sendToSlack(SlackChannel channel, String message, Player asPlayer) throws IOException {
 		SlackChatConfiguration slackChatConfiguration = SlackChatConfiguration.getConfiguration();
 
 		if(asPlayer != null && asPlayer.getName().length() > 0) {
@@ -270,8 +275,8 @@ public class SlackHandler implements SlackMessagePostedListener {
 		}
 	}
 
-	private void sendToSlack(String channelID, String message) throws IOException {
-		this.sendToSlack(channelID, message, null);
+	private void sendToSlack(SlackChannel channel, String message) throws IOException {
+		this.sendToSlack(channel, message, null);
 	}
 
 	private String getDMID(SlackUser user) {
