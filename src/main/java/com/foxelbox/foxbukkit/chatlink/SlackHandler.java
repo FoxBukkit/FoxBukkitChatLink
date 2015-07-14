@@ -81,10 +81,8 @@ public class SlackHandler implements SlackMessagePostedListener {
 				return;
 			}
 
-			System.out.println("Received message from " + event.getSender().getUserName() + " in " + event.getChannel().getName());
-
 			final String channelName = event.getChannel().getName();
-			if(!channelName.equalsIgnoreCase("#minecraft") && !channelName.equalsIgnoreCase("#minecraft-ops"))
+			if(!channelName.equalsIgnoreCase("minecraft") && !channelName.equalsIgnoreCase("minecraft-ops"))
 				return;
 
 			Player minecraftPlayer = lookupMinecraftAssociation(event.getSender().getId());
