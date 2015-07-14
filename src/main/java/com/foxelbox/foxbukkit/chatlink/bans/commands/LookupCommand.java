@@ -71,7 +71,7 @@ public class LookupCommand extends ICommand {
 				RedisHandler.sendMessage(messageOut);
 
 				messageOut.setContentsPlain(fishBansStr.toString());
-				messageOut.finalize_context = true;
+				messageOut.finalizeContext = true;
 				RedisHandler.sendMessage(messageOut);
 			}
 		}.start();

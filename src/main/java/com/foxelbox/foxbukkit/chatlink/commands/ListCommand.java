@@ -73,7 +73,7 @@ public class ListCommand extends ICommand {
                         } else {
                             reply.setContentsPlain("\u00a75[FBCL]\u00a7f Last IP: " + logEntry.getIp().getHostAddress());
                         }
-                        reply.finalize_context = true;
+                        reply.finalizeContext = true;
                         RedisHandler.sendMessage(reply);
                     }
                 }.start();

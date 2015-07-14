@@ -76,7 +76,7 @@ public class Bans {
 				} else {
 					reply.setContentsPlain("\u00a75[FBCL]\u00a7f Player with the name " + ply + " was not banned!");
 				}
-				reply.finalize_context = true;
+				reply.finalizeContext = true;
 				RedisHandler.sendMessage(reply);
 			}
 		}.start();
@@ -118,7 +118,7 @@ public class Bans {
 				ChatMessageOut messageOut = ICommand.makeReply(refMessage);
 				messageOut.to.type = "all";
 				messageOut.to.filter = null;
-				messageOut.finalize_context = true;
+				messageOut.finalizeContext = true;
 				messageOut.setContentsPlain("\u00a75[FBCL]\u00a7f " + from.getName() + " banned " + plyName + " [Reason: " + reason + "]!");
 				RedisHandler.sendMessage(messageOut);
 			}

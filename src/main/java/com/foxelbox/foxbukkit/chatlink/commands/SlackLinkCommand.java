@@ -42,7 +42,7 @@ public class SlackLinkCommand extends ICommand {
 					Main.slackHandler.beginLink(argStr.toLowerCase(), messageIn.from);
 
 					message.setContentsPlain("\u00a75[FBCL]\u00a7f Visit Slack to complete your account linking.");
-					message.finalize_context = true;
+					message.finalizeContext = true;
 					RedisHandler.sendMessage(message);
 				} catch(CommandException e) {
 					RedisHandler.sendMessage(makeError(messageIn, e.getMessage()));

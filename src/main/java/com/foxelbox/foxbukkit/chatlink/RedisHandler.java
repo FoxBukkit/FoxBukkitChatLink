@@ -46,7 +46,7 @@ public class RedisHandler extends AbstractRedisHandler {
 		if(message == null)
 			return;
 
-		message.finalize_context = true;
+		message.finalizeContext = true;
 
 		sendMessage(message);
 	}

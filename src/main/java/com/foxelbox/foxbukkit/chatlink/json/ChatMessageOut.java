@@ -187,7 +187,7 @@ public class ChatMessageOut {
     public long id = Main.redisManager.incrBy("lastMessageID", 1);
 
     public UUID context;
-    public boolean finalize_context = false;
+    public boolean finalizeContext = false;
     public String type = "text";
 
     public int importance = 0;
