@@ -44,18 +44,9 @@ public class LookupCommand extends ICommand {
 		final UUID uuid = otherPly.getUniqueId() != null ? otherPly.getUniqueId() : null;
 		new Thread() {
 			public void run() {
-				final Ban ban = BanResolver.getBan(user, uuid);
-				final String altList = BanResolver.makePossibleAltString(user, uuid);
-				final HashMap<String, Integer> fishBans = FishBansResolver.getBanCounts(user);
-
-				final StringBuilder fishBansStr = new StringBuilder("\u00a75[FBCL]\u00a7f ").append(user).append(" has");
-				for (Map.Entry<String, Integer> fishBanEntry : fishBans.entrySet())
-					if (fishBanEntry.getKey() != null && fishBanEntry.getValue() != null)
-						fishBansStr.append(String.format(" %1$d ban(s) on %2$s,", fishBanEntry.getValue(), fishBanEntry.getKey()));
-				fishBansStr.deleteCharAt(fishBansStr.length() - 1);
-
 				ChatMessageOut messageOut = makeReply(messageIn);
 
+				final Ban ban = BanResolver.getBan(user, uuid);
 				if (ban != null) {
 					messageOut.setContentsPlain(String.format("\u00a75[FBCL]\u00a7f Player %1$s IS banned by %2$s for the reason of \"%3$s\"", user, ban.getAdmin().name, ban.getReason()));
 				} else {
@@ -63,6 +54,7 @@ public class LookupCommand extends ICommand {
 				}
 				RedisHandler.sendMessage(messageOut);
 
+				final String altList = BanResolver.makePossibleAltString(user, uuid);
 				if (altList != null) {
 					messageOut.setContentsPlain("\u00a75[FBCL]\u00a7f " + altList);
 				} else {
@@ -70,6 +62,14 @@ public class LookupCommand extends ICommand {
 				}
 				RedisHandler.sendMessage(messageOut);
 
+				final HashMap<String, Integer> fishBans = FishBansResolver.getBanCounts(user);
+				final StringBuilder fishBansStr = new StringBuilder("\u00a75[FBCL]\u00a7f ").append(user).append(" has");
+				for (Map.Entry<String, Integer> fishBanEntry : fishBans.entrySet()) {
+					if (fishBanEntry.getKey() != null && fishBanEntry.getValue() != null) {
+						fishBansStr.append(String.format(" %1$d ban(s) on %2$s,", fishBanEntry.getValue(), fishBanEntry.getKey()));
+					}
+				}
+				fishBansStr.deleteCharAt(fishBansStr.length() - 1);
 				messageOut.setContentsPlain(fishBansStr.toString());
 				messageOut.finalizeContext = true;
 				RedisHandler.sendMessage(messageOut);
