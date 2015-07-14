@@ -118,33 +118,73 @@ public class SlackHandler implements SlackMessagePostedListener {
 			final String channel;
 			switch(message.to.type) {
 				case "all":
+					if(message.server.equals("Slack"))
+						return; // Don't relay messages that were just sent.
 					channel = "#minecraft";
 					break;
 				case "permission":
 					if(message.to.filter.length == 1 && message.to.filter[0].equals("foxbukkit.opchat")) {
+						if(message.server.equals("Slack"))
+							return; // Don't relay messages that were just sent.
 						// op chat
 						channel = "#minecraft-ops";
 						break;
 					}
 					return;
+				case "player":
+					this.sendPlayerMessage(message);
+					return;
 				default:
-					// We presently can't handle PMs.
 					return;
 			}
 
-			String cleanText = message.contents.replaceAll("<[^>]+>", "").replaceAll("&apos;", "'").replaceAll("&quot;", "\""); // Remove all of the HTML tags and fix &apos; and &quot;
-			if(message.server != null && message.server != "Slack")
-				cleanText = "[" + message.server + "] " + cleanText;
+			final String cleanText = cleanMessageContents(message);
 
-			sendToSlack(channel, cleanText, new Player(message.from.uuid));
+			final Player as;
+			if(message.from != null)
+				as = new Player(message.from.uuid);
+			else
+				as = null;
+
+			sendToSlack(channel, cleanText, as);
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
 	}
 
+	private void sendPlayerMessage(ChatMessageOut message) throws IOException {
+		final String cleanText = cleanMessageContents(message);
+
+		final Player as;
+		if(message.from != null)
+			as = new Player(message.from.uuid);
+		else
+			as = null;
+
+		for(String toID : message.to.filter) {
+			String slackID = minecraftToSlackLinks.get(toID);
+			if(slackID == null) // No Slack account is associated with this ID
+				continue;
+
+			SlackUser user = session.findUserById(slackID);
+			if(user == null || user.isDeleted()) // This slack user no longer exists
+				continue;
+
+			sendToSlack(getDMID(user), cleanText, as);
+		}
+	}
+
+	private String cleanMessageContents(ChatMessageOut message) {
+		String cleanText = message.contents.replaceAll("<[^>]+>", "").replaceAll("&apos;", "'").replaceAll("&quot;", "\""); // Remove all of the HTML tags and fix &apos; and &quot;
+		if(message.server != null && message.server != "Slack")
+			cleanText = "[" + message.server + "] " + cleanText;
+
+		return cleanText;
+	}
+
 	public void beginLink(String username, UserInfo minecraftUser) throws CommandException, IOException {
 		final SlackUser slackUser = session.findUserByUserName(username);
-		if(slackUser == null)
+		if(slackUser == null || slackUser.isDeleted())
 			throw new CommandException("The given Slack user does not exist.");
 
 		pendingSlackLinks.put(slackUser.getId(), minecraftUser.uuid.toString());
