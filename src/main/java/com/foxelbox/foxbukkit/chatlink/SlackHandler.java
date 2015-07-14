@@ -172,8 +172,10 @@ public class SlackHandler implements SlackMessagePostedListener {
 	}
 
 	private void handleDirectMessage(SlackMessagePosted event, SlackSession session) {
-		if(!event.getMessageContent().toLowerCase().startsWith("link "))
+		if(!event.getMessageContent().toLowerCase().startsWith("link ")) {
+			session.sendMessageOverWebSocket(event.getChannel(), event.getMessageContent(), null);
 			return; // We only care about account linking in DMs
+		}
 
 		String requestedMinecraftName = event.getMessageContent().substring(5).trim();
 		if(requestedMinecraftName.equals("")) { // The name that they gave us was empty.
