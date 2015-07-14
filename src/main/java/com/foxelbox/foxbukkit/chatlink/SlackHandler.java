@@ -58,37 +58,41 @@ public class SlackHandler implements SlackMessagePostedListener {
 
 	@Override
 	public void onEvent(SlackMessagePosted event, SlackSession session) {
-		if(event.getSender().getId() == session.sessionPersona().getId())
-			return; // Ignore our own messages.
+		try {
+			if(event.getSender().getId() == session.sessionPersona().getId())
+				return; // Ignore our own messages.
 
-		if(event.getChannel().isDirect()) {
-			handleDirectMessage(event, session);
-			return;
-		}
+			if(event.getChannel().isDirect()) {
+				handleDirectMessage(event, session);
+				return;
+			}
 
-		final String channelName = event.getChannel().getName();
-		if(!channelName.equalsIgnoreCase("#minecraft") && !channelName.equalsIgnoreCase("#minecraft-ops"))
-			return;
+			final String channelName = event.getChannel().getName();
+			if(!channelName.equalsIgnoreCase("#minecraft") && !channelName.equalsIgnoreCase("#minecraft-ops"))
+				return;
 
-		Player minecraftPlayer = lookupMinecraftAssociation(event.getSender().getId());
-		if(minecraftPlayer == null)
-			return;
+			Player minecraftPlayer = lookupMinecraftAssociation(event.getSender().getId());
+			if(minecraftPlayer == null)
+				return;
 
-		ChatMessageIn messageIn = new ChatMessageIn();
+			ChatMessageIn messageIn = new ChatMessageIn();
 
-		messageIn.type = "text";
-		messageIn.context = UUID.randomUUID();
-		messageIn.timestamp = Math.round(new Double(event.getTimeStamp()));
-		messageIn.from = new UserInfo(minecraftPlayer.getUniqueId(), minecraftPlayer.getName());
+			messageIn.type = "text";
 			messageIn.server = "Slack";
+			messageIn.context = UUID.randomUUID();
+			messageIn.timestamp = Math.round(new Double(event.getTimeStamp()));
+			messageIn.from = new UserInfo(minecraftPlayer.getUniqueId(), minecraftPlayer.getName());
 
-		messageIn.contents = event.getMessageContent();
-		if(channelName.equalsIgnoreCase("#minecraft-ops"))
-			messageIn.contents = "#" + messageIn.contents;
-		else if(messageIn.contents.charAt(0) == '.')
-			messageIn.contents = "/" + messageIn.contents.substring(1);
+			messageIn.contents = event.getMessageContent();
+			if(channelName.equalsIgnoreCase("#minecraft-ops"))
+				messageIn.contents = "#" + messageIn.contents;
+			else if(messageIn.contents.charAt(0) == '.')
+				messageIn.contents = "/" + messageIn.contents.substring(1);
 
-		RedisHandler.incomingMessage(messageIn);
+			RedisHandler.incomingMessage(messageIn);
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	public void sendMessage(ChatMessageOut message) {
@@ -124,7 +128,7 @@ public class SlackHandler implements SlackMessagePostedListener {
 		}
 	}
 
-	public void beginLink(String username, UserInfo minecraftUser) throws CommandException {
+	public void beginLink(String username, UserInfo minecraftUser) throws CommandException, IOException {
 		final SlackUser slackUser = session.findUserByUserName(username);
 		if(slackUser == null)
 			throw new CommandException("The given Slack user does not exist.");
@@ -155,11 +159,9 @@ public class SlackHandler implements SlackMessagePostedListener {
 		slackToMinecraftLinks.put(slackID, minecraftID.toString());
 	}
 
-	private void handleDirectMessage(SlackMessagePosted event, SlackSession session) {
-		if(!event.getMessageContent().toLowerCase().startsWith("link")) {
-			sendToSlack(event.getChannel().getId(), event.getMessageContent());
+	private void handleDirectMessage(SlackMessagePosted event, SlackSession session) throws IOException {
+		if(!event.getMessageContent().toLowerCase().startsWith("link"))
 			return; // We only care about account linking in DMs
-		}
 
 		String requestedMinecraftName = event.getMessageContent().substring(4).trim();
 		if(requestedMinecraftName.equals("")) { // The name that they gave us was empty.
@@ -187,7 +189,7 @@ public class SlackHandler implements SlackMessagePostedListener {
 		sendToSlack(event.getChannel().getId(), "Successfully linked your Minecraft account.");
 	}
 
-	private void sendToSlack(String channelID, String message, Player asPlayer) {
+	private void sendToSlack(String channelID, String message, Player asPlayer) throws IOException {
 		SlackChatConfiguration slackChatConfiguration = SlackChatConfiguration.getConfiguration();
 
 		if(asPlayer != null && asPlayer.getName().length() > 0) {
@@ -203,14 +205,16 @@ public class SlackHandler implements SlackMessagePostedListener {
 		}
 
 		SlackMessageHandle handle = session.sendMessage(new SlackRawChannel(channelID), message, null, slackChatConfiguration);
-		handle.waitForReply(10, TimeUnit.SECONDS);
+		handle.waitForReply(1, TimeUnit.SECONDS);
 		SlackReplyEvent slackReply = handle.getSlackReply();
-		if(!slackReply.isOk()) {
-			throw new IllegalStateException("Got non-ok reply from Slack");
+		if(slackReply == null) {
+			throw new IOException("Got no reply from Slack API after 1 second");
+		} else if(!slackReply.isOk()) {
+			throw new IOException("Got non-ok reply from Slack");
 		}
 	}
 
-	private void sendToSlack(String channelID, String message) {
+	private void sendToSlack(String channelID, String message) throws IOException {
 		this.sendToSlack(channelID, message, null);
 	}
 
