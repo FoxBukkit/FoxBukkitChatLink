@@ -77,10 +77,10 @@ public class SlackHandler implements SlackMessagePostedListener {
 		ChatMessageIn messageIn = new ChatMessageIn();
 
 		messageIn.type = "text";
-		messageIn.server = "Chat";
 		messageIn.context = UUID.randomUUID();
 		messageIn.timestamp = Math.round(new Double(event.getTimeStamp()));
 		messageIn.from = new UserInfo(minecraftPlayer.getUniqueId(), minecraftPlayer.getName());
+			messageIn.server = "Slack";
 
 		messageIn.contents = event.getMessageContent();
 		if(channelName.equalsIgnoreCase("#minecraft-ops"))
@@ -114,7 +114,9 @@ public class SlackHandler implements SlackMessagePostedListener {
 					return;
 			}
 
-			final String cleanText = message.contents.replaceAll("<[^>]+>", "").replaceAll("&apos;", "'").replaceAll("&quot;", "\""); // Remove all of the HTML tags and fix &apos; and &quot;
+			String cleanText = message.contents.replaceAll("<[^>]+>", "").replaceAll("&apos;", "'").replaceAll("&quot;", "\""); // Remove all of the HTML tags and fix &apos; and &quot;
+			if(message.server != "Slack")
+				cleanText = "[" + message.server + "] " + cleanText;
 
 			sendToSlack(channel, cleanText, new Player(message.from.uuid));
 		} catch(Exception e) {
