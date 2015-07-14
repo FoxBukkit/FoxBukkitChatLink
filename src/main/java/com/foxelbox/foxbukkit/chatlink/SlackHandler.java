@@ -136,7 +136,7 @@ public class SlackHandler implements SlackMessagePostedListener {
 
 		pendingSlackLinks.put(slackUser.getId(), minecraftUser.uuid.toString());
 
-		sendToSlack("@" + slackUser.getUserName(), minecraftUser.name + " has requested that you link your Slack account to your Minecraft account.\nIf this is you, please respond with `link " + minecraftUser.name + "`.\nIf this is not you, it is safe to ignore this message.");
+		sendToSlack(slackUser.getUserName(), minecraftUser.name + " has requested that you link your Slack account to your Minecraft account.\nIf this is you, please respond with `link " + minecraftUser.name + "`.\nIf this is not you, it is safe to ignore this message.");
 	}
 
 	private Player lookupMinecraftAssociation(String username) {
