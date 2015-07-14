@@ -52,7 +52,7 @@ public class SlackHandler implements SlackMessagePostedListener {
 
 	@Override
 	public void onEvent(SlackMessagePosted event, SlackSession session) {
-		System.out.println("Received DM from (" + event.getChannel().getId() + ") " + event.getChannel().getName());
+		System.out.println("Received message from  (" + event.getSender().getId() + ") " + event.getSender().getUserName() + " to (" + event.getChannel().getId() + ") " + event.getChannel().getName());
 		if(event.getChannel().isDirect()) {
 			handleDirectMessage(event, session);
 			return;
