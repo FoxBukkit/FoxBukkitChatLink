@@ -26,13 +26,13 @@ import com.foxelbox.foxbukkit.chatlink.util.CommandException;
 
 @ICommand.Names("slacklink")
 @ICommand.Help("Allows you to link your Minecraft account to your Slack account")
-@ICommand.Usage("<slack username>")
+@ICommand.Usage("<Slack username>")
 @ICommand.Permission("foxbukkit.slacklink")
 public class SlackLinkCommand extends ICommand {
 	@Override
 	public ChatMessageOut run(Player commandSender, final ChatMessageIn messageIn, String formattedName, final String argStr) throws CommandException {
 		if(argStr.trim().equals("")) {
-			throw new CommandException("Usage: /slacklink <slack username>");
+			throw new CommandException("Usage: /slacklink <Slack username>");
 		}
 
 		final ChatMessageOut message = makeReply(messageIn);
@@ -41,7 +41,7 @@ public class SlackLinkCommand extends ICommand {
 				try {
 					Main.slackHandler.beginLink(argStr.toLowerCase(), messageIn.from);
 
-					message.setContentsPlain("\u00a75[FBCL]\u00a7f Visit slack to complete your account linking.");
+					message.setContentsPlain("\u00a75[FBCL]\u00a7f Visit Slack to complete your account linking.");
 					message.finalize_context = true;
 					RedisHandler.sendMessage(message);
 				} catch(CommandException e) {
