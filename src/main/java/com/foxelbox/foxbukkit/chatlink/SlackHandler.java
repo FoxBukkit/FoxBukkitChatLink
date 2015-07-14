@@ -32,6 +32,7 @@ import com.ullink.slack.simpleslackapi.events.SlackReplyEvent;
 import com.ullink.slack.simpleslackapi.impl.SlackChatConfiguration;
 import com.ullink.slack.simpleslackapi.impl.SlackSessionFactory;
 import com.ullink.slack.simpleslackapi.listeners.SlackMessagePostedListener;
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
@@ -49,8 +50,11 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Pattern;
 
 public class SlackHandler implements SlackMessagePostedListener {
+	final private static Pattern htmlTags = Pattern.compile("<[^>]+>");
+
 	final private static Map<String, String> slackToMinecraftLinks = Main.redisManager.createCachedRedisMap("slacklinks:slack-to-mc");
 	final private static Map<String, String> minecraftToSlackLinks = Main.redisManager.createCachedRedisMap("slacklinks:mc-to-slack");
 	final private static Map<String, String> pendingSlackLinks = Main.redisManager.createCachedRedisMap("slacklinks:pending"); // TODO: Entries in this should expire
@@ -75,11 +79,11 @@ public class SlackHandler implements SlackMessagePostedListener {
 	public void onEvent(SlackMessagePosted event, SlackSession session) {
 		try {
 			final SlackUser sender = event.getSender();
-			if(sender == null || sender.getId() == session.sessionPersona().getId())
+			if(sender == null || sender.getId().equals(session.sessionPersona().getId()))
 				return; // Ignore our own messages.
 
 			if(event.getChannel().isDirect()) {
-				handleDirectMessage(event, session);
+				handleDirectMessage(event);
 				return;
 			}
 
@@ -102,7 +106,7 @@ public class SlackHandler implements SlackMessagePostedListener {
 			messageIn.timestamp = Math.round(new Double(event.getTimeStamp()));
 			messageIn.from = new UserInfo(minecraftPlayer.getUniqueId(), minecraftPlayer.getName());
 
-			messageIn.contents = event.getMessageContent();
+			messageIn.contents = StringEscapeUtils.unescapeHtml4(event.getMessageContent());
 
 			if(messageIn.contents.charAt(0) == '.')
 				messageIn.contents = "/" + messageIn.contents.substring(1);
@@ -124,6 +128,8 @@ public class SlackHandler implements SlackMessagePostedListener {
 
 		try {
 			final Collection<SlackChannel> sendTo = determineResponseChannels(message);
+			if(sendTo == null)
+				return; // We shouldn't send this to Slack
 
 			final String cleanText = cleanMessageContents(message);
 
@@ -146,21 +152,21 @@ public class SlackHandler implements SlackMessagePostedListener {
 	private Collection<SlackChannel> determineResponseChannels(ChatMessageOut message) {
 		String responseChannel = contextResponses.get(message.context.toString());
 		if(responseChannel != null) {
-			return Arrays.asList(session.findChannelById(responseChannel));
+			return Collections.singletonList(session.findChannelById(responseChannel));
 		}
 
 		if(message.to.type.equals("all"))
-			return Arrays.asList(session.findChannelByName("minecraft"));
+			return Collections.singletonList(session.findChannelByName("minecraft"));
 
 		if(message.to.type.equals("permission") && message.to.filter.length == 1 && message.to.filter[0].equals("foxbukkit.opchat"))
-			return Arrays.asList(session.findChannelByName("minecraft-ops"));
+			return Collections.singletonList(session.findChannelByName("minecraft-ops"));
 
 		return null;
 	}
 
 	private String cleanMessageContents(ChatMessageOut message) {
-		String cleanText = message.contents.replaceAll("<[^>]+>", "").replaceAll("&apos;", "'").replaceAll("&quot;", "\""); // Remove all of the HTML tags and fix &apos; and &quot;
-		if(message.server != null && message.server != "Slack")
+		String cleanText = StringEscapeUtils.unescapeHtml4(htmlTags.matcher(message.contents).replaceAll("")).replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;"); // Remove all of the HTML tags and fix &apos; and &quot;
+		if(message.server != null && !message.server.equals("Slack"))
 			cleanText = "[" + message.server + "] " + cleanText;
 
 		return cleanText;
@@ -196,7 +202,7 @@ public class SlackHandler implements SlackMessagePostedListener {
 		slackToMinecraftLinks.put(slackID, minecraftID.toString());
 	}
 
-	private void handleDirectMessage(SlackMessagePosted event, SlackSession session) throws IOException {
+	private void handleDirectMessage(SlackMessagePosted event) throws IOException {
 		if(!event.getMessageContent().toLowerCase().startsWith("link"))
 			return; // We only care about account linking in DMs
 
@@ -209,10 +215,7 @@ public class SlackHandler implements SlackMessagePostedListener {
 		final UUID minecraftID;
 		try {
 			minecraftID = UUID.fromString(pendingSlackLinks.get(event.getSender().getId()));
-		} catch(NullPointerException e) {
-			sendToSlack(event.getChannel(), "That account has not requested to be linked with your Slack account from Minecraft.");
-			return;
-		} catch(IllegalArgumentException e) {
+		} catch(NullPointerException | IllegalArgumentException e) {
 			sendToSlack(event.getChannel(), "That account has not requested to be linked with your Slack account from Minecraft.");
 			return;
 		}
@@ -245,16 +248,12 @@ public class SlackHandler implements SlackMessagePostedListener {
 
 		SlackChatConfiguration slackChatConfiguration = SlackChatConfiguration.getConfiguration();
 
-		if(asPlayer != null && asPlayer.getName().length() > 0) {
-			slackChatConfiguration.withName(asPlayer.getName());
-			try {
-				slackChatConfiguration.withIcon("https://minotar.net/avatar/" + URLEncoder.encode(asPlayer.getName(), "UTF-8") + "/48.png");
-			} catch(UnsupportedEncodingException e) {
-				// This should never happen.
-				e.printStackTrace();
-			}
-		} else {
-			slackChatConfiguration.asUser();
+		slackChatConfiguration.withName(asPlayer.getName());
+		try {
+			slackChatConfiguration.withIcon("https://minotar.net/avatar/" + URLEncoder.encode(asPlayer.getName(), "UTF-8") + "/48.png");
+		} catch(UnsupportedEncodingException e) {
+			// This should never happen.
+			e.printStackTrace();
 		}
 
 		SlackMessageHandle handle = session.sendMessage(channel, message, null, slackChatConfiguration);
@@ -292,20 +291,14 @@ public class SlackHandler implements SlackMessagePostedListener {
 			String channelID = (String) channelObject.get("id");
 
 			return session.findChannelById(channelID);
-		} catch(IOException e) {
+		} catch(IOException | ParseException e) {
 			e.printStackTrace();
 		}
 		return null;
 	}
 
-	private JSONObject parseObject(String json) {
+	private JSONObject parseObject(String json) throws ParseException {
 		JSONParser parser = new JSONParser();
-		try {
-			JSONObject object = (JSONObject) parser.parse(json);
-			return object;
-		} catch(ParseException e) {
-			e.printStackTrace();
-			return null;
-		}
+		return (JSONObject) parser.parse(json);
 	}
 }
