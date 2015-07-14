@@ -21,6 +21,7 @@ import com.foxelbox.foxbukkit.chatlink.json.ChatMessageIn;
 import com.foxelbox.foxbukkit.chatlink.json.ChatMessageOut;
 import com.foxelbox.foxbukkit.chatlink.json.UserInfo;
 import com.foxelbox.foxbukkit.chatlink.util.CommandException;
+import com.ullink.slack.simpleslackapi.SlackChannel;
 import com.ullink.slack.simpleslackapi.SlackSession;
 import com.ullink.slack.simpleslackapi.SlackUser;
 import com.ullink.slack.simpleslackapi.events.SlackMessagePosted;
@@ -30,6 +31,7 @@ import com.ullink.slack.simpleslackapi.listeners.SlackMessagePostedListener;
 
 import java.io.IOException;
 import java.net.URLEncoder;
+import java.util.Collection;
 import java.util.Map;
 import java.util.UUID;
 
@@ -62,7 +64,7 @@ public class SlackHandler implements SlackMessagePostedListener {
 		if(!channelName.equalsIgnoreCase("#minecraft") && !channelName.equalsIgnoreCase("#minecraft-ops"))
 			return;
 
-		Player minecraftPlayer = lookupMinecraftAssociation(event.getSender().getUserName());
+		Player minecraftPlayer = lookupMinecraftAssociation(event.getSender().getId());
 		if(minecraftPlayer == null)
 			return;
 
@@ -124,15 +126,13 @@ public class SlackHandler implements SlackMessagePostedListener {
 	}
 
 	public void beginLink(String username, UserInfo minecraftUser) throws CommandException {
-		SlackUser slackUser = session.findUserByUserName(username);
+		final SlackUser slackUser = session.findUserByUserName(username);
 		if(slackUser == null)
 			throw new CommandException("The given Slack user does not exist.");
 
-		pendingSlackLinks.put(slackUser.getUserName(), minecraftUser.uuid.toString());
+		pendingSlackLinks.put(slackUser.getId(), minecraftUser.uuid.toString());
 
-		String channelID = "D" + slackUser.getId().substring(1); // DM channel ID is the same as user ID with the U replaced with D.
-
-		session.sendMessageOverWebSocket(session.findChannelById(channelID), minecraftUser.name + " has requested that you link your Slack account to your Minecraft account.\nIf this is you, please respond with `link " + minecraftUser.name + "`.\nIf this is not you, it is safe to ignore this message.", null);
+		session.sendMessageOverWebSocket(new SlackDMChannel(slackUser), minecraftUser.name + " has requested that you link your Slack account to your Minecraft account.\nIf this is you, please respond with `link " + minecraftUser.name + "`.\nIf this is not you, it is safe to ignore this message.", null);
 	}
 
 	private Player lookupMinecraftAssociation(String username) {
@@ -146,14 +146,14 @@ public class SlackHandler implements SlackMessagePostedListener {
 		return new Player(minecraftID);
 	}
 
-	private void setMinecraftAssociation(String slackUsername, UUID minecraftID) {
-		String oldSlackUsername = minecraftToSlackLinks.get(minecraftID.toString());
-		if(!oldSlackUsername.equals("")) {
-			slackToMinecraftLinks.remove(oldSlackUsername);
+	private void setMinecraftAssociation(String slackID, UUID minecraftID) {
+		String oldSlackID = minecraftToSlackLinks.get(minecraftID.toString());
+		if(!oldSlackID.equals("")) {
+			slackToMinecraftLinks.remove(oldSlackID);
 		}
 
-		minecraftToSlackLinks.put(minecraftID.toString(), slackUsername);
-		slackToMinecraftLinks.put(slackUsername, minecraftID.toString());
+		minecraftToSlackLinks.put(minecraftID.toString(), slackID);
+		slackToMinecraftLinks.put(slackID, minecraftID.toString());
 	}
 
 	private void handleDirectMessage(SlackMessagePosted event, SlackSession session) {
@@ -168,7 +168,7 @@ public class SlackHandler implements SlackMessagePostedListener {
 
 		final UUID minecraftID;
 		try {
-			minecraftID = UUID.fromString(pendingSlackLinks.get(event.getSender().getUserName()));
+			minecraftID = UUID.fromString(pendingSlackLinks.get(event.getSender().getId()));
 		} catch(IllegalArgumentException e) {
 			session.sendMessageOverWebSocket(event.getChannel(), "You have no pending link with that Minecraft account.", null);
 			return;
@@ -180,8 +180,46 @@ public class SlackHandler implements SlackMessagePostedListener {
 			return;
 		}
 
-		pendingSlackLinks.remove(event.getSender().getUserName());
-		setMinecraftAssociation(event.getSender().getUserName(), minecraftPlayer.getUniqueId());
+		pendingSlackLinks.remove(event.getSender().getId());
+		setMinecraftAssociation(event.getSender().getId(), minecraftPlayer.getUniqueId());
+	}
+
+	private class SlackDMChannel implements SlackChannel {
+		private SlackUser user;
+
+		public SlackDMChannel(SlackUser user) {
+			this.user = user;
+		}
+
+		@Override
+		public String getId() {
+			return "@" + user.getUserName();
+		}
+
+		@Override
+		public String getName() {
+			return user.getRealName();
+		}
+
+		@Override
+		public Collection<SlackUser> getMembers() {
+			return null;
+		}
+
+		@Override
+		public String getTopic() {
+			return null;
+		}
+
+		@Override
+		public String getPurpose() {
+			return null;
+		}
+
+		@Override
+		public boolean isDirect() {
+			return true;
+		}
 	}
 
 	/*private static void publishToSlack(ChatMessageOut message) {
