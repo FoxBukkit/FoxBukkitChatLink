@@ -64,7 +64,7 @@ public class LookupCommand extends ICommand {
 				RedisHandler.sendMessage(messageOut);
 
 				if (altList != null) {
-					messageOut.setContentsPlain(altList);
+					messageOut.setContentsPlain("\u00a75[FBCL]\u00a7f " + altList);
 				} else {
 					messageOut.setContentsPlain(String.format("\u00a75[FBCL]\u00a7f No possible alts of %1$s found", user));
 				}
