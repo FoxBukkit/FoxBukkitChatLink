@@ -37,9 +37,13 @@ public class ChatQueueHandler {
 	private static final Gson gson = new Gson();
 
 	private static ZMQ.Socket sender;
+	private final ZMQ.Socket receiver;
+
+	private static final byte[] MSG_OK = new byte[] { '1' };
+	private static final byte[] MSG_FAIL = new byte[] { '0' };
 
 	public ChatQueueHandler() {
-		final ZMQ.Socket receiver = Main.zmqContext.socket(ZMQ.PULL);
+		receiver = Main.zmqContext.socket(ZMQ.REP);
 		receiver.bind(Main.configuration.getValue("zmq-server-to-link", "tcp://127.0.0.1:5556"));
 
 		sender = Main.zmqContext.socket(ZMQ.PUB);
@@ -49,13 +53,13 @@ public class ChatQueueHandler {
 			@Override
 			public void run() {
 				while(!Thread.currentThread().isInterrupted()) {
-					onMessage(receiver.recvStr(Main.CHARSET));
-					System.out.println("PULL: " + System.nanoTime());
+					String str = receiver.recvStr(Main.CHARSET);
+					onMessage(str);
 				}
 			}
 		};
 		t.setDaemon(true);
-		t.setName("ZMQ Pull");
+		t.setName("ZMQ REP");
 		t.start();
 	}
 
@@ -163,7 +167,9 @@ public class ChatQueueHandler {
 			}
 
 			incomingMessage(chatMessageIn);
+			receiver.send(MSG_OK, 0);
 		} catch(Exception e) {
+			receiver.send(MSG_FAIL, 0);
 			e.printStackTrace();
 		}
 	}
