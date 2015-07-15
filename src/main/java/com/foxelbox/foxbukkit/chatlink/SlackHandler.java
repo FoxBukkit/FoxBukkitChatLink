@@ -67,8 +67,12 @@ public class SlackHandler implements SlackMessagePostedListener {
 
 	public SlackHandler(Configuration configuration) throws IllegalArgumentException, IOException {
 		slackAuthToken = configuration.getValue("slack-token", "");
-		if(slackAuthToken.equals(""))
-			throw new IllegalArgumentException("configuration: slack-token undefined");
+		if(slackAuthToken.equals("")) {
+			System.err.println("configuration: slack-token undefined. SLACK DISABLED");
+			session = null;
+			return;
+		}
+
 		session = SlackSessionFactory.createWebSocketSlackSession(slackAuthToken);
 
 		session.addMessagePostedListener(this);
@@ -125,6 +129,10 @@ public class SlackHandler implements SlackMessagePostedListener {
 	}
 
 	public void sendMessage(ChatMessageOut message) {
+		if(session == null) {
+			return;
+		}
+
 		if(!message.type.equalsIgnoreCase("text")) { // We ignore non-text messages
 			if(message.finalizeContext) {
 				contextResponses.remove(message.context.toString());
@@ -204,6 +212,10 @@ public class SlackHandler implements SlackMessagePostedListener {
 	}
 
 	public void beginLink(String username, UserInfo minecraftUser) throws CommandException, IOException {
+		if(session == null) {
+			return;
+		}
+
 		final SlackUser slackUser = session.findUserByUserName(username);
 		if(slackUser == null || slackUser.isDeleted())
 			throw new CommandException("The given Slack user does not exist.");
