@@ -41,10 +41,10 @@ public class ChatQueueHandler {
 
 	public ChatQueueHandler() {
 		receiver = Main.zmqContext.socket(ZMQ.PULL);
-		receiver.connect(Main.configuration.getValue("zmq-broker-to-link", "tcp://127.0.0.1:5557"));
+		ZeroMQConfigurator.parseZeroMQConfig(Main.configuration.getValue("zmq-broker-to-link", ZeroMQConfigurator.getDefaultConfig("bind", 5557)), receiver);
 
 		sender = Main.zmqContext.socket(ZMQ.PUB);
-		sender.connect(Main.configuration.getValue("zmq-link-to-broker", "tcp://127.0.0.1:5558"));
+		ZeroMQConfigurator.parseZeroMQConfig(Main.configuration.getValue("zmq-link-to-broker", ZeroMQConfigurator.getDefaultConfig("bind", 5558)), sender);
 
 		Thread t = new Thread() {
 			@Override
