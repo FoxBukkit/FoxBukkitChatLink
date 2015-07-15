@@ -71,11 +71,14 @@ public class ChatQueueHandler {
 		sendMessage(message);
 	}
 
+	private final static byte[] CMO = new byte[] { 'C', 'M', 'O'};
+
 	public static void sendMessage(ChatMessageOut message) {
 		final String outMsg;
 		synchronized(gson) {
 			outMsg = gson.toJson(message);
 		}
+		sender.send(CMO, ZMQ.SNDMORE);
 		sender.send(outMsg);
 
 		Main.slackHandler.sendMessage(message);
