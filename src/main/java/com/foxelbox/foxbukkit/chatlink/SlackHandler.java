@@ -228,7 +228,7 @@ public class SlackHandler implements SlackMessagePostedListener {
 		final UUID minecraftID;
 		try {
 			minecraftID = UUID.fromString(slackToMinecraftLinks.get(username));
-		} catch(IllegalArgumentException e) {
+		} catch(NullPointerException | IllegalArgumentException e) {
 			return null;
 		}
 

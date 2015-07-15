@@ -16,8 +16,8 @@
  */
 package com.foxelbox.foxbukkit.chatlink.commands;
 
-import com.foxelbox.foxbukkit.chatlink.ChatQueueHandler;
 import com.foxelbox.foxbukkit.chatlink.Player;
+import com.foxelbox.foxbukkit.chatlink.RedisHandler;
 import com.foxelbox.foxbukkit.chatlink.bans.BanResolver;
 import com.foxelbox.foxbukkit.chatlink.bans.LogEntry;
 import com.foxelbox.foxbukkit.chatlink.commands.system.ICommand;
@@ -29,84 +29,80 @@ import com.foxelbox.foxbukkit.chatlink.util.PlayerHelper;
 import java.text.SimpleDateFormat;
 import java.util.List;
 
-@ICommand.Names({ "who", "list" })
+@ICommand.Names({"who", "list"})
 @ICommand.Help("Prints user list if used without parameters or information about the specified user")
 @ICommand.Usage("")
 @ICommand.Permission("foxbukkit.who")
 public class ListCommand extends ICommand {
-    private static final String LIST_FORMAT = "<color name=\"dark_purple\">[FBCL]</color> <color name=\"dark_gray\">[%1$s]</color> %2$s";
+	private static final String LIST_FORMAT = "<color name=\"dark_purple\">[FBCL]</color> <color name=\"dark_gray\">[%1$s]</color> %2$s";
 
-    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss");
+	private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss");
 
-    @Override
-    public ChatMessageOut run(final Player commandSender, final ChatMessageIn messageIn, String formattedName, String[] args) throws CommandException {
-        if(args.length > 0) {
-            final Player target = PlayerHelper.matchPlayerSingle(args[0], false);
+	@Override
+	public ChatMessageOut run(final Player commandSender, final ChatMessageIn messageIn, String formattedName, String[] args) throws CommandException {
+		if(args.length > 0) {
+			final Player target = PlayerHelper.matchPlayerSingle(args[0], false);
 
-            ChatMessageOut reply = makeReply(messageIn);
+			ChatMessageOut reply = makeReply(messageIn);
 
-            reply.setContentsPlain("\u00a75[FBCL]\u00a7f Name: " + target.getName());
-            ChatQueueHandler.sendMessage(reply);
+			reply.setContentsPlain("\u00a75[FBCL]\u00a7f Name: " + target.getName());
+			RedisHandler.sendMessage(reply);
 
-            reply.setContentsPlain("\u00a75[FBCL]\u00a7f Rank: " + PlayerHelper.getPlayerRank(target.getUniqueId()));
-            ChatQueueHandler.sendMessage(reply);
+			reply.setContentsPlain("\u00a75[FBCL]\u00a7f Rank: " + PlayerHelper.getPlayerRank(target.getUniqueId()));
+			RedisHandler.sendMessage(reply);
 
-            reply.setContentsPlain("\u00a75[FBCL]\u00a7f NameTag: " + PlayerHelper.getFullPlayerName(target.getUniqueId(), target.getName()));
+			reply.setContentsPlain("\u00a75[FBCL]\u00a7f NameTag: " + PlayerHelper.getFullPlayerName(target.getUniqueId(), target.getName()));
 
-            if(commandSender.hasPermission("foxbukkit.who.logdetails")) {
-                ChatQueueHandler.sendMessage(reply);
-                new Thread() {
-                    public void run() {
-                        ChatMessageOut reply = makeReply(messageIn);
-                        LogEntry logEntryLogout = BanResolver.getLatestEntry(target.getName(), target.getUniqueId(), "logout", messageIn.server);
-                        LogEntry logEntry = BanResolver.getLatestEntry(target.getName(), target.getUniqueId(), null, messageIn.server);
+			if(commandSender.hasPermission("foxbukkit.who.logdetails")) {
+				RedisHandler.sendMessage(reply);
+				new Thread() {
+					public void run() {
+						ChatMessageOut reply = makeReply(messageIn);
+						LogEntry logEntryLogout = BanResolver.getLatestEntry(target.getName(), target.getUniqueId(), "logout", messageIn.server);
+						LogEntry logEntry = BanResolver.getLatestEntry(target.getName(), target.getUniqueId(), null, messageIn.server);
 
-                        if(logEntryLogout == null) {
-                            reply.setContentsPlain("\u00a75[FBCL]\u00a7f Last logout data not present");
-                        } else {
-                            reply.setContentsPlain("\u00a75[FBCL]\u00a7f Last logout: " + DATE_FORMAT.format(logEntryLogout.getTime()));
-                        }
-                        ChatQueueHandler.sendMessage(reply);
+						if(logEntryLogout == null) {
+							reply.setContentsPlain("\u00a75[FBCL]\u00a7f Last logout data not present");
+						} else {
+							reply.setContentsPlain("\u00a75[FBCL]\u00a7f Last logout: " + DATE_FORMAT.format(logEntryLogout.getTime()));
+						}
+						RedisHandler.sendMessage(reply);
 
-                        if(logEntry == null) {
-                            reply.setContentsPlain("\u00a75[FBCL]\u00a7f IP data not present");
-                        } else {
-                            reply.setContentsPlain("\u00a75[FBCL]\u00a7f Last IP: " + logEntry.getIp().getHostAddress());
-                        }
-                        reply.finalizeContext = true;
-                        ChatQueueHandler.sendMessage(reply);
-                    }
-                }.start();
-                return null;
-            }
+						if(logEntry == null) {
+							reply.setContentsPlain("\u00a75[FBCL]\u00a7f IP data not present");
+						} else {
+							reply.setContentsPlain("\u00a75[FBCL]\u00a7f Last IP: " + logEntry.getIp().getHostAddress());
+						}
+						reply.finalizeContext = true;
+						RedisHandler.sendMessage(reply);
+					}
+				}.start();
+				return null;
+			}
 
-            return reply;
-        }
+			return reply;
+		}
 
-        ChatMessageOut message = makeReply(messageIn);
-        for(String server : PlayerHelper.getAllServers()) {
-            StringBuilder listTextB = new StringBuilder();
-            List<Player> players = PlayerHelper.getOnlinePlayersOnServer(server);
-            String listText;
-            if(players.isEmpty()) {
-                listText = "\u00a7fEmpty";
-            } else {
-                for (Player ply : PlayerHelper.getOnlinePlayersOnServer(server)) {
-                    listTextB.append("\u00a7f, ");
-                    listTextB.append(PlayerHelper.getPlayerRankTagRaw(ply.getUniqueId()));
-                    listTextB.append(ply.getName());
-                }
-                listText = "\u00a7f" + listTextB.substring(4);
-            }
-            message.setContents(
-                    LIST_FORMAT,
-                    new String[]{
-                            server, listText
-                    }
-            );
-            ChatQueueHandler.sendMessage(message);
-        }
+		ChatMessageOut message = makeReply(messageIn);
+		for(String server : PlayerHelper.getAllServers()) {
+			StringBuilder listTextB = new StringBuilder();
+			List<Player> players = PlayerHelper.getOnlinePlayersOnServer(server);
+			String listText;
+			if(players.isEmpty()) {
+				listText = "\u00a7fEmpty";
+			} else {
+				for(Player ply : PlayerHelper.getOnlinePlayersOnServer(server)) {
+					listTextB.append("\u00a7f, ");
+					listTextB.append(PlayerHelper.getPlayerRankTagRaw(ply.getUniqueId()));
+					listTextB.append(ply.getName());
+				}
+				listText = "\u00a7f" + listTextB.substring(4);
+			}
+			message.setContents(LIST_FORMAT, new String[]{server, listText});
+			message.finalizeContext = true;
+			RedisHandler.sendMessage(message);
+		}
 
-        return makeBlank(messageIn);
-    }
+		return makeBlank(messageIn);
+	}
 }
