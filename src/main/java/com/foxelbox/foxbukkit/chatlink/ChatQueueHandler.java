@@ -39,15 +39,12 @@ public class ChatQueueHandler {
 	private static ZMQ.Socket sender;
 	private final ZMQ.Socket receiver;
 
-	private static final byte[] MSG_OK = new byte[] { '1' };
-	private static final byte[] MSG_FAIL = new byte[] { '0' };
-
 	public ChatQueueHandler() {
-		receiver = Main.zmqContext.socket(ZMQ.REP);
-		receiver.bind(Main.configuration.getValue("zmq-server-to-link", "tcp://127.0.0.1:5556"));
+		receiver = Main.zmqContext.socket(ZMQ.PULL);
+		receiver.connect(Main.configuration.getValue("zmq-broker-to-link", "tcp://127.0.0.1:5557"));
 
 		sender = Main.zmqContext.socket(ZMQ.PUB);
-		sender.bind(Main.configuration.getValue("zmq-link-to-server", "tcp://127.0.0.1:5557"));
+		sender.connect(Main.configuration.getValue("zmq-link-to-broker", "tcp://127.0.0.1:5558"));
 
 		Thread t = new Thread() {
 			@Override
@@ -79,7 +76,6 @@ public class ChatQueueHandler {
 		synchronized(gson) {
 			outMsg = gson.toJson(message);
 		}
-		System.out.println("PUB: " + System.nanoTime());
 		sender.send(outMsg);
 
 		Main.slackHandler.sendMessage(message);
@@ -167,9 +163,7 @@ public class ChatQueueHandler {
 			}
 
 			incomingMessage(chatMessageIn);
-			receiver.send(MSG_OK, 0);
 		} catch(Exception e) {
-			receiver.send(MSG_FAIL, 0);
 			e.printStackTrace();
 		}
 	}
