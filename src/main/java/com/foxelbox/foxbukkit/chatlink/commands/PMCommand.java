@@ -16,8 +16,8 @@
  */
 package com.foxelbox.foxbukkit.chatlink.commands;
 
+import com.foxelbox.foxbukkit.chatlink.ChatQueueHandler;
 import com.foxelbox.foxbukkit.chatlink.Player;
-import com.foxelbox.foxbukkit.chatlink.RedisHandler;
 import com.foxelbox.foxbukkit.chatlink.commands.system.ICommand;
 import com.foxelbox.foxbukkit.chatlink.filter.MuteList;
 import com.foxelbox.foxbukkit.chatlink.json.ChatMessageIn;
@@ -33,8 +33,8 @@ import com.foxelbox.foxbukkit.chatlink.util.Utils;
 @ICommand.Permission("foxbukkit.communication.pm")
 @ICommand.NoLogging
 public class PMCommand extends ICommand {
-    private static final String PM_SEND_FORMAT = "<color name=\"yellow\">[PM &gt;]</color> " + RedisHandler.MESSAGE_FORMAT;
-    private static final String PM_RECEIVE_FORMAT = "<color name=\"yellow\">[PM &lt;]</color> " + RedisHandler.MESSAGE_FORMAT;
+    private static final String PM_SEND_FORMAT = "<color name=\"yellow\">[PM &gt;]</color> " + ChatQueueHandler.MESSAGE_FORMAT;
+    private static final String PM_RECEIVE_FORMAT = "<color name=\"yellow\">[PM &lt;]</color> " + ChatQueueHandler.MESSAGE_FORMAT;
 
     @Override
     public ChatMessageOut run(Player commandSender, ChatMessageIn messageIn, String formattedName, String[] args) throws CommandException {
@@ -54,7 +54,7 @@ public class PMCommand extends ICommand {
                 });
         message.to = new MessageTarget("player", new String[] { target.getUniqueId().toString() });
         message.importance = 4;
-        RedisHandler.sendMessage(message);
+        ChatQueueHandler.sendMessage(message);
 
         formattedName = PlayerHelper.getFullPlayerName(target.getUniqueId(), target.getName());
 

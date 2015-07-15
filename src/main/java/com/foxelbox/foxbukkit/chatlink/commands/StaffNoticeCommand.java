@@ -16,8 +16,8 @@
  */
 package com.foxelbox.foxbukkit.chatlink.commands;
 
+import com.foxelbox.foxbukkit.chatlink.ChatQueueHandler;
 import com.foxelbox.foxbukkit.chatlink.Player;
-import com.foxelbox.foxbukkit.chatlink.RedisHandler;
 import com.foxelbox.foxbukkit.chatlink.commands.system.ICommand;
 import com.foxelbox.foxbukkit.chatlink.json.ChatMessageIn;
 import com.foxelbox.foxbukkit.chatlink.json.ChatMessageOut;
@@ -28,7 +28,7 @@ import com.foxelbox.foxbukkit.chatlink.util.CommandException;
 @ICommand.Usage("<text>")
 @ICommand.Permission("foxbukkit.staffnotice")
 public class StaffNoticeCommand extends ICommand {
-    private static final String OPCHAT_FORMAT = "<color name=\"red\">[#!STAFF]</color> " + RedisHandler.MESSAGE_FORMAT;
+    private static final String OPCHAT_FORMAT = "<color name=\"red\">[#!STAFF]</color> " + ChatQueueHandler.MESSAGE_FORMAT;
 
     @Override
     public ChatMessageOut run(Player sender, ChatMessageIn messageIn, String formattedName, String argStr) throws CommandException {

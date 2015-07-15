@@ -21,9 +21,11 @@ import com.foxelbox.dependencies.redis.RedisManager;
 import com.foxelbox.dependencies.threading.SimpleThreadCreator;
 import com.foxelbox.foxbukkit.chatlink.commands.system.CommandSystem;
 import com.foxelbox.foxbukkit.chatlink.permissions.FoxBukkitPermissionHandler;
+import org.zeromq.ZMQ;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.Charset;
 
 public class Main {
 	public static Configuration configuration;
@@ -32,16 +34,20 @@ public class Main {
 
 	public static SlackHandler slackHandler;
 
+	public static ZMQ.Context zmqContext;
+	public static final Charset CHARSET = Charset.forName("UTF-8");
+
 	public static void main(String[] args) throws IOException {
 		configuration = new Configuration(getDataFolder());
 		redisManager = new RedisManager(new SimpleThreadCreator(), configuration);
+		zmqContext = ZMQ.context(4);
 
 		CommandSystem.instance.scanCommands();
 		FoxBukkitPermissionHandler.instance.load();
 
 		slackHandler = new SlackHandler(configuration);
 
-		new RedisHandler();
+		new ChatQueueHandler();
 
 		while(true) {
 			try {

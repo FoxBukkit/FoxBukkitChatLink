@@ -16,9 +16,9 @@
  */
 package com.foxelbox.foxbukkit.chatlink.commands;
 
+import com.foxelbox.foxbukkit.chatlink.ChatQueueHandler;
 import com.foxelbox.foxbukkit.chatlink.Main;
 import com.foxelbox.foxbukkit.chatlink.Player;
-import com.foxelbox.foxbukkit.chatlink.RedisHandler;
 import com.foxelbox.foxbukkit.chatlink.commands.system.ICommand;
 import com.foxelbox.foxbukkit.chatlink.json.ChatMessageIn;
 import com.foxelbox.foxbukkit.chatlink.json.ChatMessageOut;
@@ -52,9 +52,9 @@ public class MCLinkCommand extends ICommand {
 
                     message.setContentsPlain("\u00a75[FBCL]\u00a7f Go here to complete: " + link);
 					message.finalizeContext = true;
-                    RedisHandler.sendMessage(message);
+                    ChatQueueHandler.sendMessage(message);
                 } catch(Exception e) {
-                    RedisHandler.sendMessage(makeError(messageIn, "Please try again later"));
+                    ChatQueueHandler.sendMessage(makeError(messageIn, "Please try again later"));
                 }
             }
         }.start();

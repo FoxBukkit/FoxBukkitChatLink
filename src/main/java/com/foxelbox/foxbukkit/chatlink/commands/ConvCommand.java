@@ -16,8 +16,8 @@
  */
 package com.foxelbox.foxbukkit.chatlink.commands;
 
+import com.foxelbox.foxbukkit.chatlink.ChatQueueHandler;
 import com.foxelbox.foxbukkit.chatlink.Player;
-import com.foxelbox.foxbukkit.chatlink.RedisHandler;
 import com.foxelbox.foxbukkit.chatlink.commands.system.ICommand;
 import com.foxelbox.foxbukkit.chatlink.json.ChatMessageIn;
 import com.foxelbox.foxbukkit.chatlink.json.ChatMessageOut;
@@ -35,7 +35,7 @@ import java.util.UUID;
 @ICommand.Permission("foxbukkit.communication.conversation")
 @ICommand.NoLogging
 public class ConvCommand extends ICommand {
-    private static final String CONV_FORMAT = "<color name=\"yellow\">[CONV]</color> " + RedisHandler.MESSAGE_FORMAT;
+    private static final String CONV_FORMAT = "<color name=\"yellow\">[CONV]</color> " + ChatQueueHandler.MESSAGE_FORMAT;
     private static final String CONV_EMOTE_FORMAT = "<color name=\"yellow\">[CONV]</color> " + MeCommand.EMOTE_FORMAT;
 
     private static final Map<UUID, UUID> conversationMap = new HashMap<>();
@@ -50,7 +50,7 @@ public class ConvCommand extends ICommand {
         if(!target.isOnline()) {
 			ChatMessageOut message = makeError(messageIn, "Conversation target is not online");
 			message.finalizeContext = true;
-            RedisHandler.sendMessage(message);
+            ChatQueueHandler.sendMessage(message);
             return true;
         }
 
@@ -74,7 +74,7 @@ public class ConvCommand extends ICommand {
         message.importance = 4;
         message.to = new MessageTarget("player", new String[] { target.getUniqueId().toString(), message.from.uuid.toString() });
 		message.finalizeContext = true;
-        RedisHandler.sendMessage(message);
+        ChatQueueHandler.sendMessage(message);
 
         return true;
     }

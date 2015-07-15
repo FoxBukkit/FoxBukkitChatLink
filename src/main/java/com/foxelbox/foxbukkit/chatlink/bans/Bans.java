@@ -32,8 +32,8 @@
  */
 package com.foxelbox.foxbukkit.chatlink.bans;
 
+import com.foxelbox.foxbukkit.chatlink.ChatQueueHandler;
 import com.foxelbox.foxbukkit.chatlink.Player;
-import com.foxelbox.foxbukkit.chatlink.RedisHandler;
 import com.foxelbox.foxbukkit.chatlink.commands.system.ICommand;
 import com.foxelbox.foxbukkit.chatlink.json.ChatMessageIn;
 import com.foxelbox.foxbukkit.chatlink.json.ChatMessageOut;
@@ -77,7 +77,7 @@ public class Bans {
 					reply.setContentsPlain("\u00a75[FBCL]\u00a7f Player with the name " + ply + " was not banned!");
 				}
 				reply.finalizeContext = true;
-				RedisHandler.sendMessage(reply);
+				ChatQueueHandler.sendMessage(reply);
 			}
 		}.start();
 	}
@@ -120,7 +120,7 @@ public class Bans {
 				messageOut.to.filter = null;
 				messageOut.finalizeContext = true;
 				messageOut.setContentsPlain("\u00a75[FBCL]\u00a7f " + from.getName() + " banned " + plyName + " [Reason: " + reason + "]!");
-				RedisHandler.sendMessage(messageOut);
+				ChatQueueHandler.sendMessage(messageOut);
 			}
 		}.start();
 	}

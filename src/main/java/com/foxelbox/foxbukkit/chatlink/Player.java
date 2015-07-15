@@ -82,7 +82,7 @@ public class Player {
         messageOut.type = "kick";
         messageOut.to.type = "player";
         messageOut.to.filter = new String[] { uuid.toString() };
-        RedisHandler.sendMessage(messageOut);
+        ChatQueueHandler.sendMessage(messageOut);
         showKickMessage(reason, force);
     }
 
@@ -92,16 +92,16 @@ public class Player {
         messageOut.type = "inject";
         messageOut.to.type = "player";
         messageOut.to.filter = new String[] { uuid.toString() };
-        RedisHandler.sendMessage(messageOut);
+        ChatQueueHandler.sendMessage(messageOut);
     }
 
     public void showKickMessage(String reason, boolean force) {
         if (isOnline() || force) {
             ChatMessageOut messageOut = new ChatMessageOut(null, new UserInfo(uuid, name));
-            messageOut.setContents(RedisHandler.KICK_FORMAT, new String[]{
+            messageOut.setContents(ChatQueueHandler.KICK_FORMAT, new String[]{
                     name, uuid.toString(), PlayerHelper.getFullPlayerName(uuid, name), reason
             });
-            RedisHandler.sendMessage(messageOut);
+            ChatQueueHandler.sendMessage(messageOut);
         }
     }
 

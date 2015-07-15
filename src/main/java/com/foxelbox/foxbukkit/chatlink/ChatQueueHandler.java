@@ -16,7 +16,6 @@
  */
 package com.foxelbox.foxbukkit.chatlink;
 
-import com.foxelbox.dependencies.redis.AbstractRedisHandler;
 import com.foxelbox.foxbukkit.chatlink.commands.ConvCommand;
 import com.foxelbox.foxbukkit.chatlink.commands.system.CommandSystem;
 import com.foxelbox.foxbukkit.chatlink.filter.MuteList;
@@ -24,10 +23,11 @@ import com.foxelbox.foxbukkit.chatlink.json.ChatMessageIn;
 import com.foxelbox.foxbukkit.chatlink.json.ChatMessageOut;
 import com.foxelbox.foxbukkit.chatlink.util.PlayerHelper;
 import com.google.gson.Gson;
+import org.zeromq.ZMQ;
 
 import java.util.regex.Pattern;
 
-public class RedisHandler extends AbstractRedisHandler {
+public class ChatQueueHandler {
 	public static final String PLAYER_FORMAT = "<span onHover=\"show_text('%1$s')\" onClick=\"suggest_command('/pm %1$s ')\">%3$s</span>";
 	public static final String MESSAGE_FORMAT = PLAYER_FORMAT + "<color name=\"white\">: %4$s</color>";
 	public static final String KICK_FORMAT = "<color name=\"dark_red\">[-]</color> " + PLAYER_FORMAT + " <color name=\"yellow\">was kicked (%4$s)!</color>";
@@ -36,8 +36,27 @@ public class RedisHandler extends AbstractRedisHandler {
 	private static final Pattern REMOVE_DISALLOWED_CHARS = Pattern.compile("[\u00a7\r\n\t]");
 	private static final Gson gson = new Gson();
 
-	public RedisHandler() {
-		super(Main.redisManager, RedisHandlerType.BOTH, "foxbukkit:from_server");
+	private static ZMQ.Socket sender;
+
+	public ChatQueueHandler() {
+		final ZMQ.Socket receiver = Main.zmqContext.socket(ZMQ.PULL);
+		receiver.bind(Main.configuration.getValue("zmq-server-to-link", "tcp://127.0.0.1:5556"));
+
+		sender = Main.zmqContext.socket(ZMQ.PUB);
+		sender.bind(Main.configuration.getValue("zmq-link-to-server", "tcp://127.0.0.1:5557"));
+
+		Thread t = new Thread() {
+			@Override
+			public void run() {
+				while(!Thread.currentThread().isInterrupted()) {
+					onMessage(receiver.recvStr(Main.CHARSET));
+					System.out.println("PULL: " + System.nanoTime());
+				}
+			}
+		};
+		t.setDaemon(true);
+		t.setName("ZMQ Pull");
+		t.start();
 	}
 
 	public static void incomingMessage(final ChatMessageIn chatMessageIn) {
@@ -56,7 +75,8 @@ public class RedisHandler extends AbstractRedisHandler {
 		synchronized(gson) {
 			outMsg = gson.toJson(message);
 		}
-		Main.redisManager.publish("foxbukkit:to_server", outMsg);
+		System.out.println("PUB: " + System.nanoTime());
+		sender.send(outMsg);
 
 		Main.slackHandler.sendMessage(message);
 	}
@@ -135,7 +155,6 @@ public class RedisHandler extends AbstractRedisHandler {
 		throw new RuntimeException("Unprocessable message: " + messageIn.type + " => " + messageStr);
 	}
 
-	@Override
 	public void onMessage(final String c_message) {
 		try {
 			final ChatMessageIn chatMessageIn;

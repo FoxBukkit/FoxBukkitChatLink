@@ -125,7 +125,7 @@ public class SlackHandler implements SlackMessagePostedListener {
 		else if(event.getChannel().getName().equalsIgnoreCase("minecraft-ops"))
 			messageIn.contents = "#" + messageIn.contents;
 
-		RedisHandler.incomingMessage(messageIn);
+		ChatQueueHandler.incomingMessage(messageIn);
 	}
 
 	public void sendMessage(ChatMessageOut message) {

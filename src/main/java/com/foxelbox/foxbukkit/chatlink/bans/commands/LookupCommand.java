@@ -16,8 +16,8 @@
  */
 package com.foxelbox.foxbukkit.chatlink.bans.commands;
 
+import com.foxelbox.foxbukkit.chatlink.ChatQueueHandler;
 import com.foxelbox.foxbukkit.chatlink.Player;
-import com.foxelbox.foxbukkit.chatlink.RedisHandler;
 import com.foxelbox.foxbukkit.chatlink.bans.Ban;
 import com.foxelbox.foxbukkit.chatlink.bans.BanResolver;
 import com.foxelbox.foxbukkit.chatlink.bans.FishBansResolver;
@@ -52,7 +52,7 @@ public class LookupCommand extends ICommand {
 				} else {
 					messageOut.setContentsPlain(String.format("\u00a75[FBCL]\u00a7f Player %1$s is NOT banned", user));
 				}
-				RedisHandler.sendMessage(messageOut);
+				ChatQueueHandler.sendMessage(messageOut);
 
 				final String altList = BanResolver.makePossibleAltString(user, uuid);
 				if (altList != null) {
@@ -60,7 +60,7 @@ public class LookupCommand extends ICommand {
 				} else {
 					messageOut.setContentsPlain(String.format("\u00a75[FBCL]\u00a7f No possible alts of %1$s found", user));
 				}
-				RedisHandler.sendMessage(messageOut);
+				ChatQueueHandler.sendMessage(messageOut);
 
 				final HashMap<String, Integer> fishBans = FishBansResolver.getBanCounts(user);
 				final StringBuilder fishBansStr = new StringBuilder("\u00a75[FBCL]\u00a7f ").append(user).append(" has");
@@ -72,7 +72,7 @@ public class LookupCommand extends ICommand {
 				fishBansStr.deleteCharAt(fishBansStr.length() - 1);
 				messageOut.setContentsPlain(fishBansStr.toString());
 				messageOut.finalizeContext = true;
-				RedisHandler.sendMessage(messageOut);
+				ChatQueueHandler.sendMessage(messageOut);
 			}
 		}.start();
 

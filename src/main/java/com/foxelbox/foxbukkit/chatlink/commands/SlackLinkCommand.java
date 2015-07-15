@@ -16,9 +16,9 @@
  */
 package com.foxelbox.foxbukkit.chatlink.commands;
 
+import com.foxelbox.foxbukkit.chatlink.ChatQueueHandler;
 import com.foxelbox.foxbukkit.chatlink.Main;
 import com.foxelbox.foxbukkit.chatlink.Player;
-import com.foxelbox.foxbukkit.chatlink.RedisHandler;
 import com.foxelbox.foxbukkit.chatlink.commands.system.ICommand;
 import com.foxelbox.foxbukkit.chatlink.json.ChatMessageIn;
 import com.foxelbox.foxbukkit.chatlink.json.ChatMessageOut;
@@ -43,12 +43,12 @@ public class SlackLinkCommand extends ICommand {
 
 					message.setContentsPlain("\u00a75[FBCL]\u00a7f Visit Slack to complete your account linking.");
 					message.finalizeContext = true;
-					RedisHandler.sendMessage(message);
+					ChatQueueHandler.sendMessage(message);
 				} catch(CommandException e) {
-					RedisHandler.sendMessage(makeError(messageIn, e.getMessage()));
+					ChatQueueHandler.sendMessage(makeError(messageIn, e.getMessage()));
 				} catch(Exception e) {
 					e.printStackTrace();
-					RedisHandler.sendMessage(makeError(messageIn, "Please try again later."));
+					ChatQueueHandler.sendMessage(makeError(messageIn, "Please try again later."));
 				}
 			}
 		}.start();

@@ -16,8 +16,8 @@
  */
 package com.foxelbox.foxbukkit.chatlink.commands;
 
+import com.foxelbox.foxbukkit.chatlink.ChatQueueHandler;
 import com.foxelbox.foxbukkit.chatlink.Player;
-import com.foxelbox.foxbukkit.chatlink.RedisHandler;
 import com.foxelbox.foxbukkit.chatlink.commands.system.CommandSystem;
 import com.foxelbox.foxbukkit.chatlink.commands.system.ICommand;
 import com.foxelbox.foxbukkit.chatlink.json.ChatMessageIn;
@@ -46,7 +46,7 @@ public class HelpCommand extends ICommand {
 
             for (String line : val.getHelp().split("\n")) {
                 message.setContentsPlain("\u00a75[FBCL]\u00a7f " + line);
-                RedisHandler.sendMessage(message);
+                ChatQueueHandler.sendMessage(message);
             }
             message.setContentsPlain("\u00a75[FBCL]\u00a7f Usage: /" + args[0] + " " + val.getUsage());
             return message;

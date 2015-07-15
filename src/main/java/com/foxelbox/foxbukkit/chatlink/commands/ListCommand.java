@@ -16,8 +16,8 @@
  */
 package com.foxelbox.foxbukkit.chatlink.commands;
 
+import com.foxelbox.foxbukkit.chatlink.ChatQueueHandler;
 import com.foxelbox.foxbukkit.chatlink.Player;
-import com.foxelbox.foxbukkit.chatlink.RedisHandler;
 import com.foxelbox.foxbukkit.chatlink.bans.BanResolver;
 import com.foxelbox.foxbukkit.chatlink.bans.LogEntry;
 import com.foxelbox.foxbukkit.chatlink.commands.system.ICommand;
@@ -46,15 +46,15 @@ public class ListCommand extends ICommand {
             ChatMessageOut reply = makeReply(messageIn);
 
             reply.setContentsPlain("\u00a75[FBCL]\u00a7f Name: " + target.getName());
-            RedisHandler.sendMessage(reply);
+            ChatQueueHandler.sendMessage(reply);
 
             reply.setContentsPlain("\u00a75[FBCL]\u00a7f Rank: " + PlayerHelper.getPlayerRank(target.getUniqueId()));
-            RedisHandler.sendMessage(reply);
+            ChatQueueHandler.sendMessage(reply);
 
             reply.setContentsPlain("\u00a75[FBCL]\u00a7f NameTag: " + PlayerHelper.getFullPlayerName(target.getUniqueId(), target.getName()));
 
             if(commandSender.hasPermission("foxbukkit.who.logdetails")) {
-                RedisHandler.sendMessage(reply);
+                ChatQueueHandler.sendMessage(reply);
                 new Thread() {
                     public void run() {
                         ChatMessageOut reply = makeReply(messageIn);
@@ -66,7 +66,7 @@ public class ListCommand extends ICommand {
                         } else {
                             reply.setContentsPlain("\u00a75[FBCL]\u00a7f Last logout: " + DATE_FORMAT.format(logEntryLogout.getTime()));
                         }
-                        RedisHandler.sendMessage(reply);
+                        ChatQueueHandler.sendMessage(reply);
 
                         if(logEntry == null) {
                             reply.setContentsPlain("\u00a75[FBCL]\u00a7f IP data not present");
@@ -74,7 +74,7 @@ public class ListCommand extends ICommand {
                             reply.setContentsPlain("\u00a75[FBCL]\u00a7f Last IP: " + logEntry.getIp().getHostAddress());
                         }
                         reply.finalizeContext = true;
-                        RedisHandler.sendMessage(reply);
+                        ChatQueueHandler.sendMessage(reply);
                     }
                 }.start();
                 return null;
@@ -104,7 +104,7 @@ public class ListCommand extends ICommand {
                             server, listText
                     }
             );
-            RedisHandler.sendMessage(message);
+            ChatQueueHandler.sendMessage(message);
         }
 
         return makeBlank(messageIn);
