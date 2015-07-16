@@ -102,10 +102,6 @@ public class ListCommand extends ICommand {
 			ChatQueueHandler.sendMessage(message);
 		}
 
-		message = makeBlank(messageIn);
-		message.finalizeContext = true;
-		ChatQueueHandler.sendMessage(message);
-
 		return makeBlank(messageIn);
 	}
 }
