@@ -135,20 +135,16 @@ public class SlackHandler implements SlackMessagePostedListener {
 
 		if(message.type == Messages.MessageType.TEXT) { // We ignore non-text messages
 			StringBuilder contextBuffer = contextBuffers.get(message.context.toString());
-			if(!message.finalizeContext) {
-				// Buffer this so that we can make fewer calls to Slack
-
-				if(contextBuffer == null) {
-					contextBuffer = new StringBuilder();
-					contextBuffers.put(message.context.toString(), contextBuffer);
-				}
-
-				if(contextBuffer.length() > 0)
-					contextBuffer.append('\n');
-
-				contextBuffer.append(cleanMessageContents(message));
-				return;
+			if(contextBuffer == null) {
+				contextBuffer = new StringBuilder();
+				contextBuffers.put(message.context.toString(), contextBuffer);
 			}
+
+			if(contextBuffer.length() > 0)
+				contextBuffer.append('\n');
+
+			contextBuffer.append(cleanMessageContents(message));
+			return;
 		}
 
 		if(message.finalizeContext) {
