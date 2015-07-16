@@ -17,6 +17,7 @@
 package com.foxelbox.foxbukkit.chatlink.commands;
 
 import com.foxelbox.foxbukkit.chatlink.ChatQueueHandler;
+import com.foxelbox.foxbukkit.chatlink.Messages;
 import com.foxelbox.foxbukkit.chatlink.Player;
 import com.foxelbox.foxbukkit.chatlink.commands.system.ICommand;
 import com.foxelbox.foxbukkit.chatlink.json.ChatMessageIn;
@@ -72,7 +73,7 @@ public class ConvCommand extends ICommand {
             );
         }
         message.importance = 4;
-        message.to = new MessageTarget("player", new String[] { target.getUniqueId().toString(), message.from.uuid.toString() });
+        message.to = new MessageTarget(Messages.TargetType.PLAYER, new String[] { target.getUniqueId().toString(), message.from.uuid.toString() });
 		message.finalizeContext = true;
         ChatQueueHandler.sendMessage(message);
 

@@ -109,7 +109,7 @@ public class SlackHandler implements SlackMessagePostedListener {
 
 		ChatMessageIn messageIn = new ChatMessageIn();
 
-		messageIn.type = "text";
+		messageIn.type = Messages.MessageType.TEXT;
 		messageIn.server = "Slack";
 
 		messageIn.context = UUID.randomUUID();
@@ -133,7 +133,7 @@ public class SlackHandler implements SlackMessagePostedListener {
 			return;
 		}
 
-		if(!message.type.equalsIgnoreCase("text")) { // We ignore non-text messages
+		if(message.type != Messages.MessageType.TEXT) { // We ignore non-text messages
 			if(message.finalizeContext) {
 				contextResponses.remove(message.context.toString());
 				contextBuffers.remove(message.context.toString());

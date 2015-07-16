@@ -33,6 +33,7 @@
 package com.foxelbox.foxbukkit.chatlink.bans;
 
 import com.foxelbox.foxbukkit.chatlink.ChatQueueHandler;
+import com.foxelbox.foxbukkit.chatlink.Messages;
 import com.foxelbox.foxbukkit.chatlink.Player;
 import com.foxelbox.foxbukkit.chatlink.commands.system.ICommand;
 import com.foxelbox.foxbukkit.chatlink.json.ChatMessageIn;
@@ -70,7 +71,7 @@ public class Bans {
 				ChatMessageOut reply = ICommand.makeReply(refMessage);
 				if(ban != null) {
 					BanResolver.deleteBan(ban);
-					reply.to.type = "all";
+					reply.to.type = Messages.TargetType.ALL;
 					reply.to.filter = null;
 					reply.setContentsPlain("\u00a75[FBCL]\u00a7f " + from.getName() + " unbanned " + ply + "!");
 				} else {
@@ -116,7 +117,7 @@ public class Bans {
 				newBan.setType(type.getName());
 				BanResolver.addBan(newBan);
 				ChatMessageOut messageOut = ICommand.makeReply(refMessage);
-				messageOut.to.type = "all";
+				messageOut.to.type = Messages.TargetType.ALL;
 				messageOut.to.filter = null;
 				messageOut.finalizeContext = true;
 				messageOut.setContentsPlain("\u00a75[FBCL]\u00a7f " + from.getName() + " banned " + plyName + " [Reason: " + reason + "]!");

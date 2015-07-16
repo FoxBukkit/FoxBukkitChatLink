@@ -17,6 +17,7 @@
 package com.foxelbox.foxbukkit.chatlink.commands;
 
 import com.foxelbox.foxbukkit.chatlink.ChatQueueHandler;
+import com.foxelbox.foxbukkit.chatlink.Messages;
 import com.foxelbox.foxbukkit.chatlink.Player;
 import com.foxelbox.foxbukkit.chatlink.commands.system.ICommand;
 import com.foxelbox.foxbukkit.chatlink.filter.MuteList;
@@ -52,7 +53,7 @@ public class PMCommand extends ICommand {
                 new String[] {
                         messageIn.from.name, message.from.uuid.toString(), formattedName, messageText
                 });
-        message.to = new MessageTarget("player", new String[] { target.getUniqueId().toString() });
+        message.to = new MessageTarget(Messages.TargetType.PLAYER, new String[] { target.getUniqueId().toString() });
         message.importance = 4;
         ChatQueueHandler.sendMessage(message);
 

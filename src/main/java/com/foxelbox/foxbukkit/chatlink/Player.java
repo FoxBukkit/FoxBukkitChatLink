@@ -79,8 +79,8 @@ public class Player {
     public void kick(String reason, boolean force) {
         ChatMessageOut messageOut = new ChatMessageOut(null, new UserInfo(uuid, name));
         messageOut.contents = "[Kicked] " + reason;
-        messageOut.type = "kick";
-        messageOut.to.type = "player";
+        messageOut.type = Messages.MessageType.KICK;
+        messageOut.to.type = Messages.TargetType.PLAYER;
         messageOut.to.filter = new String[] { uuid.toString() };
         ChatQueueHandler.sendMessage(messageOut);
         showKickMessage(reason, force);
@@ -89,8 +89,8 @@ public class Player {
     public void chat(String message) {
         ChatMessageOut messageOut = new ChatMessageOut(null, new UserInfo(uuid, name));
         messageOut.contents = message;
-        messageOut.type = "inject";
-        messageOut.to.type = "player";
+        messageOut.type = Messages.MessageType.INJECT;
+        messageOut.to.type = Messages.TargetType.PLAYER;
         messageOut.to.filter = new String[] { uuid.toString() };
         ChatQueueHandler.sendMessage(messageOut);
     }

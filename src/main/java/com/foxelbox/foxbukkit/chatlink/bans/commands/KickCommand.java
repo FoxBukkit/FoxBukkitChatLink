@@ -16,6 +16,7 @@
  */
 package com.foxelbox.foxbukkit.chatlink.bans.commands;
 
+import com.foxelbox.foxbukkit.chatlink.Messages;
 import com.foxelbox.foxbukkit.chatlink.Player;
 import com.foxelbox.foxbukkit.chatlink.commands.system.ICommand;
 import com.foxelbox.foxbukkit.chatlink.json.ChatMessageIn;
@@ -41,7 +42,7 @@ public class KickCommand extends ICommand {
         otherPly.kick("[" + messageIn.from.name + "] " + Utils.concatArray(" ", args, 1, ""));
 
         ChatMessageOut reply = makeReply(messageIn);
-        reply.to.type = "all";
+        reply.to.type = Messages.TargetType.ALL;
         reply.to.filter = null;
         reply.setContentsPlain(messageIn.from.name + " kicked " + otherPly.getName());
         return reply;

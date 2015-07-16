@@ -16,6 +16,7 @@
  */
 package com.foxelbox.foxbukkit.chatlink.util;
 
+import com.foxelbox.foxbukkit.chatlink.Messages;
 import com.foxelbox.foxbukkit.chatlink.Player;
 import com.foxelbox.foxbukkit.chatlink.json.ChatMessageOut;
 import com.foxelbox.foxbukkit.chatlink.json.MessageTarget;
@@ -102,7 +103,7 @@ public class MessageHelper {
 		}
 
         ChatMessageOut result = new ChatMessageOut("", new UserInfo(null, ""));
-        result.to = new MessageTarget("all", new String[0]);
+        result.to = new MessageTarget(Messages.TargetType.ALL, new String[0]);
         result.setContents(format, params);
         return result;
 	}
@@ -121,7 +122,7 @@ public class MessageHelper {
 		}
 
         ChatMessageOut result = new ChatMessageOut("", new UserInfo(null, ""));
-        result.to = new MessageTarget("player", new String[] { commandSender.getUniqueId().toString() });
+        result.to = new MessageTarget(Messages.TargetType.PLAYER, new String[] { commandSender.getUniqueId().toString() });
 		result.setContents(format, params);
         return result;
 	}

@@ -17,6 +17,7 @@
 package com.foxelbox.foxbukkit.chatlink.json;
 
 import com.foxelbox.foxbukkit.chatlink.Main;
+import com.foxelbox.foxbukkit.chatlink.Messages;
 import com.foxelbox.foxbukkit.chatlink.util.Utils;
 
 import java.util.*;
@@ -26,8 +27,12 @@ public class ChatMessageOut {
     public ChatMessageOut(String server, UserInfo from) {
         this.server = server;
         this.from = from;
-        this.to = new MessageTarget("all", null);
+        this.to = new MessageTarget(Messages.TargetType.ALL, null);
         this.context = UUID.randomUUID();
+    }
+
+    private ChatMessageOut() {
+
     }
 
     private static String[] xmlEscapeArray(String[] in) {
@@ -186,9 +191,66 @@ public class ChatMessageOut {
 
     public UUID context;
     public boolean finalizeContext = false;
-    public String type = "text";
+    public Messages.MessageType type = Messages.MessageType.TEXT;
 
     public int importance = 0;
 
     public String contents;
+
+    public Messages.ChatMessageOut toProtoBuf() {
+        Messages.ChatMessageOut.Builder builder = Messages.ChatMessageOut.newBuilder();
+
+        if(server != null) {
+            builder.setServer(server);
+        }
+        if(from != null) {
+            builder.setFromUuid(from.uuid.toString());
+            builder.setFromName(from.name);
+        }
+        if(to != null && to.type != Messages.TargetType.ALL) {
+            builder.setToType(to.type);
+            builder.clearToFilter();
+            for(String s : to.filter) {
+                builder.addToFilter(s);
+            }
+        }
+
+        builder.setId(id);
+        builder.setTimestamp(timestamp);
+
+        builder.setContext(context.toString());
+        if(!finalizeContext) {
+            builder.setFinalizeContext(false);
+        }
+        if(type != null && type != Messages.MessageType.TEXT) {
+            builder.setType(type);
+        }
+
+        if(contents != null) {
+            builder.setContents(contents);
+        }
+
+        return builder.build();
+    }
+
+    public static ChatMessageOut fromProtoBuf(Messages.ChatMessageOut message) {
+        ChatMessageOut ret = new ChatMessageOut();
+
+        ret.server = message.getServer();
+        ret.from = new UserInfo(UUID.fromString(message.getFromUuid()), message.getFromName());
+
+        List<String> filterTo = message.getToFilterList();
+        ret.to = new MessageTarget(message.getToType(), filterTo.toArray(new String[filterTo.size()]));
+
+        ret.id = message.getId();
+        ret.timestamp = message.getTimestamp();
+
+        ret.context = UUID.fromString(message.getContext());
+        ret.finalizeContext = message.getFinalizeContext();
+        ret.type = message.getType();
+
+        ret.contents = message.getContents();
+
+        return ret;
+    }
 }

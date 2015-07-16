@@ -22,7 +22,6 @@ import com.foxelbox.foxbukkit.chatlink.filter.MuteList;
 import com.foxelbox.foxbukkit.chatlink.json.ChatMessageIn;
 import com.foxelbox.foxbukkit.chatlink.json.ChatMessageOut;
 import com.foxelbox.foxbukkit.chatlink.util.PlayerHelper;
-import com.google.gson.Gson;
 import org.zeromq.ZMQ;
 
 import java.util.regex.Pattern;
@@ -34,7 +33,6 @@ public class ChatQueueHandler {
 	public static final String QUIT_FORMAT = "<color name=\"dark_red\">[-]</color> " + PLAYER_FORMAT + " <color name=\"yellow\">disconnected!</color>";
 	public static final String JOIN_FORMAT = "<color name=\"dark_green\">[+]</color> " + PLAYER_FORMAT + " <color name=\"yellow\">joined!</color>";
 	private static final Pattern REMOVE_DISALLOWED_CHARS = Pattern.compile("[\u00a7\r\n\t]");
-	private static final Gson gson = new Gson();
 
 	private static ZMQ.Socket sender;
 	private final ZMQ.Socket receiver;
@@ -50,7 +48,7 @@ public class ChatQueueHandler {
 			@Override
 			public void run() {
 				while(!Thread.currentThread().isInterrupted()) {
-					String str = receiver.recvStr(Main.CHARSET);
+					byte[] str = receiver.recv(0);
 					onMessage(str);
 				}
 			}
@@ -74,14 +72,11 @@ public class ChatQueueHandler {
 	private final static byte[] CMO = "CMO".getBytes();
 
 	public static void sendMessage(ChatMessageOut message) {
-		final String outMsg;
-		synchronized(gson) {
-			outMsg = gson.toJson(message);
-		}
+		final byte[] msg = message.toProtoBuf().toByteArray();
 
 		synchronized (sender) {
 			sender.send(CMO, ZMQ.SNDMORE);
-			sender.send(outMsg);
+			sender.send(msg, 0);
 		}
 
 		Main.slackHandler.sendMessage(message);
@@ -100,7 +95,7 @@ public class ChatQueueHandler {
 		String messageStr = messageIn.contents;
 
 		switch(messageIn.type) {
-			case "playerstate":
+			case PLAYERSTATE:
 				switch(messageStr) {
 					case "join":
 						return runFormatAndStore(messageIn, JOIN_FORMAT, new String[]{plyN, messageIn.from.uuid.toString(), formattedName});
@@ -120,7 +115,7 @@ public class ChatQueueHandler {
 
 				break;
 
-			case "text":
+			case TEXT:
 				messageStr = REMOVE_DISALLOWED_CHARS.matcher(messageStr).replaceAll("");
 
 				if(messageStr.length() > 1) {
@@ -161,14 +156,9 @@ public class ChatQueueHandler {
 		throw new RuntimeException("Unprocessable message: " + messageIn.type + " => " + messageStr);
 	}
 
-	public void onMessage(final String c_message) {
+	public void onMessage(final byte[] c_message) {
 		try {
-			final ChatMessageIn chatMessageIn;
-			synchronized(gson) {
-				chatMessageIn = gson.fromJson(c_message, ChatMessageIn.class);
-			}
-
-			incomingMessage(chatMessageIn);
+			incomingMessage(ChatMessageIn.fromProtoBuf(Messages.ChatMessageIn.parseFrom(c_message)));
 		} catch(Exception e) {
 			e.printStackTrace();
 		}

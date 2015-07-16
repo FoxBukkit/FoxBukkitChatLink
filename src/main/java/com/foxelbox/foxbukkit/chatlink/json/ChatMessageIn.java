@@ -16,6 +16,8 @@
  */
 package com.foxelbox.foxbukkit.chatlink.json;
 
+import com.foxelbox.foxbukkit.chatlink.Messages;
+
 import java.util.UUID;
 
 public class ChatMessageIn {
@@ -26,6 +28,47 @@ public class ChatMessageIn {
     public long timestamp;
     public UUID context;
 
-    public String type;
+    public Messages.MessageType type;
     public String contents;
+
+    public Messages.ChatMessageIn toProtoBuf() {
+        Messages.ChatMessageIn.Builder builder = Messages.ChatMessageIn.newBuilder();
+
+        if(server != null) {
+            builder.setServer(server);
+        }
+        if(from != null) {
+            builder.setFromUuid(from.uuid.toString());
+            builder.setFromName(from.name);
+        }
+
+        builder.setTimestamp(timestamp);
+
+        builder.setContext(context.toString());
+        if(type != null && type != Messages.MessageType.TEXT) {
+            builder.setType(type);
+        }
+
+        if(contents != null) {
+            builder.setContents(contents);
+        }
+
+        return builder.build();
+    }
+
+    public static ChatMessageIn fromProtoBuf(Messages.ChatMessageIn message) {
+        ChatMessageIn ret = new ChatMessageIn();
+
+        ret.server = message.getServer();
+        ret.from = new UserInfo(UUID.fromString(message.getFromUuid()), message.getFromName());
+
+        ret.timestamp = message.getTimestamp();
+
+        ret.context = UUID.fromString(message.getContext());
+        ret.type = message.getType();
+
+        ret.contents = message.getContents();
+
+        return ret;
+    }
 }

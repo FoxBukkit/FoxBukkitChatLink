@@ -17,6 +17,7 @@
 package com.foxelbox.foxbukkit.chatlink.commands;
 
 import com.foxelbox.foxbukkit.chatlink.ChatQueueHandler;
+import com.foxelbox.foxbukkit.chatlink.Messages;
 import com.foxelbox.foxbukkit.chatlink.Player;
 import com.foxelbox.foxbukkit.chatlink.commands.system.ICommand;
 import com.foxelbox.foxbukkit.chatlink.filter.MuteList;
@@ -43,7 +44,7 @@ public class OpChatCommand extends ICommand {
                 new String[] {
                         messageIn.from.name, message.from.uuid.toString(), formattedName, argStr
                 });
-        message.to.type = "permission";
+        message.to.type = Messages.TargetType.PERMISSION;
         message.importance = 3;
         message.to.filter = new String[] { "foxbukkit.opchat" };
         return message;

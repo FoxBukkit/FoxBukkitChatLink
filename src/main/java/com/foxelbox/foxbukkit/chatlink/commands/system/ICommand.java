@@ -16,6 +16,7 @@
  */
 package com.foxelbox.foxbukkit.chatlink.commands.system;
 
+import com.foxelbox.foxbukkit.chatlink.Messages;
 import com.foxelbox.foxbukkit.chatlink.Player;
 import com.foxelbox.foxbukkit.chatlink.json.ChatMessageIn;
 import com.foxelbox.foxbukkit.chatlink.json.ChatMessageOut;
@@ -187,14 +188,14 @@ public abstract class ICommand {
 
     public static ChatMessageOut makeReply(ChatMessageIn messageIn) {
         ChatMessageOut message = new ChatMessageOut(messageIn);
-        message.to.type = "player";
+        message.to.type = Messages.TargetType.PLAYER;
         message.to.filter = new String[] { message.from.uuid.toString() };
         return message;
     }
 
 	public static ChatMessageOut makeBlank(ChatMessageIn messageIn) {
 		ChatMessageOut message = makeReply(messageIn);
-		message.type = "blank";
+		message.type = Messages.MessageType.BLANK;
 		return message;
 	}
 
