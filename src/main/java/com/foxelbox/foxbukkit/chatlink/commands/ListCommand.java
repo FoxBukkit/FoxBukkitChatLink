@@ -99,9 +99,12 @@ public class ListCommand extends ICommand {
 				listText = "\u00a7f" + listTextB.substring(4);
 			}
 			message.setContents(LIST_FORMAT, new String[]{server, listText});
-			message.finalizeContext = true;
 			ChatQueueHandler.sendMessage(message);
 		}
+
+		message = makeBlank(messageIn);
+		message.finalizeContext = true;
+		ChatQueueHandler.sendMessage(message);
 
 		return makeBlank(messageIn);
 	}
