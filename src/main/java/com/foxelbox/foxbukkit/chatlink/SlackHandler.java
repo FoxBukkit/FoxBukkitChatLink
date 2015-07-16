@@ -133,58 +133,50 @@ public class SlackHandler implements SlackMessagePostedListener {
 			return;
 		}
 
-		if(message.type != Messages.MessageType.TEXT) { // We ignore non-text messages
-			if(message.finalizeContext) {
+		if(message.type == Messages.MessageType.TEXT) { // We ignore non-text messages
+			StringBuilder contextBuffer = contextBuffers.get(message.context.toString());
+			if(!message.finalizeContext) {
+				// Buffer this so that we can make fewer calls to Slack
+
+				if(contextBuffer == null) {
+					contextBuffer = new StringBuilder();
+					contextBuffers.put(message.context.toString(), contextBuffer);
+				}
+
+				if(contextBuffer.length() > 0)
+					contextBuffer.append('\n');
+
+				contextBuffer.append(cleanMessageContents(message));
+				return;
+			}
+		}
+
+		if(message.finalizeContext) {
+			try {
+				final StringBuilder contextBuffer = contextBuffers.get(message.context.toString());
+				if(contextBuffer == null)
+					return;
+
+				final Collection<SlackChannel> sendTo = determineResponseChannels(message);
+				if(sendTo == null)
+					return; // We shouldn't send this to Slack
+
+				final Player as;
+				if(message.from != null)
+					as = new Player(message.from.uuid);
+				else
+					as = null;
+
+				final String finalMessage = contextBuffer.toString();
+
+				for(final SlackChannel channel : sendTo)
+					sendToSlack(channel, finalMessage, as);
+			} catch(Exception e) {
+				e.printStackTrace();
+			} finally {
 				contextResponses.remove(message.context.toString());
 				contextBuffers.remove(message.context.toString());
 			}
-			return;
-		}
-
-		StringBuilder contextBuffer = contextBuffers.get(message.context.toString());
-		if(!message.finalizeContext) {
-			// Buffer this so that we can make fewer calls to Slack
-
-			if(contextBuffer == null) {
-				contextBuffer = new StringBuilder();
-				contextBuffers.put(message.context.toString(), contextBuffer);
-			}
-
-			if(contextBuffer.length() > 0)
-				contextBuffer.append('\n');
-
-			contextBuffer.append(cleanMessageContents(message));
-			return;
-		}
-
-		try {
-			final Collection<SlackChannel> sendTo = determineResponseChannels(message);
-			if(sendTo == null)
-				return; // We shouldn't send this to Slack
-
-			final String finalMessage;
-			if(contextBuffer == null)
-				finalMessage = cleanMessageContents(message);
-			else {
-				if(contextBuffer.length() > 0)
-					contextBuffer.append('\n');
-				contextBuffer.append(cleanMessageContents(message));
-				finalMessage = contextBuffer.toString();
-			}
-
-			final Player as;
-			if(message.from != null)
-				as = new Player(message.from.uuid);
-			else
-				as = null;
-
-			for(final SlackChannel channel : sendTo)
-				sendToSlack(channel, finalMessage, as);
-		} catch(Exception e) {
-			e.printStackTrace();
-		} finally {
-			contextResponses.remove(message.context.toString());
-			contextBuffers.remove(message.context.toString());
 		}
 	}
 
@@ -194,10 +186,10 @@ public class SlackHandler implements SlackMessagePostedListener {
 			return Collections.singletonList(session.findChannelById(responseChannel));
 		}
 
-		if(message.to.type.equals("all"))
+		if(message.to.type == Messages.TargetType.ALL)
 			return Collections.singletonList(session.findChannelByName("minecraft"));
 
-		if(message.to.type.equals("permission") && message.to.filter.length == 1 && message.to.filter[0].equals("foxbukkit.opchat"))
+		if(message.to.type == Messages.TargetType.PERMISSION && message.to.filter.length == 1 && message.to.filter[0].equals("foxbukkit.opchat"))
 			return Collections.singletonList(session.findChannelByName("minecraft-ops"));
 
 		return null;
