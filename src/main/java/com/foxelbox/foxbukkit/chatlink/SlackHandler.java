@@ -144,7 +144,6 @@ public class SlackHandler implements SlackMessagePostedListener {
 				contextBuffer.append('\n');
 
 			contextBuffer.append(cleanMessageContents(message));
-			return;
 		}
 
 		if(message.finalizeContext) {
