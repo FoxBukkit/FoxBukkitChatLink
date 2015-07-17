@@ -24,10 +24,7 @@ import javax.jmdns.ServiceInfo;
 import javax.jmdns.ServiceListener;
 import java.io.IOException;
 import java.net.InetAddress;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.UUID;
+import java.util.*;
 
 public class ZeroMQConfigurator {
     public static void parseZeroMQConfig(String config, ZMQ.Socket socket, String serviceType, String serviceName) {
@@ -71,11 +68,13 @@ public class ZeroMQConfigurator {
         return "_" + serviceName + "-" + serviceType + "._tcp.local.";
     }
 
-    private static final ArrayList<ServiceInfo> services = new ArrayList<>();
+    private static final Stack<ServiceInfo> services = new Stack<>();
 
     public static void shutdown() {
-        for(ServiceInfo info : services) {
-            jmDNS.unregisterService(info);
+        synchronized (services) {
+            while (!services.empty()) {
+                jmDNS.unregisterService(services.pop());
+            }
         }
         jmDNS.unregisterAllServices();;
         try {
