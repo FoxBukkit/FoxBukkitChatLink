@@ -18,6 +18,7 @@ package com.foxelbox.foxbukkit.chatlink.json;
 
 import com.foxelbox.foxbukkit.chatlink.Main;
 import com.foxelbox.foxbukkit.chatlink.Messages;
+import com.foxelbox.foxbukkit.chatlink.ProtobufUUID;
 import com.foxelbox.foxbukkit.chatlink.util.Utils;
 
 import java.util.*;
@@ -205,7 +206,7 @@ public class ChatMessageOut {
         }
         if(from != null) {
             builder.setFrom(Messages.UserInfo.newBuilder()
-                    .setUuid(from.uuid.toString())
+                    .setUuid(ProtobufUUID.convertJavaToProtobuf(from.uuid))
                     .setName(from.name));
         }
         if(to != null && to.type != Messages.TargetType.ALL) {
@@ -221,7 +222,7 @@ public class ChatMessageOut {
         builder.setId(id);
         builder.setTimestamp(timestamp);
 
-        builder.setContext(context.toString());
+        builder.setContext(ProtobufUUID.convertJavaToProtobuf(context));
         if(!finalizeContext) {
             builder.setFinalizeContext(false);
         }
@@ -241,7 +242,7 @@ public class ChatMessageOut {
 
         ret.server = message.getServer();
         if(message.getFrom() != null) {
-            ret.from = new UserInfo(UUID.fromString(message.getFrom().getUuid()), message.getFrom().getName());
+            ret.from = new UserInfo(ProtobufUUID.convertProtobufToJava(message.getFrom().getUuid()), message.getFrom().getName());
         }
 
         if(message.getTo() != null) {
@@ -254,7 +255,7 @@ public class ChatMessageOut {
         ret.id = message.getId();
         ret.timestamp = message.getTimestamp();
 
-        ret.context = UUID.fromString(message.getContext());
+        ret.context = ProtobufUUID.convertProtobufToJava(message.getContext());
         ret.finalizeContext = message.getFinalizeContext();
         ret.type = message.getType();
 

@@ -24,7 +24,10 @@ import javax.jmdns.ServiceInfo;
 import javax.jmdns.ServiceListener;
 import java.io.IOException;
 import java.net.InetAddress;
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Stack;
+import java.util.UUID;
 
 public class ZeroMQConfigurator {
     public static void parseZeroMQConfig(String config, ZMQ.Socket socket, String serviceType, String serviceName) {

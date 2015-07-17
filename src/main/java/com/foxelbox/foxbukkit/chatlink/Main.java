@@ -23,7 +23,10 @@ import com.foxelbox.foxbukkit.chatlink.commands.system.CommandSystem;
 import com.foxelbox.foxbukkit.chatlink.permissions.FoxBukkitPermissionHandler;
 import org.zeromq.ZMQ;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
 
 public class Main {
 	public static Configuration configuration;
