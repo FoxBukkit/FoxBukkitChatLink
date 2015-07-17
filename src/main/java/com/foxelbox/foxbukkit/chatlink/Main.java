@@ -68,7 +68,11 @@ public class Main {
 		t.start();
 
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		while(!"exit".equalsIgnoreCase(br.readLine())) { }
+		while(!"exit".equalsIgnoreCase(br.readLine())) {
+			try {
+				Thread.sleep(200);
+			} catch (Exception e) { }
+		}
 		ZeroMQConfigurator.shutdown();
 		System.exit(0);
 	}
