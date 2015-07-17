@@ -23,9 +23,7 @@ import com.foxelbox.foxbukkit.chatlink.commands.system.CommandSystem;
 import com.foxelbox.foxbukkit.chatlink.permissions.FoxBukkitPermissionHandler;
 import org.zeromq.ZMQ;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.charset.Charset;
+import java.io.*;
 
 public class Main {
 	public static Configuration configuration;
@@ -35,7 +33,6 @@ public class Main {
 	public static SlackHandler slackHandler;
 
 	public static ZMQ.Context zmqContext;
-	public static final Charset CHARSET = Charset.forName("UTF-8");
 
 	public static void main(String[] args) throws IOException {
 		configuration = new Configuration(getDataFolder());
@@ -49,17 +46,31 @@ public class Main {
 
 		new ChatQueueHandler();
 
-		while(true) {
-			try {
-				if(new File("FoxBukkitChatLink.jar.deploy").exists()) {
-					System.exit(0);
-					return;
+		System.out.println("READY");
+
+		Thread t = new Thread() {
+			public void run() {
+				while (true) {
+					try {
+						if (new File("FoxBukkitChatLink.jar.deploy").exists()) {
+							ZeroMQConfigurator.shutdown();
+							System.exit(0);
+							return;
+						}
+						Thread.sleep(5000);
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
 				}
-				Thread.sleep(5000);
-			} catch(Exception e) {
-				e.printStackTrace();
 			}
-		}
+		};
+		t.setDaemon(true);
+		t.start();
+
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		while(!"exit".equalsIgnoreCase(br.readLine())) { }
+		ZeroMQConfigurator.shutdown();
+		System.exit(0);
 	}
 
 	public static File getDataFolder() {

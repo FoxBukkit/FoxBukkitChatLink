@@ -39,10 +39,18 @@ public class ChatQueueHandler {
 
 	public ChatQueueHandler() {
 		receiver = Main.zmqContext.socket(ZMQ.PULL);
-		ZeroMQConfigurator.parseZeroMQConfig(Main.configuration.getValue("zmq-broker-to-link", ZeroMQConfigurator.getDefaultConfig("bind", 5557)), receiver);
+		ZeroMQConfigurator.parseZeroMQConfig(
+				Main.configuration.getValue("zmq-server2link", "announce;random"),
+				receiver,
+				"fbchat-server2link",
+				Main.configuration.getValue("zmq-mdns-server2link", "default"));
 
 		sender = Main.zmqContext.socket(ZMQ.PUB);
-		ZeroMQConfigurator.parseZeroMQConfig(Main.configuration.getValue("zmq-link-to-broker", ZeroMQConfigurator.getDefaultConfig("bind", 5558)), sender);
+		ZeroMQConfigurator.parseZeroMQConfig(
+				Main.configuration.getValue("zmq-link2server", "announce;random"),
+				sender,
+				"fbchat-link2server",
+				Main.configuration.getValue("zmq-mdns-link2server", "default"));
 
 		Thread t = new Thread() {
 			@Override
