@@ -49,6 +49,7 @@ import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.*;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
@@ -74,10 +75,34 @@ public class SlackHandler implements SlackMessagePostedListener {
 		}
 
 		session = SlackSessionFactory.createWebSocketSlackSession(slackAuthToken);
-
 		session.addMessagePostedListener(this);
-
 		session.connect();
+
+		Thread t = new Thread() {
+			@Override
+			public void run() {
+				while(!Thread.currentThread().isInterrupted()) {
+					final SlackMessage message;
+					synchronized (slackMessageQueue) {
+						message = slackMessageQueue.poll();
+					}
+					if(message == null) {
+						try {
+							Thread.sleep(100);
+						} catch (Exception e) { }
+						continue;
+					}
+					try {
+						_sendToSlack(message);
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			}
+		};
+		t.setDaemon(true);
+		t.setName("SlackSender");
+		t.start();
 	}
 
 	@Override
@@ -93,8 +118,9 @@ public class SlackHandler implements SlackMessagePostedListener {
 			}
 
 			final String channelName = event.getChannel().getName();
-			if(!channelName.equalsIgnoreCase("minecraft") && !channelName.equalsIgnoreCase("minecraft-ops"))
+			if(!channelName.equalsIgnoreCase("minecraft") && !channelName.equalsIgnoreCase("minecraft-ops")) {
 				return;
+			}
 
 			handleSlackMessage(event);
 		} catch(Exception e) {
@@ -104,8 +130,9 @@ public class SlackHandler implements SlackMessagePostedListener {
 
 	private void handleSlackMessage(SlackMessagePosted event) {
 		Player minecraftPlayer = lookupMinecraftAssociation(event.getSender().getId());
-		if(minecraftPlayer == null)
+		if(minecraftPlayer == null) {
 			return;
+		}
 
 		ChatMessageIn messageIn = new ChatMessageIn();
 
@@ -120,10 +147,11 @@ public class SlackHandler implements SlackMessagePostedListener {
 
 		messageIn.contents = StringEscapeUtils.unescapeHtml4(event.getMessageContent());
 
-		if(messageIn.contents.charAt(0) == '.')
+		if(messageIn.contents.charAt(0) == '.') {
 			messageIn.contents = "/" + messageIn.contents.substring(1);
-		else if(event.getChannel().getName().equalsIgnoreCase("minecraft-ops"))
+		} else if(event.getChannel().getName().equalsIgnoreCase("minecraft-ops")) {
 			messageIn.contents = "#" + messageIn.contents;
+		}
 
 		ChatQueueHandler.incomingMessage(messageIn);
 	}
@@ -140,8 +168,9 @@ public class SlackHandler implements SlackMessagePostedListener {
 				contextBuffers.put(message.context.toString(), contextBuffer);
 			}
 
-			if(contextBuffer.length() > 0)
+			if(contextBuffer.length() > 0) {
 				contextBuffer.append('\n');
+			}
 
 			contextBuffer.append(cleanMessageContents(message));
 		}
@@ -164,8 +193,9 @@ public class SlackHandler implements SlackMessagePostedListener {
 
 				final String finalMessage = contextBuffer.toString();
 
-				for(final SlackChannel channel : sendTo)
+				for(final SlackChannel channel : sendTo) {
 					sendToSlack(channel, finalMessage, as);
+				}
 			} catch(Exception e) {
 				e.printStackTrace();
 			} finally {
@@ -272,9 +302,29 @@ public class SlackHandler implements SlackMessagePostedListener {
 		sendToSlack(event.getChannel(), "Successfully linked your Minecraft account.");
 	}
 
+	private static class SlackMessage {
+		final SlackChannel channel;
+		final String message;
+		final Player asPlayer;
+
+		public SlackMessage(SlackChannel channel, String message, Player asPlayer) {
+			this.channel = channel;
+			this.message = message;
+			this.asPlayer = asPlayer;
+		}
+	}
+
+	private final Queue<SlackMessage> slackMessageQueue = new LinkedBlockingQueue<>();
+
 	private void sendToSlack(SlackChannel channel, String message, Player asPlayer) throws IOException {
-		if(asPlayer == null || asPlayer.getName().equals("")) {
-			final SlackMessageHandle handle = session.sendMessageOverWebSocket(channel, message, null);
+		synchronized (slackMessageQueue) {
+			slackMessageQueue.add(new SlackMessage(channel, message, asPlayer));
+		}
+	}
+
+	private void _sendToSlack(SlackMessage message) throws IOException {
+		if(message.asPlayer == null || message.asPlayer.getName().equals("")) {
+			final SlackMessageHandle handle = session.sendMessageOverWebSocket(message.channel, message.message, null);
 			handle.waitForReply(1, TimeUnit.SECONDS);
 			SlackReplyEvent slackReply = handle.getSlackReply();
 			if(slackReply == null) {
@@ -288,15 +338,15 @@ public class SlackHandler implements SlackMessagePostedListener {
 
 		SlackChatConfiguration slackChatConfiguration = SlackChatConfiguration.getConfiguration();
 
-		slackChatConfiguration.withName(asPlayer.getName());
+		slackChatConfiguration.withName(message.asPlayer.getName());
 		try {
-			slackChatConfiguration.withIcon("https://minotar.net/avatar/" + URLEncoder.encode(asPlayer.getName(), "UTF-8") + "/48.png");
+			slackChatConfiguration.withIcon("https://minotar.net/avatar/" + URLEncoder.encode(message.asPlayer.getName(), "UTF-8") + "/48.png");
 		} catch(UnsupportedEncodingException e) {
 			// This should never happen.
 			e.printStackTrace();
 		}
 
-		SlackMessageHandle handle = session.sendMessage(channel, message, null, slackChatConfiguration);
+		SlackMessageHandle handle = session.sendMessage(message.channel, message.message, null, slackChatConfiguration);
 		handle.waitForReply(1, TimeUnit.SECONDS);
 		SlackReplyEvent slackReply = handle.getSlackReply();
 		if(slackReply == null) {
