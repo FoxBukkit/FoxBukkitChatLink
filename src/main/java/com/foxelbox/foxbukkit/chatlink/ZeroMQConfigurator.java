@@ -35,6 +35,9 @@ public class ZeroMQConfigurator {
         for(int i = 0; i < values.length; i += 2) {
             String cValue = values[i + 1];
             switch(values[i].toLowerCase()) {
+                case "mdns":
+                    new ZeroMQConfigurator(socket, serviceType, serviceName);
+                    break;
                 case "connect":
                     socket.connect(cValue);
                     break;
