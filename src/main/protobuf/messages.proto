@@ -12,6 +12,8 @@ enum TargetType {
     ALL = 0;
     PLAYER = 1;
     PERMISSION = 2;
+    SLACKUSER = 3;
+    SERVER = 4;
 }
 
 message ChatMessageOut {
