@@ -204,15 +204,18 @@ public class ChatMessageOut {
             builder.setServer(server);
         }
         if(from != null) {
-            builder.setFromUuid(from.uuid.toString());
-            builder.setFromName(from.name);
+            builder.setFrom(Messages.UserInfo.newBuilder()
+                    .setUuid(from.uuid.toString())
+                    .setName(from.name));
         }
         if(to != null && to.type != Messages.TargetType.ALL) {
-            builder.setToType(to.type);
-            builder.clearToFilter();
+            Messages.MessageTarget.Builder toBuilder = Messages.MessageTarget.newBuilder()
+                    .setType(to.type);
+            toBuilder.clearFilter();
             for(String s : to.filter) {
-                builder.addToFilter(s);
+                toBuilder.addFilter(s);
             }
+            builder.setTo(toBuilder);
         }
 
         builder.setId(id);
@@ -237,10 +240,16 @@ public class ChatMessageOut {
         ChatMessageOut ret = new ChatMessageOut();
 
         ret.server = message.getServer();
-        ret.from = new UserInfo(UUID.fromString(message.getFromUuid()), message.getFromName());
+        if(message.getFrom() != null) {
+            ret.from = new UserInfo(UUID.fromString(message.getFrom().getUuid()), message.getFrom().getName());
+        }
 
-        List<String> filterTo = message.getToFilterList();
-        ret.to = new MessageTarget(message.getToType(), filterTo.toArray(new String[filterTo.size()]));
+        if(message.getTo() != null) {
+            List<String> filterTo = message.getTo().getFilterList();
+            ret.to = new MessageTarget(message.getTo().getType(), filterTo.toArray(new String[filterTo.size()]));
+        } else {
+            ret.to = new MessageTarget(Messages.TargetType.ALL, null);
+        }
 
         ret.id = message.getId();
         ret.timestamp = message.getTimestamp();

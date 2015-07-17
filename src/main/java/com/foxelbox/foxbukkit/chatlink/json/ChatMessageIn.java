@@ -38,8 +38,9 @@ public class ChatMessageIn {
             builder.setServer(server);
         }
         if(from != null) {
-            builder.setFromUuid(from.uuid.toString());
-            builder.setFromName(from.name);
+            builder.setFrom(Messages.UserInfo.newBuilder()
+                    .setUuid(from.uuid.toString())
+                    .setName(from.name));
         }
 
         builder.setTimestamp(timestamp);
@@ -60,7 +61,9 @@ public class ChatMessageIn {
         ChatMessageIn ret = new ChatMessageIn();
 
         ret.server = message.getServer();
-        ret.from = new UserInfo(UUID.fromString(message.getFromUuid()), message.getFromName());
+        if(message.getFrom() != null) {
+            ret.from = new UserInfo(UUID.fromString(message.getFrom().getUuid()), message.getFrom().getName());
+        }
 
         ret.timestamp = message.getTimestamp();
 
