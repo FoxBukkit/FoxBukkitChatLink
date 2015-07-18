@@ -17,8 +17,8 @@ enum TargetType {
 }
 
 message UUID {
-    required int64 msb = 1;
-    required int64 lsb = 2;
+    required sint64 msb = 1;
+    required sint64 lsb = 2;
 }
 
 message UserInfo {
