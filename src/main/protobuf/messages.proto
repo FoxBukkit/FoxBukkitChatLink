@@ -1,11 +1,11 @@
 package com.foxelbox.foxbukkit.chatlink;
 
 enum MessageType {
-    BLANK = 0;
-    TEXT = 1;
+    TEXT = 0;
+    BLANK = 1;
     KICK = 2;
-    PLAYERSTATE = 4;
-    INJECT = 5;
+    PLAYERSTATE = 3;
+    INJECT = 4;
 }
 
 enum TargetType {
