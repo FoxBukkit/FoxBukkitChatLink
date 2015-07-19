@@ -115,7 +115,9 @@ public class ChatQueueHandler {
 		synchronized (messageQueue) {
 			messageQueue.add(msg);
 		}
-		senderThread.notify();
+		synchronized (senderThread) {
+			senderThread.notify();
+		}
 
 		Main.slackHandler.sendMessage(message);
 	}
