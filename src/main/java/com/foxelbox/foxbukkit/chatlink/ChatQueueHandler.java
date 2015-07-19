@@ -80,7 +80,9 @@ public class ChatQueueHandler {
 					}
 					if(message == null) {
 						try {
-							wait();
+							synchronized (this) {
+								wait();
+							}
 						} catch (InterruptedException e) {
 							return;
 						}
