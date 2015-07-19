@@ -325,7 +325,9 @@ public class SlackHandler implements SlackMessagePostedListener {
 		synchronized (slackMessageQueue) {
 			slackMessageQueue.add(new SlackMessage(channel, message, asPlayer));
 		}
-		senderThread.notify();
+		synchronized (senderThread) {
+			senderThread.notify();
+		}
 	}
 
 	private void _sendToSlack(SlackMessage message) throws IOException {
