@@ -44,10 +44,11 @@ public class ConvCommand extends ICommand {
 
     public static boolean handleConvMessage(ChatMessageIn messageIn, String formattedName, String messageText, boolean isEmote) {
         UUID targetUUID = conversationMap.get(messageIn.from.uuid);
-        if(targetUUID == null)
+        if(targetUUID == null) {
             return false;
+        }
 
-        Player target = Player.getPlayerFromMessage(messageIn);
+        Player target = new Player(targetUUID);
 
         if(!target.isOnline()) {
 			ChatMessageOut message = makeError(messageIn, "Conversation target is not online");
