@@ -44,6 +44,9 @@ public class ChatQueueHandler {
 
 	public ChatQueueHandler() {
 		sender = Main.zmqContext.socket(ZMQ.PUB);
+		sender.setSendTimeOut(5000);
+		sender.setImmediate(true);
+		sender.setLinger(0);
 		ZeroMQConfigurator.parseZeroMQConfig(
 				Main.configuration.getValue("zmq-link2server", "announce;5558"),
 				sender,
@@ -51,6 +54,8 @@ public class ChatQueueHandler {
 				Main.configuration.getValue("zmq-mdns-link2server", "default"));
 
 		receiver = Main.zmqContext.socket(ZMQ.PULL);
+		receiver.setImmediate(true);
+		receiver.setLinger(0);
 		ZeroMQConfigurator.parseZeroMQConfig(
 				Main.configuration.getValue("zmq-server2link", "announce;5557"),
 				receiver,
