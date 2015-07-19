@@ -37,6 +37,8 @@ public class Main {
 
 	public static ZMQ.Context zmqContext;
 
+	public static ChatQueueHandler chatQueueHandler;
+
 	public static void main(String[] args) throws IOException {
 		configuration = new Configuration(getDataFolder());
 		redisManager = new RedisManager(new SimpleThreadCreator(), configuration);
@@ -47,7 +49,7 @@ public class Main {
 
 		slackHandler = new SlackHandler(configuration);
 
-		new ChatQueueHandler();
+		chatQueueHandler = new ChatQueueHandler();
 
 		System.out.println("READY");
 

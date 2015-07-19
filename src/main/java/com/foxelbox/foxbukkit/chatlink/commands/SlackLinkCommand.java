@@ -43,12 +43,12 @@ public class SlackLinkCommand extends ICommand {
 
 					message.setContentsPlain("\u00a75[FBCL]\u00a7f Visit Slack to complete your account linking.");
 					message.finalizeContext = true;
-					ChatQueueHandler.sendMessage(message);
+					Main.chatQueueHandler.sendMessage(message);
 				} catch(CommandException e) {
-					ChatQueueHandler.sendMessage(makeError(messageIn, e.getMessage()));
+					Main.chatQueueHandler.sendMessage(makeError(messageIn, e.getMessage()));
 				} catch(Exception e) {
 					e.printStackTrace();
-					ChatQueueHandler.sendMessage(makeError(messageIn, "Please try again later."));
+					Main.chatQueueHandler.sendMessage(makeError(messageIn, "Please try again later."));
 				}
 			}
 		}.start();

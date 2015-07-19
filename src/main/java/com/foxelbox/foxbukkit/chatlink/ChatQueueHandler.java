@@ -24,6 +24,8 @@ import com.foxelbox.foxbukkit.chatlink.json.ChatMessageOut;
 import com.foxelbox.foxbukkit.chatlink.util.PlayerHelper;
 import org.zeromq.ZMQ;
 
+import java.util.Queue;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.regex.Pattern;
 
 public class ChatQueueHandler {
@@ -34,8 +36,11 @@ public class ChatQueueHandler {
 	public static final String JOIN_FORMAT = "<color name=\"dark_green\">[+]</color> " + PLAYER_FORMAT + " <color name=\"yellow\">joined!</color>";
 	private static final Pattern REMOVE_DISALLOWED_CHARS = Pattern.compile("[\u00a7\r\n\t]");
 
-	private static ZMQ.Socket sender;
+	private final ZMQ.Socket sender;
 	private final ZMQ.Socket receiver;
+
+	private final Thread senderThread;
+	private final Queue<byte[]> messageQueue = new LinkedBlockingQueue<>();
 
 	public ChatQueueHandler() {
 		sender = Main.zmqContext.socket(ZMQ.PUB);
@@ -64,9 +69,34 @@ public class ChatQueueHandler {
 		t.setDaemon(true);
 		t.setName("ZMQ REP");
 		t.start();
+
+		senderThread = new Thread() {
+			@Override
+			public void run() {
+				while(!Thread.currentThread().isInterrupted()) {
+					final byte[] message;
+					synchronized (messageQueue) {
+						message = messageQueue.poll();
+					}
+					if(message == null) {
+						try {
+							wait();
+						} catch (InterruptedException e) {
+							return;
+						}
+						continue;
+					}
+					sender.send(CMO, ZMQ.SNDMORE);
+					sender.send(message, 0);
+				}
+			}
+		};
+		senderThread.setDaemon(true);
+		senderThread.setName("ZMQ PUB");
+		senderThread.start();
 	}
 
-	public static void incomingMessage(final ChatMessageIn chatMessageIn) {
+	public void incomingMessage(final ChatMessageIn chatMessageIn) {
 		final ChatMessageOut message = formatMessage(chatMessageIn);
 
 		if(message == null)
@@ -79,13 +109,13 @@ public class ChatQueueHandler {
 
 	private final static byte[] CMO = "CMO".getBytes();
 
-	public static void sendMessage(ChatMessageOut message) {
+	public void sendMessage(ChatMessageOut message) {
 		final byte[] msg = message.toProtoBuf().toByteArray();
 
-		synchronized (sender) {
-			sender.send(CMO, ZMQ.SNDMORE);
-			sender.send(msg, 0);
+		synchronized (messageQueue) {
+			messageQueue.add(msg);
 		}
+		senderThread.notify();
 
 		Main.slackHandler.sendMessage(message);
 	}

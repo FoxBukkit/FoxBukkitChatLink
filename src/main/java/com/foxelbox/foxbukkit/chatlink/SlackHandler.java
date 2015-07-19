@@ -66,11 +66,14 @@ public class SlackHandler implements SlackMessagePostedListener {
 	final private SlackSession session;
 	final private String slackAuthToken;
 
+	private final Thread senderThread;
+
 	public SlackHandler(Configuration configuration) throws IllegalArgumentException, IOException {
 		slackAuthToken = configuration.getValue("slack-token", "");
 		if(slackAuthToken.equals("")) {
 			System.err.println("configuration: slack-token undefined. SLACK DISABLED");
 			session = null;
+			senderThread = null;
 			return;
 		}
 
@@ -78,7 +81,7 @@ public class SlackHandler implements SlackMessagePostedListener {
 		session.addMessagePostedListener(this);
 		session.connect();
 
-		Thread t = new Thread() {
+		senderThread = new Thread() {
 			@Override
 			public void run() {
 				while(!Thread.currentThread().isInterrupted()) {
@@ -88,8 +91,10 @@ public class SlackHandler implements SlackMessagePostedListener {
 					}
 					if(message == null) {
 						try {
-							Thread.sleep(100);
-						} catch (Exception e) { }
+							wait();
+						} catch (InterruptedException e) {
+							return;
+						}
 						continue;
 					}
 					try {
@@ -100,9 +105,9 @@ public class SlackHandler implements SlackMessagePostedListener {
 				}
 			}
 		};
-		t.setDaemon(true);
-		t.setName("SlackSender");
-		t.start();
+		senderThread.setDaemon(true);
+		senderThread.setName("SlackSender");
+		senderThread.start();
 	}
 
 	@Override
@@ -153,7 +158,7 @@ public class SlackHandler implements SlackMessagePostedListener {
 			messageIn.contents = "#" + messageIn.contents;
 		}
 
-		ChatQueueHandler.incomingMessage(messageIn);
+		Main.chatQueueHandler.incomingMessage(messageIn);
 	}
 
 	public void sendMessage(ChatMessageOut message) {
@@ -320,6 +325,7 @@ public class SlackHandler implements SlackMessagePostedListener {
 		synchronized (slackMessageQueue) {
 			slackMessageQueue.add(new SlackMessage(channel, message, asPlayer));
 		}
+		senderThread.notify();
 	}
 
 	private void _sendToSlack(SlackMessage message) throws IOException {

@@ -82,7 +82,7 @@ public class Player {
         messageOut.type = Messages.MessageType.KICK;
         messageOut.to.type = Messages.TargetType.PLAYER;
         messageOut.to.filter = new String[] { uuid.toString() };
-        ChatQueueHandler.sendMessage(messageOut);
+        Main.chatQueueHandler.sendMessage(messageOut);
         showKickMessage(reason, force);
     }
 
@@ -92,7 +92,7 @@ public class Player {
         messageOut.type = Messages.MessageType.INJECT;
         messageOut.to.type = Messages.TargetType.PLAYER;
         messageOut.to.filter = new String[] { uuid.toString() };
-        ChatQueueHandler.sendMessage(messageOut);
+        Main.chatQueueHandler.sendMessage(messageOut);
     }
 
     public void showKickMessage(String reason, boolean force) {
@@ -101,7 +101,7 @@ public class Player {
             messageOut.setContents(ChatQueueHandler.KICK_FORMAT, new String[]{
                     name, uuid.toString(), PlayerHelper.getFullPlayerName(uuid, name), reason
             });
-            ChatQueueHandler.sendMessage(messageOut);
+            Main.chatQueueHandler.sendMessage(messageOut);
         }
     }
 

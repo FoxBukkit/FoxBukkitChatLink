@@ -52,9 +52,9 @@ public class MCLinkCommand extends ICommand {
 
                     message.setContentsPlain("\u00a75[FBCL]\u00a7f Go here to complete: " + link);
 					message.finalizeContext = true;
-                    ChatQueueHandler.sendMessage(message);
+                    Main.chatQueueHandler.sendMessage(message);
                 } catch(Exception e) {
-                    ChatQueueHandler.sendMessage(makeError(messageIn, "Please try again later"));
+                    Main.chatQueueHandler.sendMessage(makeError(messageIn, "Please try again later"));
                 }
             }
         }.start();

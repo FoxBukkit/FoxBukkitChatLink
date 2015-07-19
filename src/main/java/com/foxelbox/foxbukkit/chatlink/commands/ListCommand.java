@@ -17,6 +17,7 @@
 package com.foxelbox.foxbukkit.chatlink.commands;
 
 import com.foxelbox.foxbukkit.chatlink.ChatQueueHandler;
+import com.foxelbox.foxbukkit.chatlink.Main;
 import com.foxelbox.foxbukkit.chatlink.Player;
 import com.foxelbox.foxbukkit.chatlink.bans.BanResolver;
 import com.foxelbox.foxbukkit.chatlink.bans.LogEntry;
@@ -46,15 +47,15 @@ public class ListCommand extends ICommand {
 			ChatMessageOut reply = makeReply(messageIn);
 
 			reply.setContentsPlain("\u00a75[FBCL]\u00a7f Name: " + target.getName());
-			ChatQueueHandler.sendMessage(reply);
+			Main.chatQueueHandler.sendMessage(reply);
 
 			reply.setContentsPlain("\u00a75[FBCL]\u00a7f Rank: " + PlayerHelper.getPlayerRank(target.getUniqueId()));
-			ChatQueueHandler.sendMessage(reply);
+			Main.chatQueueHandler.sendMessage(reply);
 
 			reply.setContentsPlain("\u00a75[FBCL]\u00a7f NameTag: " + PlayerHelper.getFullPlayerName(target.getUniqueId(), target.getName()));
 
 			if(commandSender.hasPermission("foxbukkit.who.logdetails")) {
-				ChatQueueHandler.sendMessage(reply);
+				Main.chatQueueHandler.sendMessage(reply);
 				new Thread() {
 					public void run() {
 						ChatMessageOut reply = makeReply(messageIn);
@@ -66,7 +67,7 @@ public class ListCommand extends ICommand {
 						} else {
 							reply.setContentsPlain("\u00a75[FBCL]\u00a7f Last logout: " + DATE_FORMAT.format(logEntryLogout.getTime()));
 						}
-						ChatQueueHandler.sendMessage(reply);
+						Main.chatQueueHandler.sendMessage(reply);
 
 						if(logEntry == null) {
 							reply.setContentsPlain("\u00a75[FBCL]\u00a7f IP data not present");
@@ -74,7 +75,7 @@ public class ListCommand extends ICommand {
 							reply.setContentsPlain("\u00a75[FBCL]\u00a7f Last IP: " + logEntry.getIp().getHostAddress());
 						}
 						reply.finalizeContext = true;
-						ChatQueueHandler.sendMessage(reply);
+						Main.chatQueueHandler.sendMessage(reply);
 					}
 				}.start();
 				return null;
@@ -99,7 +100,7 @@ public class ListCommand extends ICommand {
 				listText = "\u00a7f" + listTextB.substring(4);
 			}
 			message.setContents(LIST_FORMAT, new String[]{server, listText});
-			ChatQueueHandler.sendMessage(message);
+			Main.chatQueueHandler.sendMessage(message);
 		}
 
 		return makeBlank(messageIn);
