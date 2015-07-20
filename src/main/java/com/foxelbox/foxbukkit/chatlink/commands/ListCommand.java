@@ -29,6 +29,7 @@ import com.foxelbox.foxbukkit.chatlink.util.Utils;
 
 import java.text.SimpleDateFormat;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -97,7 +98,7 @@ public class ListCommand extends ICommand {
 				for(Player ply : PlayerHelper.getOnlinePlayersOnServer(server)) {
 					names.add(PlayerHelper.getPlayerRankTagRaw(ply.getUniqueId()) + ply.getName());
 				}
-				Collections.sort(names);
+				Collections.sort(names, new NameComparator());
 
 				listText = Utils.joinList(names, "\u00a7f, ");
 			}
@@ -106,5 +107,15 @@ public class ListCommand extends ICommand {
 		}
 
 		return makeBlank(messageIn);
+	}
+
+	private static class NameComparator implements Comparator<String> {
+		@Override
+		public int compare(String a, String b) {
+			final String strippedA = PlayerHelper.stripColor(a);
+			final String strippedB = PlayerHelper.stripColor(b);
+
+			return strippedA.compareToIgnoreCase(strippedB);
+		}
 	}
 }
