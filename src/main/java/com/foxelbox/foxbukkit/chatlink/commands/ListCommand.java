@@ -16,7 +16,6 @@
  */
 package com.foxelbox.foxbukkit.chatlink.commands;
 
-import com.foxelbox.foxbukkit.chatlink.ChatQueueHandler;
 import com.foxelbox.foxbukkit.chatlink.Main;
 import com.foxelbox.foxbukkit.chatlink.Player;
 import com.foxelbox.foxbukkit.chatlink.bans.BanResolver;
@@ -26,8 +25,11 @@ import com.foxelbox.foxbukkit.chatlink.json.ChatMessageIn;
 import com.foxelbox.foxbukkit.chatlink.json.ChatMessageOut;
 import com.foxelbox.foxbukkit.chatlink.util.CommandException;
 import com.foxelbox.foxbukkit.chatlink.util.PlayerHelper;
+import com.foxelbox.foxbukkit.chatlink.util.Utils;
 
 import java.text.SimpleDateFormat;
+import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 @ICommand.Names({"who", "list"})
@@ -86,18 +88,18 @@ public class ListCommand extends ICommand {
 
 		ChatMessageOut message = makeReply(messageIn);
 		for(String server : PlayerHelper.getAllServers()) {
-			StringBuilder listTextB = new StringBuilder();
 			List<Player> players = PlayerHelper.getOnlinePlayersOnServer(server);
 			String listText;
 			if(players.isEmpty()) {
 				listText = "\u00a7fEmpty";
 			} else {
+				final List<String> names = new LinkedList<>();
 				for(Player ply : PlayerHelper.getOnlinePlayersOnServer(server)) {
-					listTextB.append("\u00a7f, ");
-					listTextB.append(PlayerHelper.getPlayerRankTagRaw(ply.getUniqueId()));
-					listTextB.append(ply.getName());
+					names.add(PlayerHelper.getPlayerRankTagRaw(ply.getUniqueId()) + ply.getName());
 				}
-				listText = "\u00a7f" + listTextB.substring(4);
+				Collections.sort(names);
+
+				listText = Utils.joinList(names, "\u00a7f, ");
 			}
 			message.setContents(LIST_FORMAT, new String[]{server, listText});
 			Main.chatQueueHandler.sendMessage(message);
