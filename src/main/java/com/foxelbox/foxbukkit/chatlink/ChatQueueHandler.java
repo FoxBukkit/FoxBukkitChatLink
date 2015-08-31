@@ -195,6 +195,10 @@ public class ChatQueueHandler {
 					if(ConvCommand.handleConvMessage(messageIn, formattedName, messageStr, false)) {
 						return null;
 					}
+					
+					if(!sender.hasPermission("foxbukkit.communication.chat")) {
+						return null;
+					}
 
 					return runFormatAndStore(messageIn, MESSAGE_FORMAT, new String[]{plyN, messageIn.from.uuid.toString(), formattedName, messageStr});
 				}
