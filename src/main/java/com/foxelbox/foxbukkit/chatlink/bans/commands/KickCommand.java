@@ -44,7 +44,7 @@ public class KickCommand extends ICommand {
         ChatMessageOut reply = makeReply(messageIn);
         reply.to.type = Messages.TargetType.ALL;
         reply.to.filter = null;
-        reply.setContentsPlain(messageIn.from.name + " kicked " + otherPly.getName());
+        reply.setContentsPlain("\u00a75[FBCL]\u00a7f " + messageIn.from.name + " kicked " + otherPly.getName());
         return reply;
     }
 }
