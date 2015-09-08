@@ -34,22 +34,14 @@ import java.util.UUID;
 @ICommand.Permission("foxbukkit.users.setrank")
 public class SetRankCommand extends ICommand {
 	@Override
-    public ChatMessageOut run(Player commandSender, ChatMessageIn messageIn, String formattedName, String[] args) throws CommandException {
-        args = parseFlags(args);
+	public ChatMessageOut run(Player commandSender, ChatMessageIn messageIn, String formattedName, String[] args) throws CommandException {
+		args = parseFlags(args);
 
 		String otherName = args[0];
 		Player otherPly = new Player(UUID.fromString(PlayerHelper.playerNameToUUID.get(args[0].toLowerCase())));
 		String newRank = args[1];
 		String oldRank = PlayerHelper.getPlayerRank(otherPly.getUniqueId());
 		
-		if(oldRank.equalsIgnoreCase("banned")) {
-			throw new CommandException("Player is banned! /unban first!");
-		}
-		
-		if(newRank.equalsIgnoreCase("banned")) {
-			throw new CommandException("Please use /ban to ban people!");
-		}
-
 		if (newRank.equalsIgnoreCase(oldRank))
 			throw new CommandException("Player already has that rank!");
 
@@ -61,11 +53,13 @@ public class SetRankCommand extends ICommand {
 		int oldlvl = otherPly.getLevel();
 		int newlvl = PlayerHelper.getRankLevel(newRank);
 
-		if(selflvl <= oldlvl)
+		if(selflvl <= oldlvl) {
 			throw new PermissionDeniedException();
+		}
 
-		if(selflvl <= newlvl)
+		if(selflvl <= newlvl) {
 			throw new PermissionDeniedException();
+		}
 
 		int opLvl = PlayerHelper.getRankLevel("op");
 
