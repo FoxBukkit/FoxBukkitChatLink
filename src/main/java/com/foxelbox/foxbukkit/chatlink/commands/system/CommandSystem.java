@@ -86,16 +86,13 @@ public class CommandSystem {
 				if(!icmd.canPlayerUseCommand(player))
                     throw new PermissionDeniedException();
 
-				if(needsLogging(player, icmd))
-				{
-					String logmsg = "FBCL Command: " + playerName + ": "  + cmd + " " + argStr;
-                    System.err.println(logmsg);
+				if(needsLogging(player, icmd)) {
+                    System.err.println("Command: " + playerName + ": "  + cmd + " " + argStr);
 				}
 				return icmd.run(sender, message, PlayerHelper.getFullPlayerName(message.from.uuid, message.from.name), argStr.trim());
 			}
 			catch (PermissionDeniedException e) {
-				String logmsg = "FBCL Command denied: " + playerName + ": "  + cmd + " " + argStr;
-				System.err.println(logmsg);
+				System.err.println("Command denied: " + playerName + ": "  + cmd + " " + argStr);
                 return ICommand.makeError(message, e.getMessage());
 			}
 			catch (CommandException e) {

@@ -200,6 +200,8 @@ public class ChatQueueHandler {
 						return null;
 					}
 
+					System.err.println("<" + plyN + "> "  + messageStr);
+
 					return runFormatAndStore(messageIn, MESSAGE_FORMAT, new String[]{plyN, messageIn.from.uuid.toString(), formattedName, messageStr});
 				}
 		}
