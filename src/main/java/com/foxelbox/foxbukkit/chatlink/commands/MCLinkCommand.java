@@ -54,6 +54,7 @@ public class MCLinkCommand extends ICommand {
 					message.finalizeContext = true;
                     Main.chatQueueHandler.sendMessage(message);
                 } catch(Exception e) {
+                    e.printStackTrace();
                     Main.chatQueueHandler.sendMessage(makeError(messageIn, "Please try again later"));
                 }
             }
