@@ -59,7 +59,7 @@ public class IPInfoCommand extends ICommand {
         final String ip; final Player target;
         if(args[0].equalsIgnoreCase("[IP]")) {
             target = null;
-            ip = args[0];
+            ip = args[1];
         } else {
             target = PlayerHelper.matchPlayerSingle(args[0], false);
             ip = null;
@@ -67,6 +67,8 @@ public class IPInfoCommand extends ICommand {
 
         new Thread() {
             public void run() {
+                final HashMap<String,String> ipInfo = new HashMap<>();
+
                 final InetAddress ipAddress;
                 if (target != null) {
                     final LogEntry logEntry = BanResolver.getLatestEntry(target.getName(), target.getUniqueId(), null, messageIn.server);
@@ -75,6 +77,8 @@ public class IPInfoCommand extends ICommand {
                         sendError(messageIn);
                         return;
                     }
+
+                    ipInfo.put("Username", target.getName());
 
                     ipAddress = logEntry.getIp();
                 } else {
@@ -88,8 +92,6 @@ public class IPInfoCommand extends ICommand {
 
                 final String ip = ipAddress.getHostAddress();
                 final String host = ipAddress.getCanonicalHostName();
-
-                final HashMap<String,String> ipInfo = new HashMap<>();
 
                 ipInfo.put("IP", ip);
                 ipInfo.put("Host", host);
