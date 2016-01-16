@@ -58,11 +58,11 @@ public class IPInfoCommand extends ICommand {
     public ChatMessageOut run(final Player commandSender, final ChatMessageIn messageIn, String formattedName, String[] args) throws CommandException {
         final String ip; final Player target;
         if(args[0].equalsIgnoreCase("[IP]")) {
-            target = PlayerHelper.matchPlayerSingle(args[0], false);
-            ip = null;
-        } else {
             target = null;
             ip = args[0];
+        } else {
+            target = PlayerHelper.matchPlayerSingle(args[0], false);
+            ip = null;
         }
 
         new Thread() {
