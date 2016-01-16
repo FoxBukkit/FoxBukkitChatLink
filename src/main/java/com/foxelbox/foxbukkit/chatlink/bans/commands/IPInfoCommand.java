@@ -101,7 +101,7 @@ public class IPInfoCommand extends ICommand {
                     JSONObject obj = (JSONObject)parser.parse(new InputStreamReader(is));
 
                     ipInfo.put("Location", obj.get("country_name") + " (" + obj.get("city") + ")");
-                    ipInfo.put("OS", obj.get("os").toString());
+                    ipInfo.put("OS", "" + obj.get("os"));
 
                     ipInfo.put("Open ports", ((JSONArray)obj.get("ports")).toJSONString());
 
@@ -116,7 +116,7 @@ public class IPInfoCommand extends ICommand {
                 Main.chatQueueHandler.sendMessage(reply);
 
                 for(Map.Entry<String, String> e : ipInfo.entrySet()) {
-                    reply.setContentsPlain("\u00a7d[FBCL]\u00a7f " + e.getKey() + ": " + e.getValue());
+                    reply.setContentsPlain("\u00a75[FBCL]\u00a7f " + e.getKey() + ": " + e.getValue());
                     Main.chatQueueHandler.sendMessage(reply);
                 }
 
