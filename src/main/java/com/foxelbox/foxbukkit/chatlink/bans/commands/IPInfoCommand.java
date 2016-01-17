@@ -86,7 +86,7 @@ public class IPInfoCommand extends ICommand {
                         return;
                     }
 
-                    final String altList = BanResolver.makePossibleAltString(target.getName(), target.getUniqueId());
+                    final String altList = BanResolver.makePossibleAltString(target.getName(), target.getUniqueId(), true);
 
                     ipInfo.put("Username", target.getName());
                     ipInfo.put("Alts", altList);

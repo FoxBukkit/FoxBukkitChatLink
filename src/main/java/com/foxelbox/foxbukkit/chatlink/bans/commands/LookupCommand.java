@@ -55,7 +55,7 @@ public class LookupCommand extends ICommand {
 				}
 				Main.chatQueueHandler.sendMessage(messageOut);
 
-				final String altList = BanResolver.makePossibleAltString(user, uuid);
+				final String altList = BanResolver.makePossibleAltString(user, uuid, false);
 				if (altList != null) {
 					messageOut.setContentsPlain("\u00a75[FBCL]\u00a7f " + altList);
 				} else {

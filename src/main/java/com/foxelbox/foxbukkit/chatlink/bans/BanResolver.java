@@ -93,7 +93,7 @@ public class BanResolver {
 		}
 	}
 
-	public static String makePossibleAltString(String user, UUID uuid) {
+	public static String makePossibleAltString(String user, UUID uuid, boolean raw) {
 		final Collection<BanPlayer> alts = getPossibleAltsForPlayer(user, uuid);
 		if(alts == null || alts.isEmpty())
 			return null;
@@ -120,10 +120,15 @@ public class BanResolver {
 			sb.append(alt.name);
 		}
 
-		if (hasBans)
+		if (raw) {
+			return sb.toString();
+		}
+
+		if (hasBans) {
 			return String.format("%1$s has some banned possible alts: %2$s", user, sb);
-		else
+		} else {
 			return String.format("Possible alts of %1$s: %2$s", user, sb);
+		}
 	}
 
 	public static Collection<BanPlayer> getPossibleAltsForPlayer(String username, UUID uuid) {
