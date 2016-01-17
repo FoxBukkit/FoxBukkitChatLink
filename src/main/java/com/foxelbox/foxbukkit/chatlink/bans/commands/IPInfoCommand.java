@@ -54,6 +54,14 @@ public class IPInfoCommand extends ICommand {
         Main.chatQueueHandler.sendMessage(reply);
     }
 
+    private static void pushQueue(ChatMessageOut reply, HashMap<String,String> ipInfo) {
+        for(Map.Entry<String, String> e : ipInfo.entrySet()) {
+            reply.setContentsPlain("\u00a75[FBCL]\u00a7f " + e.getKey() + ": " + e.getValue());
+            Main.chatQueueHandler.sendMessage(reply);
+        }
+        ipInfo.clear();
+    }
+
     @Override
     public ChatMessageOut run(final Player commandSender, final ChatMessageIn messageIn, String formattedName, String[] args) throws CommandException {
         final String ip; final Player target;
@@ -78,23 +86,36 @@ public class IPInfoCommand extends ICommand {
                         return;
                     }
 
+                    final String altList = BanResolver.makePossibleAltString(target.getName(), target.getUniqueId());
+
                     ipInfo.put("Username", target.getName());
+                    ipInfo.put("Alts", altList);
 
                     ipAddress = logEntry.getIp();
-                } else {
+                } else if(ip != null) {
                     try {
                         ipAddress = InetAddress.getByName(ip);
                     } catch (UnknownHostException e) {
                         sendError(messageIn);
                         return;
                     }
+                } else {
+                    sendError(messageIn);
+                    return;
                 }
+
+                ChatMessageOut reply = makeReply(messageIn);
+                reply.finalizeContext = false;
+                reply.setContentsPlain("\u00a7d[FBCL]\u00a7f --- START ---");
+                Main.chatQueueHandler.sendMessage(reply);
 
                 final String ip = ipAddress.getHostAddress();
                 final String host = ipAddress.getCanonicalHostName();
 
                 ipInfo.put("IP", ip);
                 ipInfo.put("Host", host);
+
+                pushQueue(reply, ipInfo);
 
                 try {
                     URLConnection conn = new URL("https://api.shodan.io/shodan/host/" + ip + "?minify=True&key=" + SHODAN_API_KEY).openConnection();
@@ -114,15 +135,12 @@ public class IPInfoCommand extends ICommand {
                     e.printStackTrace();
                 }
 
-                ChatMessageOut reply = makeReply(messageIn);
-                reply.finalizeContext = false;
-                reply.setContentsPlain("\u00a7d[FBCL]\u00a7f --- START ---");
-                Main.chatQueueHandler.sendMessage(reply);
-
                 for(Map.Entry<String, String> e : ipInfo.entrySet()) {
                     reply.setContentsPlain("\u00a75[FBCL]\u00a7f " + e.getKey() + ": " + e.getValue());
                     Main.chatQueueHandler.sendMessage(reply);
                 }
+
+                pushQueue(reply, ipInfo);
 
                 reply.finalizeContext = true;
                 reply.setContentsPlain("\u00a7d[FBCL]\u00a7f ---- END ----");
