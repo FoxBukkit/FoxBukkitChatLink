@@ -135,11 +135,6 @@ public class IPInfoCommand extends ICommand {
                     e.printStackTrace();
                 }
 
-                for(Map.Entry<String, String> e : ipInfo.entrySet()) {
-                    reply.setContentsPlain("\u00a75[FBCL]\u00a7f " + e.getKey() + ": " + e.getValue());
-                    Main.chatQueueHandler.sendMessage(reply);
-                }
-
                 pushQueue(reply, ipInfo);
 
                 reply.finalizeContext = true;
