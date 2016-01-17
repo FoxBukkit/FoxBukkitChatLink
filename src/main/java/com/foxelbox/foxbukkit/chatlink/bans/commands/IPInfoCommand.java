@@ -107,6 +107,8 @@ public class IPInfoCommand extends ICommand {
 
                     ipInfo.put("Open ports", ((JSONArray)obj.get("ports")).toJSONString());
 
+                    ipInfo.put("Shodan", "https://www.shodan.io/host/" + ip);
+
                     is.close();
                 } catch (IOException|ParseException|RuntimeException e) {
                     e.printStackTrace();
