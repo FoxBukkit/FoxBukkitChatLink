@@ -82,7 +82,7 @@ public class MessageHelper {
 
 	public static String button(String command, String label, String color, boolean run) {
 		final String eventType = run ? "run_command" : "suggest_command";
-		return String.format("<color name=\"%3$s\" onClick=\"%4$s('%1$s')\" onHover=\"show_text('%1$s')\">[%2$s]</color>", escape(command), escape(label), escape(color), eventType);
+		return String.format("<color name=\"%3$s\"><span onClick=\"%4$s('%1$s')\" onHover=\"show_text('%1$s')\">[%2$s]</span></color>", escape(command), escape(label), escape(color), eventType);
 	}
 
 	public static ChatMessageOut sendServerMessage(String format, String... params) {
