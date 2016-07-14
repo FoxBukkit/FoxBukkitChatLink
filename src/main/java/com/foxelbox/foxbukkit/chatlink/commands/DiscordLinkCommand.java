@@ -17,12 +17,12 @@ public class DiscordLinkCommand extends ICommand {
     @Override
     public ChatMessageOut run(Player commandSender, ChatMessageIn messageIn, String formattedName, String[] args) throws CommandException {
         if(args.length != 1) {
-            throw new CommandException("Invalid discord link code");
+            throw new CommandException("Invalid discord link code parameters");
         }
 
         String[] split = args[0].split("_");
         if(split.length != 2) {
-            throw new CommandException("Invalid discord link code");
+            throw new CommandException("Invalid discord link code format");
         }
 
         final String discordId = split[0];
@@ -32,6 +32,7 @@ public class DiscordLinkCommand extends ICommand {
         correctHash.update(new byte[] { '_' });
         correctHash.update((discordId.getBytes()));
         if(gotHash != correctHash.getValue()) {
+            System.out.println("DiscordLink CRC32: Expected: " + correctHash.getValue() + ", got " + gotHash);
             throw new CommandException("Invalid discord link code");
         }
 
