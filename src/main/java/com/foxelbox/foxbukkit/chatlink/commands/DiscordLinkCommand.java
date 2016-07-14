@@ -20,28 +20,19 @@ public class DiscordLinkCommand extends ICommand {
             throw new CommandException("Invalid discord link code parameters");
         }
 
-        String[] split = args[0].split("_");
-        if(split.length != 2) {
-            throw new CommandException("Invalid discord link code format");
-        }
-
-        final String discordId = split[0];
-        long gotHash = Long.parseLong(split[1]);
-        CRC32 correctHash = new CRC32();
-        correctHash.update(Main.configuration.getValue("discord-hash-secret", "").getBytes());
-        correctHash.update(new byte[] { '|' });
-        correctHash.update((discordId.getBytes()));
-        if(gotHash != correctHash.getValue()) {
-            System.out.println("DiscordLink CRC32: Expected: " + correctHash.getValue() + ", got " + gotHash);
+        final String redisKey = "discordlink:key:" + args[0];
+        final String discordId = Main.redisManager.get(redisKey);
+        if(discordId == null || discordId.length() < 1) {
             throw new CommandException("Invalid discord link code");
         }
+        Main.redisManager.del(redisKey);
 
         Main.redisManager.hset("discordlinks:discord-to-mc", discordId, commandSender.getUniqueId().toString());
         Main.redisManager.hset("discordlinks:mc-to-discord", commandSender.getUniqueId().toString(), discordId);
 
         ChatMessageOut reply = new ChatMessageOut(messageIn);
         reply.finalizeContext = true;
-        reply.setContentsPlain("Accounts linked");
+        reply.setContentsPlain("\u00a75[FBCL]\u00a7f Accounts linked");
         return reply;
     }
 }
