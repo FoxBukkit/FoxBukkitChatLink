@@ -30,7 +30,9 @@ public class DiscordLinkCommand extends ICommand {
         Main.redisManager.hset("discordlinks:discord-to-mc", discordId, commandSender.getUniqueId().toString());
         Main.redisManager.hset("discordlinks:mc-to-discord", commandSender.getUniqueId().toString(), discordId);
 
-        ChatMessageOut reply = new ChatMessageOut(messageIn);
+        Main.redisManager.publish("playerRankUpdate", commandSender.getUniqueId().toString());
+
+        ChatMessageOut reply = makeReply(messageIn);
         reply.finalizeContext = true;
         reply.setContentsPlain("\u00a75[FBCL]\u00a7f Accounts linked");
         return reply;

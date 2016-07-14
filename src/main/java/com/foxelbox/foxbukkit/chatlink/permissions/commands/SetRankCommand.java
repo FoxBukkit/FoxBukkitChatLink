@@ -16,6 +16,7 @@
  */
 package com.foxelbox.foxbukkit.chatlink.permissions.commands;
 
+import com.foxelbox.foxbukkit.chatlink.Main;
 import com.foxelbox.foxbukkit.chatlink.Player;
 import com.foxelbox.foxbukkit.chatlink.commands.system.ICommand;
 import com.foxelbox.foxbukkit.chatlink.json.ChatMessageIn;
@@ -73,6 +74,8 @@ public class SetRankCommand extends ICommand {
 			throw new PermissionDeniedException();
 
         FoxBukkitPermissionHandler.instance.setGroup(otherPly.getUniqueId(), newRank);
+
+		Main.redisManager.publish("playerRankUpdate", commandSender.getUniqueId().toString());
 
         ChatMessageOut message = new ChatMessageOut(messageIn);
         message.setContentsPlain("\u00a75[FBCL]\u00a7f " + messageIn.from.name + " set rank of " + otherName + " to " + newRank);
