@@ -75,7 +75,7 @@ public class SetRankCommand extends ICommand {
 
         FoxBukkitPermissionHandler.instance.setGroup(otherPly.getUniqueId(), newRank);
 
-		Main.redisManager.publish("playerRankUpdate", commandSender.getUniqueId().toString());
+		Main.redisManager.publish("playerRankUpdate", otherPly.getUniqueId().toString());
 
         ChatMessageOut message = new ChatMessageOut(messageIn);
         message.setContentsPlain("\u00a75[FBCL]\u00a7f " + messageIn.from.name + " set rank of " + otherName + " to " + newRank);
