@@ -29,7 +29,7 @@ public class DiscordLinkCommand extends ICommand {
         long gotHash = Long.parseLong(split[1]);
         CRC32 correctHash = new CRC32();
         correctHash.update(Main.configuration.getValue("discord-hash-secret", "").getBytes());
-        correctHash.update(new byte[] { '_' });
+        correctHash.update(new byte[] { '|' });
         correctHash.update((discordId.getBytes()));
         if(gotHash != correctHash.getValue()) {
             System.out.println("DiscordLink CRC32: Expected: " + correctHash.getValue() + ", got " + gotHash);
