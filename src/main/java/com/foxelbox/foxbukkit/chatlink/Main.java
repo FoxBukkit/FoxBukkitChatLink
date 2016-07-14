@@ -33,8 +33,6 @@ public class Main {
 
 	public static RedisManager redisManager;
 
-	public static SlackHandler slackHandler;
-
 	public static ZMQ.Context zmqContext;
 
 	public static ChatQueueHandler chatQueueHandler;
@@ -46,8 +44,6 @@ public class Main {
 
 		CommandSystem.instance.scanCommands();
 		FoxBukkitPermissionHandler.instance.load();
-
-		slackHandler = new SlackHandler(configuration);
 
 		chatQueueHandler = new ChatQueueHandler();
 

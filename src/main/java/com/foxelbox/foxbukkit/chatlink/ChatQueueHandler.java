@@ -125,8 +125,6 @@ public class ChatQueueHandler {
 		synchronized (senderThread) {
 			senderThread.notify();
 		}
-
-		Main.slackHandler.sendMessage(message);
 	}
 
 	private static ChatMessageOut runFormatAndStore(ChatMessageIn messageIn, String format, String[] formatArgs) {
