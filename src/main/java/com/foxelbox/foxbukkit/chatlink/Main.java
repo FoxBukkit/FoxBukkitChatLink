@@ -54,7 +54,6 @@ public class Main {
 				while (true) {
 					try {
 						if (new File("FoxBukkitChatLink.jar.deploy").exists()) {
-							ZeroMQConfigurator.shutdown();
 							System.exit(0);
 							return;
 						}
@@ -74,7 +73,6 @@ public class Main {
 				Thread.sleep(200);
 			} catch (Exception e) { }
 		}
-		ZeroMQConfigurator.shutdown();
 		System.exit(0);
 	}
 

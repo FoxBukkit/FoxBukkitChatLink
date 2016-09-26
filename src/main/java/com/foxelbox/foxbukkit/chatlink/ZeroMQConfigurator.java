@@ -18,16 +18,8 @@ package com.foxelbox.foxbukkit.chatlink;
 
 import org.zeromq.ZMQ;
 
-import javax.jmdns.JmDNS;
-import javax.jmdns.ServiceEvent;
-import javax.jmdns.ServiceInfo;
-import javax.jmdns.ServiceListener;
-import java.io.IOException;
-import java.net.InetAddress;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Stack;
-import java.util.UUID;
 
 public class ZeroMQConfigurator {
     public static void parseZeroMQConfig(String config, ZMQ.Socket socket, String serviceType, String serviceName) {
@@ -35,25 +27,9 @@ public class ZeroMQConfigurator {
         for(int i = 0; i < values.length; i += 2) {
             String cValue = values[i + 1];
             switch(values[i].toLowerCase()) {
-                case "mdns":
-                    new ZeroMQConfigurator(socket, serviceType, serviceName);
-                    break;
                 case "connect":
                     socket.connect(cValue);
                     break;
-                case "announce":
-                    int port; boolean fallthrough = true;
-                    if(cValue.equalsIgnoreCase("random")) {
-                        port = socket.bindToRandomPort("tcp://*");
-                        fallthrough = false;
-                    } else {
-                        port = Integer.parseInt(cValue);
-                    }
-                    announceService(serviceType, serviceName, port);
-                    if(!fallthrough) {
-                        break;
-                    }
-                    cValue = "tcp://*:" + port;
                 case "bind":
                     socket.bind(cValue);
                     break;
@@ -67,93 +43,9 @@ public class ZeroMQConfigurator {
 
     private final ZMQ.Socket socket;
 
-    private static String formatDNS(String serviceType, String serviceName) {
-        return "_" + serviceName + "-" + serviceType + "._tcp.local.";
-    }
-
-    private static final Stack<ServiceInfo> services = new Stack<>();
-
-    public static void shutdown() {
-        synchronized (services) {
-            while (!services.empty()) {
-                jmDNS.unregisterService(services.pop());
-            }
-        }
-        jmDNS.unregisterAllServices();;
-        try {
-            jmDNS.close();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public static void announceService(final String serviceType, final String serviceName, final int port) {
-        new Thread() {
-            public void run() {
-                final String type = formatDNS(serviceType, serviceName);
-                try {
-                    final ServiceInfo info = ServiceInfo.create(type, IDENDITY, port, "me");
-                    synchronized (services) {
-                        services.add(info);
-                    }
-                    jmDNS.registerService(info);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-        }.start();
-    }
-
-    private static final String IDENDITY;
-    private static final JmDNS jmDNS;
-    static {
-        IDENDITY = Main.configuration.getValue("mdns-idendity", UUID.randomUUID().toString());
-        try {
-            jmDNS = JmDNS.create(InetAddress.getLocalHost(), IDENDITY);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     private HashMap<String, HashSet<String>> registeredHosts = new HashMap<>();
 
     public ZeroMQConfigurator(ZMQ.Socket _socket, String serviceType, final String serviceName) {
         this.socket = _socket;
-
-        final String type = formatDNS(serviceType, serviceName);
-        jmDNS.addServiceListener(type, new ServiceListener() {
-            @Override
-            public void serviceAdded(ServiceEvent serviceEvent) {
-
-            }
-
-            @Override
-            public void serviceRemoved(ServiceEvent serviceEvent) {
-                HashSet<String> hosts = registeredHosts.get(serviceEvent.getName());
-                if(hosts == null) {
-                    return;
-                }
-                for(String addr : hosts) {
-                    System.out.println("ZeroMQ: DISCONNECT: " + type + ": " + addr);
-                    socket.disconnect(addr);
-                }
-            }
-
-            @Override
-            public void serviceResolved(ServiceEvent serviceEvent) {
-                HashSet<String> hosts = registeredHosts.get(serviceEvent.getName());
-                if(hosts == null) {
-                    hosts = new HashSet<>();
-                    registeredHosts.put(serviceEvent.getName(), hosts);
-                }
-                final int port = serviceEvent.getInfo().getPort();
-                for(InetAddress address : serviceEvent.getInfo().getInetAddresses()) {
-                    String addr = "tcp://" + address.getHostAddress() + ":" + port;
-                    hosts.add(addr);
-                    System.out.println("ZeroMQ: CONNECT: " + type + ": " + addr);
-                    socket.connect(addr);
-                }
-            }
-        });
     }
 }
